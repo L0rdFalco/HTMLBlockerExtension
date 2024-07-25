@@ -15,6 +15,7 @@
     },
     "content_scripts": [
         {
+            "all_frames": false,
             "matches": [
                 "https://*/*",
                 "http://127.0.0.1/*",
@@ -23,7 +24,7 @@
             "js": [
                 "content_script.js"
             ],
-            "run_at": "document_start"
+            "run_at": "document_end"
         }
     ],
     "action": {
@@ -37,8 +38,7 @@
             "256": "./icons/icon256.png",
             "512": "./icons/icon512.png"
         },
-        "default_title": "templ",
-        "default_popup": "popup.html"
+        "default_title": "html blocker"
     },
     "options_page": "options.html",
     "background": {
@@ -53,5 +53,16 @@
     ],
     "host_permissions": [
         "*://*/*"
-    ]
+    ],
+    "web_accessible_resources": [
+        {
+            "matches": [
+                "*://*/*"
+            ],
+            "resources": [
+                "content.css"
+            ]
+        }
+    ],
+    "incognito": "spanning"
 }
