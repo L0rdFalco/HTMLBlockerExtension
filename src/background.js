@@ -78,6 +78,20 @@ function deactivateBlocker() {
 }
 
 async function blockerClicked() {
+  if (!allowed) {
+    //for ffx
+    allowed = await chrome.permissions.request({ origins: ["*://*/*"] })
+
+  }
+
+  /*
+  1. check if its a real tab
+  2. check if extension is activated on said tab by sending msg to content script
+  3. if not activated, load the content scripts that activates the blocker
+  */
+
+  let tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
 
 }
 
