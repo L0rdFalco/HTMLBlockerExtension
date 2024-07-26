@@ -96299,54 +96299,141 @@ function setInStorage(key, value) {
     });
   });
 }
-function isBlockerActive() {
-  return _isBlockerActive.apply(this, arguments);
+function isRealTab() {
+  return _isRealTab.apply(this, arguments);
 }
-function _isBlockerActive() {
-  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+function _isRealTab() {
+  _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    var tabs;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
+          _context3.next = 2;
+          return chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          });
+        case 2:
+          tabs = _context3.sent;
+          if (!(!tabs || !tabs.length || tabs[0].id < 0)) {
+            _context3.next = 5;
+            break;
+          }
+          return _context3.abrupt("return");
+        case 5:
+          return _context3.abrupt("return", tabs[0]);
+        case 6:
         case "end":
           return _context3.stop();
       }
     }, _callee3);
   }));
+  return _isRealTab.apply(this, arguments);
+}
+function isBlockerActive() {
   return _isBlockerActive.apply(this, arguments);
 }
-function activateBlocker() {}
-function deactivateBlocker() {}
-function blockerClicked() {
-  return _blockerClicked.apply(this, arguments);
-}
-function _blockerClicked() {
-  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+function _isBlockerActive() {
+  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var mTab;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
-          console.log("blocker clicked");
-        case 1:
+          _context4.next = 2;
+          return isRealTab();
+        case 2:
+          mTab = _context4.sent;
+          console.log(mTab.url.startsWith("http"), mTab.url);
+          if (mTab.url.startsWith("http")) {}
+        case 5:
         case "end":
           return _context4.stop();
       }
     }, _callee4);
   }));
+  return _isBlockerActive.apply(this, arguments);
+}
+function onIcon() {}
+function offIcon() {}
+function blockerClicked() {
+  return _blockerClicked.apply(this, arguments);
+}
+function _blockerClicked() {
+  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var mTab, res;
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
+        case 0:
+          if (allowed) {
+            _context5.next = 4;
+            break;
+          }
+          _context5.next = 3;
+          return chrome.permissions.request({
+            origins: ["*://*/*"]
+          });
+        case 3:
+          allowed = _context5.sent;
+        case 4:
+          _context5.next = 6;
+          return isRealTab();
+        case 6:
+          mTab = _context5.sent;
+          _context5.next = 9;
+          return chrome.tabs.sendMessage(mTab.id, {
+            action: "toggle",
+            allowed: allowed
+          })["catch"](function () {
+            console.log("tabs send message failed");
+          });
+        case 9:
+          res = _context5.sent;
+          if (res) {
+            _context5.next = 21;
+            break;
+          }
+          _context5.prev = 11;
+          _context5.next = 14;
+          return chrome.scripting.executeScript({
+            files: ["content_script.js"],
+            target: {
+              tabId: mTab.id
+            }
+          });
+        case 14:
+          _context5.next = 16;
+          return chrome.tabs.sendMessage(mTab.id, {
+            action: "toggle",
+            allowed: allowed
+          });
+        case 16:
+          _context5.next = 21;
+          break;
+        case 18:
+          _context5.prev = 18;
+          _context5.t0 = _context5["catch"](11);
+          console.log("could not load content script");
+        case 21:
+        case "end":
+          return _context5.stop();
+      }
+    }, _callee5, null, [[11, 18]]);
+  }));
   return _blockerClicked.apply(this, arguments);
 }
 chrome.action.onClicked.addListener(blockerClicked);
 chrome.tabs.onActivated.addListener(function (data) {
-  console.log("tabs onactivated: ", data);
+  isBlockerActive();
 });
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  console.log("tabs onudated: ", tabId);
+  isBlockerActive();
 });
 chrome.permissions.contains({
   origins: ["*://*/*"]
 }).then(function (res) {
-  console.log("permissions contains: ", function (res) {
-    return allowed = res;
-  });
+  return allowed = res;
 });
+isBlockerActive();
 })();
 
 /******/ })()

@@ -65,17 +65,48 @@ function setInStorage(key, value) {
   });
 }
 
+function onIcon() {
+  chrome.action.setIcon({ path: "" })
+  chrome.action.setTitle({ title: "blocking on" })
+}
+
+function offIcon() {
+  chrome.action.setIcon({ path: "" })
+  chrome.action.setTitle({ title: "blocking off" })
+}
+
+
+async function isRealTab() {
+
+  let tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
+  if (!tabs || !tabs.length || tabs[0].id < 0) return // not a tab you'd need the blocker to work
+
+  return tabs[0];
+}
+
 async function isBlockerActive() {
 
+  let mTab = await isRealTab()
+
+  // console.log(mTab.url.startsWith("http"), mTab.url);
+  if (!mTab.url.startsWith("http")) {
+    chrome.action.setIcon({ path: "blocking forbidden!" })
+    chrome.action.setTitle({ title: "" })
+
+    return
+  }
+
+  let blockStatus = await chrome.tabs.sendMessage(mTab.id, { action: "getStatus" }).catch(() => {
+    console.log("tabs send message fail 2");
+  })
+
+
+  blockStatus ? onIcon() : offIcon()
 }
 
-function activateBlocker() {
 
-}
 
-function deactivateBlocker() {
-
-}
 
 async function blockerClicked() {
   if (!allowed) {
@@ -90,8 +121,24 @@ async function blockerClicked() {
   3. if not activated, load the content scripts that activates the blocker
   */
 
-  let tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+  let mTab = await isRealTab()
 
+  let res = await chrome.tabs.sendMessage(mTab.id, { action: "toggle", allowed }).catch(() => {
+    console.log("tabs send message fail 1");
+  })
+
+  if (!res) {// meaning that blocker isn't active  on said page
+
+    try {
+      await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } })
+
+      await chrome.tabs.sendMessage(mTab.id, { action: "toggle", allowed })
+    } catch (error) {
+      console.log("could not load content script");
+
+    }
+
+  }
 
 }
 
@@ -100,9 +147,13 @@ async function blockerClicked() {
 chrome.action.onClicked.addListener(blockerClicked)
 
 chrome.tabs.onActivated.addListener((data) => {
+  isBlockerActive()
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  isBlockerActive()
 })
 
 chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => allowed = res)
+
+isBlockerActive()
