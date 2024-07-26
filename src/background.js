@@ -66,12 +66,12 @@ function setInStorage(key, value) {
 }
 
 function onIcon() {
-  chrome.action.setIcon({ path: "" })
+  chrome.action.setIcon({ path: "./icons/icon16_on.png" })
   chrome.action.setTitle({ title: "blocking on" })
 }
 
 function offIcon() {
-  chrome.action.setIcon({ path: "" })
+  chrome.action.setIcon({ path: "./icons/icon16_off.png" })
   chrome.action.setTitle({ title: "blocking off" })
 }
 
@@ -91,8 +91,8 @@ async function isBlockerActive() {
 
   // console.log(mTab.url.startsWith("http"), mTab.url);
   if (!mTab.url.startsWith("http")) {
-    chrome.action.setIcon({ path: "blocking forbidden!" })
-    chrome.action.setTitle({ title: "" })
+    chrome.action.setIcon({ path: "./icons/icon16_no.png" })
+    chrome.action.setTitle({ title: "blocking forbidden!" })
 
     return
   }
@@ -101,6 +101,7 @@ async function isBlockerActive() {
     console.log("tabs send message fail 2");
   })
 
+  console.log(blockStatus);
 
   blockStatus ? onIcon() : offIcon()
 }

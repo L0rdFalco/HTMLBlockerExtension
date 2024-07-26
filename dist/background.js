@@ -96299,6 +96299,22 @@ function setInStorage(key, value) {
     });
   });
 }
+function onIcon() {
+  chrome.action.setIcon({
+    path: "./icons/icon16_on.png"
+  });
+  chrome.action.setTitle({
+    title: "blocking on"
+  });
+}
+function offIcon() {
+  chrome.action.setIcon({
+    path: "./icons/icon16_off.png"
+  });
+  chrome.action.setTitle({
+    title: "blocking off"
+  });
+}
 function isRealTab() {
   return _isRealTab.apply(this, arguments);
 }
@@ -96335,7 +96351,7 @@ function isBlockerActive() {
 }
 function _isBlockerActive() {
   _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-    var mTab;
+    var mTab, blockStatus;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
@@ -96343,9 +96359,29 @@ function _isBlockerActive() {
           return isRealTab();
         case 2:
           mTab = _context4.sent;
-          console.log(mTab.url.startsWith("http"), mTab.url);
-          if (mTab.url.startsWith("http")) {}
-        case 5:
+          if (mTab.url.startsWith("http")) {
+            _context4.next = 7;
+            break;
+          }
+          chrome.action.setIcon({
+            path: "./icons/icon16_no.png"
+          });
+          chrome.action.setTitle({
+            title: "blocking forbidden!"
+          });
+          return _context4.abrupt("return");
+        case 7:
+          _context4.next = 9;
+          return chrome.tabs.sendMessage(mTab.id, {
+            action: "getStatus"
+          })["catch"](function () {
+            console.log("tabs send message fail 2");
+          });
+        case 9:
+          blockStatus = _context4.sent;
+          console.log(blockStatus);
+          blockStatus ? onIcon() : offIcon();
+        case 12:
         case "end":
           return _context4.stop();
       }
@@ -96353,8 +96389,6 @@ function _isBlockerActive() {
   }));
   return _isBlockerActive.apply(this, arguments);
 }
-function onIcon() {}
-function offIcon() {}
 function blockerClicked() {
   return _blockerClicked.apply(this, arguments);
 }
@@ -96384,7 +96418,7 @@ function _blockerClicked() {
             action: "toggle",
             allowed: allowed
           })["catch"](function () {
-            console.log("tabs send message failed");
+            console.log("tabs send message fail 1");
           });
         case 9:
           res = _context5.sent;
