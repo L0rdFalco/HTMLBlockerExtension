@@ -96457,9 +96457,11 @@ function _blockerClicked() {
 }
 chrome.action.onClicked.addListener(blockerClicked);
 chrome.tabs.onActivated.addListener(function (data) {
+  console.log("tabs on activated");
   isBlockerActive();
 });
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  console.log("tabs on updated");
   isBlockerActive();
 });
 chrome.permissions.contains({

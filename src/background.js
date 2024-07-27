@@ -148,10 +148,13 @@ async function blockerClicked() {
 chrome.action.onClicked.addListener(blockerClicked)
 
 chrome.tabs.onActivated.addListener((data) => {
+  console.log("tabs on activated");
   isBlockerActive()
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  console.log("tabs on updated");
+
   isBlockerActive()
 })
 

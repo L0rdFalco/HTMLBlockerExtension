@@ -1,7 +1,7 @@
 {
-    "name": "test",
-    "version": "1.0.0",
-    "description": "",
+    "name": "htmlblocker",
+    "version": "1.0.0.0",
+    "description": "chrome extension to block html elements with one click",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "webpack --mode production",
