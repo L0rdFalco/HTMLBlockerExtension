@@ -81100,7 +81100,7 @@ var init_messaging_helpers = __esm({
 });
 
 // src/utils/storage-helpers.ts
-function getLocalStorage(key, extract_key = false) {
+function getLocalStorage(key) {
   return new Promise((resolve) => {
     shouldDelegateStorage().then((delegate) => {
       if (delegate) {
@@ -81111,11 +81111,7 @@ function getLocalStorage(key, extract_key = false) {
         );
       } else {
         chrome.storage.local.get(key, function(result) {
-          if (extract_key) {
-            resolve(result[key]);
-          } else {
-            resolve(result);
-          }
+          resolve(result);
         });
       }
     });
@@ -81233,21 +81229,12 @@ function getIdentifier() {
     });
   });
 }
-function getExtensionIdentifier() {
+function getChromeExtensionIdentifier() {
   return new Promise((resolve) => {
     try {
       resolve(chrome.runtime.id);
     } catch (error2) {
       resolve("identifier_not_found");
-    }
-  });
-}
-function getExtensionName() {
-  return new Promise((resolve) => {
-    try {
-      resolve(chrome.runtime.getManifest().name);
-    } catch (error2) {
-      resolve("extension_name_not_found");
     }
   });
 }
@@ -81290,25 +81277,23 @@ var init_logger = __esm({
 });
 
 // src/constants.ts
-var MELLOWTEL_VERSION, MAX_PARALLEL_EXECUTIONS, MAX_PARALLEL_EXECUTIONS_BATCH, MAX_QUEUE_SIZE, LIFESPAN_IFRAME, DATA_ID_IFRAME, DATA_ID_IFRAME_BATCH, DATA_ID_STRING, RULE_ID_XFRAME, RULE_ID_CONTENT_DISPOSITION, RULE_ID_CONTENT_TYPE, RULE_ID_VALUE_TO_MODIFY_CONTENT_TYPE_TO, RULE_ID_POST_REQUEST, MAX_DAILY_RATE, BADGE_COLOR, REFRESH_INTERVAL, SPEED_REFRESH_INTERVAL;
+var MELLOWTEL_VERSION, MAX_PARALLEL_EXECUTIONS, MAX_PARALLEL_EXECUTIONS_BATCH, MAX_QUEUE_SIZE, LIFESPAN_IFRAME, DATA_ID_IFRAME, DATA_ID_IFRAME_BATCH, RULE_ID_XFRAME, RULE_ID_CONTENT_DISPOSITION, RULE_ID_CONTENT_TYPE, RULE_ID_VALUE_TO_MODIFY_CONTENT_TYPE_TO, RULE_ID_POST_REQUEST, MAX_DAILY_RATE, REFRESH_INTERVAL, SPEED_REFRESH_INTERVAL;
 var init_constants = __esm({
   "src/constants.ts"() {
     "use strict";
-    MELLOWTEL_VERSION = "1.3.6";
+    MELLOWTEL_VERSION = "1.3.5";
     MAX_PARALLEL_EXECUTIONS = 4;
     MAX_PARALLEL_EXECUTIONS_BATCH = 4;
     MAX_QUEUE_SIZE = 24;
     LIFESPAN_IFRAME = 1e3 * 60 * 1.5;
     DATA_ID_IFRAME = "data-mllwtl-frame-crwl-ml";
     DATA_ID_IFRAME_BATCH = "data-mllwtl-frame-batch-crwl-ml";
-    DATA_ID_STRING = "data-mllwtl-frame";
     RULE_ID_XFRAME = 80045;
     RULE_ID_CONTENT_DISPOSITION = 80046;
     RULE_ID_CONTENT_TYPE = 80047;
     RULE_ID_VALUE_TO_MODIFY_CONTENT_TYPE_TO = 80048;
     RULE_ID_POST_REQUEST = 80049;
     MAX_DAILY_RATE = 300;
-    BADGE_COLOR = "#4CAF50";
     REFRESH_INTERVAL = 1e3 * 60 * 60 * 24;
     SPEED_REFRESH_INTERVAL = 1e3 * 60 * 60 * 4;
   }
@@ -81440,8 +81425,9 @@ function disableXFrameHeaders(hostname, skipHeaders) {
                   ]
                 },
                 condition: {
-                  resourceTypes: ["sub_frame"],
-                  urlFilter: "*://*/*"
+                  // resourceTypes: ["sub_frame" as ResourceType],
+                  urlFilter: "*"
+                  //"*://*/*",
                   // `*${hostname}*`, --> specific filter disabled because
                   // there are internal redirects that need to be handled.
                   // Need to find a way to handle redirects and disable headers
@@ -81623,202 +81609,10 @@ function getFrameCount(BATCH_execution) {
     `[data-id=${BATCH_execution ? DATA_ID_IFRAME_BATCH : DATA_ID_IFRAME}]`
   ).length;
 }
-function openPopupWindow(url, title, w, h) {
-  return new Promise((resolve) => {
-    let left = screen.width / 2 - w / 2;
-    let top = screen.height / 2 - h / 2 - 150;
-    window.open(
-      url,
-      title,
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${w}, height=${h}, top=${top}, left=${left}`
-    );
-    resolve(true);
-  });
-}
 var init_utils = __esm({
   "src/utils/utils.ts"() {
     "use strict";
     init_constants();
-  }
-});
-
-// src/transparency/badge-settings.ts
-function getBadgeProperties() {
-  return new Promise((resolve) => {
-    if (!chrome.action) {
-      sendMessageToBackground({
-        intent: "getBadgeProperties"
-      }).then((response) => {
-        resolve(response);
-      });
-    }
-    chrome.action.getBadgeText({}, (text) => {
-      chrome.action.getBadgeTextColor({}, (textColor) => {
-        chrome.action.getBadgeBackgroundColor({}, (backgroundColor) => {
-          Logger.log("[getBadgeProperties]:", text, textColor, backgroundColor);
-          resolve({ text, textColor, backgroundColor });
-        });
-      });
-    });
-  });
-}
-function restoreBadgeProperties() {
-  return new Promise((resolve) => {
-    try {
-      if (!chrome.action) {
-        sendMessageToBackground({
-          intent: "restoreBadgeProperties"
-        }).then((response) => {
-          resolve(response);
-        });
-      }
-      getLocalStorage("badgeText", true).then((text) => {
-        getLocalStorage("badgeTextColor", true).then((textColor) => {
-          getLocalStorage("badgeBackgroundColor", true).then(
-            (backgroundColor) => {
-              Logger.log(
-                `[restoreBadgeProperties]: ${text}, ${JSON.parse(textColor)}, ${JSON.parse(backgroundColor)}`
-              );
-              chrome.action.setBadgeText({ text });
-              chrome.action.setBadgeTextColor({ color: JSON.parse(textColor) });
-              chrome.action.setBadgeBackgroundColor({
-                color: JSON.parse(backgroundColor)
-              });
-              resolve(true);
-            }
-          );
-        });
-      });
-    } catch (error2) {
-      Logger.log("[restoreBadgeProperties]: error " + error2);
-      resolve(false);
-    }
-  });
-}
-function showBadge() {
-  return new Promise((resolve) => __async(this, null, function* () {
-    try {
-      if (!chrome.action) {
-        sendMessageToBackground({
-          intent: "showBadge"
-        }).then((response) => {
-          resolve(response);
-        });
-      }
-      const { text, textColor, backgroundColor } = yield getBadgeProperties();
-      yield setLocalStorage("badgeText", text);
-      yield setLocalStorage("badgeTextColor", JSON.stringify(textColor));
-      yield setLocalStorage(
-        "badgeBackgroundColor",
-        JSON.stringify(backgroundColor)
-      );
-      chrome.action.setBadgeTextColor({ color: BADGE_COLOR });
-      chrome.action.setBadgeText({ text: "." });
-      chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
-      resolve(true);
-    } catch (error2) {
-      Logger.log("[showBadge]: error " + error2);
-      resolve(false);
-    }
-  }));
-}
-function hideBadge() {
-  return new Promise((resolve) => __async(this, null, function* () {
-    try {
-      if (!chrome.action) {
-        sendMessageToBackground({
-          intent: "hideBadge"
-        }).then((response) => {
-          resolve(response);
-        });
-      }
-      chrome.action.setBadgeText({ text: "" });
-      yield restoreBadgeProperties();
-      resolve(true);
-    } catch (error2) {
-      Logger.log("[hideBadge]: error " + error2);
-      resolve(false);
-    }
-  }));
-}
-function shouldShowBadge() {
-  return new Promise((resolve) => {
-    try {
-      getLocalStorage("shouldShowBadge").then((result) => {
-        if (result === void 0 || !result.hasOwnProperty("shouldShowBadge")) {
-          resolve(false);
-        } else {
-          let shouldShowBadge2 = result["shouldShowBadge"].toString().toLowerCase();
-          if (shouldShowBadge2 === "true") {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        }
-      });
-    } catch (error2) {
-      Logger.log("[shouldShowBadge]: error " + error2);
-      resolve(false);
-    }
-  });
-}
-function showBadgeIfShould() {
-  return new Promise((resolve) => {
-    shouldShowBadge().then((result) => {
-      if (result) {
-        showBadge().then(() => {
-          resolve(true);
-        });
-      } else {
-        resolve(false);
-      }
-    });
-  });
-}
-function hideBadgeIfShould() {
-  return new Promise((resolve) => {
-    shouldShowBadge().then((result) => {
-      if (result) {
-        hideBadge().then(() => {
-          resolve(true);
-        });
-      } else {
-        resolve(false);
-      }
-    });
-  });
-}
-function setShouldShowBadge() {
-  return new Promise((resolve) => {
-    try {
-      setLocalStorage("shouldShowBadge", true).then(() => {
-        resolve(true);
-      });
-    } catch (error2) {
-      Logger.log("[setShouldShowBadge]: error " + error2);
-      resolve(false);
-    }
-  });
-}
-function unsetShouldShowBadge() {
-  return new Promise((resolve) => {
-    try {
-      setLocalStorage("shouldShowBadge", false).then(() => {
-        resolve(true);
-      });
-    } catch (error2) {
-      Logger.log("[unsetShouldShowBadge]: error " + error2);
-      resolve(false);
-    }
-  });
-}
-var init_badge_settings = __esm({
-  "src/transparency/badge-settings.ts"() {
-    "use strict";
-    init_storage_helpers();
-    init_logger();
-    init_constants();
-    init_messaging_helpers();
   }
 });
 
@@ -81837,7 +81631,6 @@ function injectHiddenIFrame(url, id, onload = function() {
     iframe.setAttribute("data-id", data_id);
   iframe.src = url;
   iframe.onload = onload;
-  iframe.referrerPolicy = "no-referrer";
   if (htmlVisualizer2) {
     iframe.style.width = "1800px";
     iframe.style.height = "0px";
@@ -81864,9 +81657,6 @@ function injectHiddenIFrame(url, id, onload = function() {
     iframe.style.display = "none";
     document.body.prepend(iframe);
   }
-  if (data_id === DATA_ID_IFRAME) {
-    showBadgeIfShould().then();
-  }
 }
 function inIframe() {
   try {
@@ -81878,8 +81668,6 @@ function inIframe() {
 var init_iframe_helpers = __esm({
   "src/utils/iframe-helpers.ts"() {
     "use strict";
-    init_badge_settings();
-    init_constants();
   }
 });
 
@@ -82530,16 +82318,12 @@ function setLifespanForIframe(recordID, waitBeforeScraping, BATCH_execution) {
   );
   setTimeout(() => __async(this, null, function* () {
     let iframe = document.getElementById(recordID);
-    let dataId = (iframe == null ? void 0 : iframe.getAttribute("data-id")) || "";
     let divIframe = document.getElementById("div-" + recordID);
     if (iframe)
       iframe.remove();
     if (divIframe)
       divIframe.remove();
     yield resetAfterCrawl(recordID, BATCH_execution);
-    if (dataId === DATA_ID_IFRAME) {
-      yield hideBadgeIfShould();
-    }
   }), LIFESPAN_IFRAME + waitBeforeScraping);
 }
 var init_reset_crawl = __esm({
@@ -82552,7 +82336,6 @@ var init_reset_crawl = __esm({
     init_dnr_helpers();
     init_logger();
     init_triggers_download_helpers();
-    init_badge_settings();
   }
 });
 
@@ -82985,7 +82768,7 @@ var init_rate_limiter = __esm({
           }
         });
       }
-      static checkRateLimit(increase_count = true) {
+      static checkRateLimit() {
         return __async(this, null, function* () {
           const now = Date.now();
           let { timestamp, count } = yield this.getRateLimitData();
@@ -82998,8 +82781,7 @@ var init_rate_limiter = __esm({
             yield this.setHistoricData(now, 1);
             return {
               shouldContinue: true,
-              isLastCount: false,
-              requestsCount: 0
+              isLastCount: false
             };
           }
           const elapsedTime = this.calculateElapsedTime(now, timestamp);
@@ -83009,19 +82791,16 @@ var init_rate_limiter = __esm({
             yield setLocalStorage("mllwtl_rate_limit_reached", false);
             return {
               shouldContinue: true,
-              isLastCount: false,
-              requestsCount: 0
+              isLastCount: false
             };
           }
-          if (increase_count) {
-            count++;
-            yield setLocalStorage("count_mellowtel", count);
-            lifetime_total_count++;
-            yield setLocalStorage(
-              "lifetime_total_count_mellowtel",
-              lifetime_total_count
-            );
-          }
+          count++;
+          yield setLocalStorage("count_mellowtel", count);
+          lifetime_total_count++;
+          yield setLocalStorage(
+            "lifetime_total_count_mellowtel",
+            lifetime_total_count
+          );
           Logger.log(
             `[\u{1F552}]: SHOULD CONTINUE? IF COUNT (${count}) <= ${this.MAX_DAILY_RATE} : ${count <= this.MAX_DAILY_RATE}`
           );
@@ -83029,15 +82808,13 @@ var init_rate_limiter = __esm({
             let isLastCount = count === this.MAX_DAILY_RATE;
             return {
               shouldContinue: true,
-              isLastCount,
-              requestsCount: count
+              isLastCount
             };
           } else {
             Logger.log(`[\u{1F552}]: RATE LIMIT REACHED`);
             return {
               shouldContinue: false,
-              isLastCount: false,
-              requestsCount: count
+              isLastCount: false
             };
           }
         });
@@ -83197,11 +82974,11 @@ function startConnectionWs(identifier) {
               startConnectionWs(identifier);
             }
           } else {
-            const extension_identifier = yield getExtensionIdentifier();
+            const chrome_identifier = yield getChromeExtensionIdentifier();
             const speedMpbs = yield MeasureConnectionSpeed();
             Logger.log(`[\u{1F310}]: Connection speed: ${speedMpbs} Mbps`);
             const ws = new isomorphic_ws__WEBPACK_IMPORTED_MODULE_1__["default"](
-              `${ws_url}?node_id=${identifier}&version=${MELLOWTEL_VERSION}&chrome_id=${extension_identifier}&speedMbps=${speedMpbs}`
+              `${ws_url}?node_id=${identifier}&version=${MELLOWTEL_VERSION}&chrome_id=${chrome_identifier}&speedMbps=${speedMpbs}`
             );
             ws.onopen = function open() {
               setSharedMemory("webSocketConnectedMellowtel", "true");
@@ -83413,7 +83190,7 @@ function generateAndOpenOptInLink() {
     }
     let alreadyOpened = yield getAlreadyOpened();
     if (!alreadyOpened) {
-      let extension_id = yield getExtensionIdentifier();
+      let extension_id = yield getChromeExtensionIdentifier();
       getIdentifier().then((nodeId) => __async(this, null, function* () {
         let configuration_key = nodeId.split("_")[1];
         let link = `${BASE_LINK_OPT_IN}?extension_id=${extension_id}&configuration_key=${configuration_key}`;
@@ -83428,7 +83205,7 @@ function generateAndOpenOptInLink() {
 }
 function generateOptInLink() {
   return new Promise((resolve) => __async(this, null, function* () {
-    let extension_id = yield getExtensionIdentifier();
+    let extension_id = yield getChromeExtensionIdentifier();
     getIdentifier().then((nodeId) => {
       let configuration_key = nodeId.split("_")[1];
       resolve(
@@ -83439,27 +83216,13 @@ function generateOptInLink() {
 }
 function generateSettingsLink() {
   return new Promise((resolve) => __async(this, null, function* () {
-    let extension_id = yield getExtensionIdentifier();
+    let extension_id = yield getChromeExtensionIdentifier();
     getIdentifier().then((nodeId) => {
       let configuration_key = nodeId.split("_")[1];
       resolve(
         `${BASE_LINK_SETTING}?extension_id=${extension_id}&configuration_key=${configuration_key}`
       );
     });
-  }));
-}
-function openUserSettingsInPopupWindow() {
-  return new Promise((resolve) => __async(this, null, function* () {
-    let userSettingsLink = yield generateSettingsLink();
-    let isInBackgroundScript = !(yield shouldDelegateTabsAPI());
-    if (isInBackgroundScript) {
-      Logger.log(
-        "openUserSettingsInPopupWindow: Method not supported in background script"
-      );
-      resolve(false);
-    }
-    yield openPopupWindow(userSettingsLink, "Mellowtel Settings", 768, 400);
-    resolve(true);
   }));
 }
 var BASE_LINK_SETTING, BASE_LINK_OPT_IN;
@@ -83470,8 +83233,6 @@ var init_generate_links = __esm({
     init_storage_helpers();
     init_tabs_helpers();
     init_messaging_helpers();
-    init_utils();
-    init_logger();
     BASE_LINK_SETTING = "https://www.mellow.tel/settings/";
     BASE_LINK_OPT_IN = "https://www.mellow.tel/opt-in/";
   }
@@ -83573,51 +83334,6 @@ var init_put_to_signed = __esm({
   "src/utils/put-to-signed.ts"() {
     "use strict";
     init_logger();
-  }
-});
-
-// src/mellowtel-elements/mellowtel-elements-utils.ts
-function getIfCurrentlyActiveBCK() {
-  return __async(this, null, function* () {
-    return new Promise(function(res) {
-      chrome.tabs.query({}, function(tabs) {
-        let numTabs = tabs.length;
-        let numTabsChecked = 0;
-        let mllwtlFramePresent = false;
-        for (let i = 0; i < numTabs; i++) {
-          sendMessageToContentScript(tabs[i].id, {
-            intent: "getSharedMemoryDOM"
-          }).then(function(response) {
-            numTabsChecked++;
-            if (response) {
-              mllwtlFramePresent = true;
-            }
-            if (numTabsChecked === numTabs) {
-              res(mllwtlFramePresent);
-            }
-          });
-        }
-      });
-    });
-  });
-}
-function getIfCurrentlyActiveDOM() {
-  return new Promise((resolve) => {
-    let frame = document.querySelector(
-      `[id^=${DATA_ID_STRING}]`
-    );
-    if (frame) {
-      resolve(true);
-    } else {
-      resolve(false);
-    }
-  });
-}
-var init_mellowtel_elements_utils = __esm({
-  "src/mellowtel-elements/mellowtel-elements-utils.ts"() {
-    "use strict";
-    init_messaging_helpers();
-    init_constants();
   }
 });
 
@@ -83765,21 +83481,6 @@ function setUpBackgroundListeners() {
         if (request.intent === "resetImageRenderHTMLVisualizer") {
           resetImageRenderHTMLVisualizer().then(sendResponse);
         }
-        if (request.intent === "getIfCurrentlyActiveBCK") {
-          getIfCurrentlyActiveBCK().then(sendResponse);
-        }
-        if (request.intent === "showBadge") {
-          showBadge().then(sendResponse);
-        }
-        if (request.intent === "hideBadge") {
-          hideBadge().then(sendResponse);
-        }
-        if (request.intent === "getBadgeProperties") {
-          getBadgeProperties().then(sendResponse);
-        }
-        if (request.intent === "restoreBadgeProperties") {
-          restoreBadgeProperties().then(sendResponse);
-        }
         return true;
       }
     );
@@ -83795,22 +83496,15 @@ function setUpContentScriptListeners() {
           if (request.intent === "deleteIframeMellowtel") {
             let recordID = request.recordID;
             let iframe = document.getElementById(recordID);
-            let dataId = (iframe == null ? void 0 : iframe.getAttribute("data-id")) || "";
             let divIframe = document.getElementById("div-" + recordID);
             if (iframe)
               iframe.remove();
             if (divIframe)
               divIframe.remove();
             yield resetAfterCrawl(recordID, request.BATCH_execution);
-            if (dataId === DATA_ID_IFRAME) {
-              yield hideBadgeIfShould();
-            }
           }
           if (request.intent === "getSharedMemoryDOM") {
             getSharedMemoryDOM(request.key).then(sendResponse);
-          }
-          if (request.intent === "getIfCurrentlyActiveDOM") {
-            getIfCurrentlyActiveDOM().then(sendResponse);
           }
           if (request.intent === "startConnectionMellowtel") {
             getIdentifier().then((identifier) => {
@@ -83890,9 +83584,6 @@ var init_listener_helpers = __esm({
     init_measure_connection_speed();
     init_execute_crawl();
     init_put_to_signed();
-    init_mellowtel_elements_utils();
-    init_badge_settings();
-    init_constants();
   }
 });
 
@@ -95530,33 +95221,20 @@ init_logger();
 init_start_stop_helpers();
 init_document_body_observer();
 init_messaging_helpers();
-init_generate_links();
-init_badge_settings();
-function createMessagingChannels(extension_id) {
-  const channelFromExtensionToSite = document.createElement("input");
-  const channelFromSiteToExtension = document.createElement("input");
-  channelFromExtensionToSite.id = `mellowtel-message-from-extension-to-site-${extension_id}`;
-  channelFromExtensionToSite.style.display = "none";
-  channelFromSiteToExtension.id = `mellowtel-message-from-site-to-extension-${extension_id}`;
-  channelFromSiteToExtension.style.display = "none";
-  document.body.appendChild(channelFromExtensionToSite);
-  document.body.appendChild(channelFromSiteToExtension);
-}
 function setUpExternalMessageListeners() {
   return __async(this, null, function* () {
     let current_hostname = window.location.hostname;
-    let extension_id_original = yield getExtensionIdentifier();
+    let extension_id_original = yield getChromeExtensionIdentifier();
     executeFunctionIfOrWhenBodyExists(() => __async(this, null, function* () {
       if (current_hostname.includes("mellowtel.it") || current_hostname.includes("mellow.tel") || current_hostname.includes("mellowtel.dev")) {
         Logger.log(
           "[setUpExternalMessageListeners]: Setting up external message listeners"
         );
-        createMessagingChannels(extension_id_original);
         const channelFromSiteToExtension = document.getElementById(
-          `mellowtel-message-from-site-to-extension-${extension_id_original}`
+          "mellowtel-message-from-site-to-extension"
         );
         if (channelFromSiteToExtension) {
-          channelFromSiteToExtension.addEventListener("change", (event) => __async(this, null, function* () {
+          channelFromSiteToExtension.addEventListener("change", (event) => {
             const message = JSON.parse(channelFromSiteToExtension.value);
             const message_id = message.id;
             const extension_id_message = message.extension_id;
@@ -95574,193 +95252,94 @@ function setUpExternalMessageListeners() {
             }
             if (message.action === "optIn") {
               optIn().then(() => {
-                sendMessageToWebsite(
-                  { message: "opted-in", id: message_id },
-                  extension_id_original
-                );
+                sendMessageToWebsite({ message: "opted-in", id: message_id });
               });
             }
             if (message.action === "optOut") {
               optOut().then(() => {
-                sendMessageToWebsite(
-                  { message: "opted-out", id: message_id },
-                  extension_id_original
-                );
+                sendMessageToWebsite({ message: "opted-out", id: message_id });
               });
             }
             if (message.action === "startMellowtel") {
               start().then(() => {
-                sendMessageToWebsite(
-                  {
-                    message: "mellowtel-started",
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+                sendMessageToWebsite({
+                  message: "mellowtel-started",
+                  id: message_id
+                });
               });
             }
             if (message.action === "stopMellowtel") {
               stop().then(() => {
-                sendMessageToWebsite(
-                  {
-                    message: "mellowtel-stopped",
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+                sendMessageToWebsite({
+                  message: "mellowtel-stopped",
+                  id: message_id
+                });
               });
             }
             if (message.action === "getOptInStatus") {
               getOptInStatus().then((status) => {
-                sendMessageToWebsite(
-                  {
-                    message: "opt-in-status",
-                    status,
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+                sendMessageToWebsite({
+                  message: "opt-in-status",
+                  status,
+                  id: message_id
+                });
               });
             }
             if (message.action === "getNodeId") {
               getIdentifier().then((nodeId) => {
-                sendMessageToWebsite(
-                  {
-                    message: "node-id",
-                    nodeId,
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+                sendMessageToWebsite({
+                  message: "node-id",
+                  nodeId,
+                  id: message_id
+                });
               });
             }
             if (message.action === "getMellowtelVersion") {
-              sendMessageToWebsite(
-                {
-                  message: "mellowtel-version",
-                  version: MELLOWTEL_VERSION,
-                  id: message_id
-                },
-                extension_id_original
-              );
+              sendMessageToWebsite({
+                message: "mellowtel-version",
+                version: MELLOWTEL_VERSION,
+                id: message_id
+              });
             }
             if (message.action === "getRequestsHandled") {
               RateLimiter.getLifetimeTotalCount().then((requestsHandled) => {
-                sendMessageToWebsite(
-                  {
-                    message: "requests-handled",
-                    requestsHandled,
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+                sendMessageToWebsite({
+                  message: "requests-handled",
+                  requestsHandled,
+                  id: message_id
+                });
               });
             }
             if (message.action === "getRateLimitData") {
-              RateLimiter.checkRateLimit(false).then((rateLimitData) => {
-                sendMessageToWebsite(
-                  {
-                    message: "rate-limit-data",
-                    requestsCount: rateLimitData.requestsCount,
-                    id: message_id
-                  },
-                  extension_id_original
-                );
+              RateLimiter.getRateLimitData().then((rateLimitData) => {
+                sendMessageToWebsite({
+                  message: "rate-limit-data",
+                  timestamp: rateLimitData.timestamp,
+                  count: rateLimitData.count,
+                  id: message_id
+                });
               });
             }
             if (message.action === "closePage") {
               sendMessageToBackground({ intent: "removeCurrentTab" }).then(
                 (tab_id) => {
                   Logger.log("[setUpExternalMessageListeners] tab_id: ", tab_id);
-                  sendMessageToWebsite(
-                    {
-                      message: "page-closed",
-                      id: message_id
-                    },
-                    extension_id_original
-                  );
+                  sendMessageToWebsite({
+                    message: "page-closed",
+                    id: message_id
+                  });
                 }
               );
             }
-            if (message.action === "getIfCurrentlyActive") {
-              getIfCurrentlyActive().then((currentlyActive) => {
-                sendMessageToWebsite(
-                  {
-                    message: "currently-active",
-                    currentlyActive,
-                    id: message_id
-                  },
-                  extension_id_original
-                );
-              });
-            }
-            if (message.action === "getInfoToDisplayInTable") {
-              let currentlyActive = yield getIfCurrentlyActive();
-              let settingsLink = yield generateSettingsLink();
-              let optInStatus = yield getOptInStatus();
-              let extensionId = yield getExtensionIdentifier();
-              let extensionName = yield getExtensionName();
-              let shouldShowBadgeVar = yield shouldShowBadge();
-              let requestsCount = (yield RateLimiter.checkRateLimit(false)).requestsCount;
-              let configuration_key = (yield getIdentifier()).split(
-                "_"
-              )[1];
-              sendMessageToWebsite(
-                {
-                  message: "info-to-display-in-table",
-                  settingsLink,
-                  extensionName,
-                  extensionId,
-                  optInStatus,
-                  currentlyActive,
-                  configurationKey: configuration_key,
-                  shouldShowBadge: shouldShowBadgeVar,
-                  requestsCount,
-                  id: message_id
-                },
-                extension_id_original
-              );
-            }
-            if (message.action === "setShouldShowBadge") {
-              setShouldShowBadge().then(() => {
-                sendMessageToWebsite(
-                  {
-                    message: "set-should-show-badge",
-                    id: message_id
-                  },
-                  extension_id_original
-                );
-              });
-            }
-            if (message.action === "unsetShouldShowBadge") {
-              unsetShouldShowBadge().then(() => {
-                sendMessageToWebsite(
-                  {
-                    message: "unset-should-show-badge",
-                    id: message_id
-                  },
-                  extension_id_original
-                );
-              });
-            }
-          }));
+          });
         }
       }
     }));
   });
 }
-function getIfCurrentlyActive() {
-  return new Promise((resolve) => {
-    sendMessageToBackground({ intent: "getIfCurrentlyActiveBCK" }).then(
-      (response) => {
-        resolve(response);
-      }
-    );
-  });
-}
-function sendMessageToWebsite(message, extension_id) {
+function sendMessageToWebsite(message) {
   const channelFromExtensionToSite = document.getElementById(
-    `mellowtel-message-from-extension-to-site-${extension_id}`
+    "mellowtel-message-from-extension-to-site"
   );
   if (channelFromExtensionToSite) {
     channelFromExtensionToSite.value = JSON.stringify(message);
@@ -95845,11 +95424,6 @@ var Mellowtel = class {
       return generateSettingsLink();
     });
   }
-  openUserSettingsInPopupWindow() {
-    return __async(this, null, function* () {
-      return openUserSettingsInPopupWindow();
-    });
-  }
   getNodeId() {
     return __async(this, null, function* () {
       return getOrGenerateIdentifier(this.publishableKey);
@@ -95860,9 +95434,9 @@ var Mellowtel = class {
       return MELLOWTEL_VERSION;
     });
   }
-  getExtensionIdentifier() {
+  getChromeExtensionIdentifier() {
     return __async(this, null, function* () {
-      return getExtensionIdentifier();
+      return getChromeExtensionIdentifier();
     });
   }
   start(metadata_id) {
@@ -96011,16 +95585,69 @@ var __webpack_exports__ = {};
   \***************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mellowtel__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mellowtel */ "./node_modules/mellowtel/dist/index.mjs");
+
+
 var _this = undefined;
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof2(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof2(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof2(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _typeof2(o) { "@babel/helpers - typeof"; return _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof2(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof2(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof2(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-function _typeof2(o) { "@babel/helpers - typeof"; return _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof2(o); }
 
-var mellowtel = new mellowtel__WEBPACK_IMPORTED_MODULE_0__["default"]("34c8c438");
+var mellowtel;
+_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+  return _regeneratorRuntime().wrap(function _callee$(_context) {
+    while (1) switch (_context.prev = _context.next) {
+      case 0:
+        mellowtel = new mellowtel__WEBPACK_IMPORTED_MODULE_0__["default"]("34c8c438", {
+          disableLogs: true
+        });
+        _context.next = 3;
+        return mellowtel.initBackground();
+      case 3:
+      case "end":
+        return _context.stop();
+    }
+  }, _callee);
+}))();
+_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+  var settingsLink;
+  return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+    while (1) switch (_context2.prev = _context2.next) {
+      case 0:
+        _context2.next = 2;
+        return mellowtel.generateSettingsLink();
+      case 2:
+        settingsLink = _context2.sent;
+        chrome.storage.sync.set({
+          settingsLink: settingsLink
+        });
+      case 4:
+      case "end":
+        return _context2.stop();
+    }
+  }, _callee2);
+}))();
+chrome.runtime.onInstalled.addListener(function (details) {
+  console.log("Extension Installed or Updated");
+  // If you want to handle first install and updates differently
+
+  if (details.reason === "install") {
+    // call a function to handle a first install
+
+    _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.next = 2;
+            return mellowtel.generateAndOpenOptInLink();
+          case 2:
+          case "end":
+            return _context3.stop();
+        }
+      }, _callee3);
+    }))();
+  }
+});
 (function () {
   function _slicedToArray(t, n) {
     return _arrayWithHoles(t) || _iterableToArrayLimit(t, n) || _unsupportedIterableToArray(t, n) || _nonIterableRest();
@@ -96213,91 +95840,32 @@ function init() {
   return _init.apply(this, arguments);
 } // init()
 function _init() {
-  _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+  _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var hasOptedIn;
-    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-      while (1) switch (_context2.prev = _context2.next) {
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
         case 0:
-          _context2.next = 2;
+          _context4.next = 2;
           return mellowtel.initBackground();
         case 2:
-          _context2.next = 4;
+          _context4.next = 4;
           return mellowtel.optIn();
         case 4:
-          _context2.next = 6;
+          _context4.next = 6;
           return mellowtel.start();
         case 6:
-          _context2.next = 8;
+          _context4.next = 8;
           return mellowtel.getOptInStatus();
         case 8:
-          hasOptedIn = _context2.sent;
+          hasOptedIn = _context4.sent;
           console.log("?", hasOptedIn);
         case 10:
         case "end":
-          return _context2.stop();
+          return _context4.stop();
       }
-    }, _callee2);
+    }, _callee4);
   }));
   return _init.apply(this, arguments);
-}
-chrome.runtime.onInstalled.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-  var currentVersion, newVersionKey, updateShownKey, previousVersion, updateShown;
-  return _regeneratorRuntime().wrap(function _callee$(_context) {
-    while (1) switch (_context.prev = _context.next) {
-      case 0:
-        currentVersion = chrome.runtime.getManifest().version;
-        newVersionKey = 'newVersion';
-        updateShownKey = 'updateShown'; // Check if this is a new version of the extension
-        _context.next = 5;
-        return getFromStorage(newVersionKey);
-      case 5:
-        previousVersion = _context.sent;
-        if (!(currentVersion !== previousVersion)) {
-          _context.next = 16;
-          break;
-        }
-        _context.next = 9;
-        return setInStorage(newVersionKey, currentVersion);
-      case 9:
-        _context.next = 11;
-        return getFromStorage(updateShownKey);
-      case 11:
-        updateShown = _context.sent;
-        if (updateShown) {
-          _context.next = 16;
-          break;
-        }
-        // Open a new tab with the update page
-        chrome.tabs.create({
-          url: "disclaimer.html"
-        });
-
-        // Set the flag so we don't show the update notification again
-        _context.next = 16;
-        return setInStorage(updateShownKey, true);
-      case 16:
-      case "end":
-        return _context.stop();
-    }
-  }, _callee);
-})));
-
-// Helper function to get data from storage
-function getFromStorage(key) {
-  return new Promise(function (resolve) {
-    chrome.storage.local.get([key], function (result) {
-      resolve(result[key]);
-    });
-  });
-}
-
-// Helper function to set data in storage
-function setInStorage(key, value) {
-  return new Promise(function (resolve) {
-    chrome.storage.local.set(_defineProperty({}, key, value), function () {
-      resolve();
-    });
-  });
 }
 function onIcon() {
   chrome.action.setIcon({
@@ -96319,30 +95887,30 @@ function isRealTab() {
   return _isRealTab.apply(this, arguments);
 }
 function _isRealTab() {
-  _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+  _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var tabs;
-    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
         case 0:
-          _context3.next = 2;
+          _context5.next = 2;
           return chrome.tabs.query({
             active: true,
             currentWindow: true
           });
         case 2:
-          tabs = _context3.sent;
+          tabs = _context5.sent;
           if (!(!tabs || !tabs.length || tabs[0].id < 0)) {
-            _context3.next = 5;
+            _context5.next = 5;
             break;
           }
-          return _context3.abrupt("return");
+          return _context5.abrupt("return");
         case 5:
-          return _context3.abrupt("return", tabs[0]);
+          return _context5.abrupt("return", tabs[0]);
         case 6:
         case "end":
-          return _context3.stop();
+          return _context5.stop();
       }
-    }, _callee3);
+    }, _callee5);
   }));
   return _isRealTab.apply(this, arguments);
 }
@@ -96350,17 +95918,17 @@ function isBlockerActive() {
   return _isBlockerActive.apply(this, arguments);
 }
 function _isBlockerActive() {
-  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
     var mTab, blockStatus;
-    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-      while (1) switch (_context4.prev = _context4.next) {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
         case 0:
-          _context4.next = 2;
+          _context6.next = 2;
           return isRealTab();
         case 2:
-          mTab = _context4.sent;
+          mTab = _context6.sent;
           if (mTab.url.startsWith("http")) {
-            _context4.next = 7;
+            _context6.next = 7;
             break;
           }
           chrome.action.setIcon({
@@ -96369,23 +95937,23 @@ function _isBlockerActive() {
           chrome.action.setTitle({
             title: "blocking forbidden!"
           });
-          return _context4.abrupt("return");
+          return _context6.abrupt("return");
         case 7:
-          _context4.next = 9;
+          _context6.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "getStatus"
           })["catch"](function () {
             console.log("tabs send message fail 2");
           });
         case 9:
-          blockStatus = _context4.sent;
+          blockStatus = _context6.sent;
           console.log(blockStatus);
           blockStatus ? onIcon() : offIcon();
         case 12:
         case "end":
-          return _context4.stop();
+          return _context6.stop();
       }
-    }, _callee4);
+    }, _callee6);
   }));
   return _isBlockerActive.apply(this, arguments);
 }
@@ -96393,27 +95961,27 @@ function blockerClicked() {
   return _blockerClicked.apply(this, arguments);
 }
 function _blockerClicked() {
-  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
     var mTab, res;
-    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-      while (1) switch (_context5.prev = _context5.next) {
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
         case 0:
           if (allowed) {
-            _context5.next = 4;
+            _context7.next = 4;
             break;
           }
-          _context5.next = 3;
+          _context7.next = 3;
           return chrome.permissions.request({
             origins: ["*://*/*"]
           });
         case 3:
-          allowed = _context5.sent;
+          allowed = _context7.sent;
         case 4:
-          _context5.next = 6;
+          _context7.next = 6;
           return isRealTab();
         case 6:
-          mTab = _context5.sent;
-          _context5.next = 9;
+          mTab = _context7.sent;
+          _context7.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
             allowed: allowed
@@ -96421,13 +95989,13 @@ function _blockerClicked() {
             console.log("tabs send message fail 1");
           });
         case 9:
-          res = _context5.sent;
+          res = _context7.sent;
           if (res) {
-            _context5.next = 21;
+            _context7.next = 21;
             break;
           }
-          _context5.prev = 11;
-          _context5.next = 14;
+          _context7.prev = 11;
+          _context7.next = 14;
           return chrome.scripting.executeScript({
             files: ["content_script.js"],
             target: {
@@ -96435,23 +96003,23 @@ function _blockerClicked() {
             }
           });
         case 14:
-          _context5.next = 16;
+          _context7.next = 16;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
             allowed: allowed
           });
         case 16:
-          _context5.next = 21;
+          _context7.next = 21;
           break;
         case 18:
-          _context5.prev = 18;
-          _context5.t0 = _context5["catch"](11);
+          _context7.prev = 18;
+          _context7.t0 = _context7["catch"](11);
           console.log("could not load content script");
         case 21:
         case "end":
-          return _context5.stop();
+          return _context7.stop();
       }
-    }, _callee5, null, [[11, 18]]);
+    }, _callee7, null, [[11, 18]]);
   }));
   return _blockerClicked.apply(this, arguments);
 }
