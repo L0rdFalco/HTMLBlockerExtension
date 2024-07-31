@@ -95961,16 +95961,40 @@ var mainObj = {
   blockStatus: false,
   keyDownCB: function keyDownCB() {},
   keyUpCB: function keyUpCB() {},
+  startBlocking: function startBlocking() {
+    this.blockStatus = true;
+    chrome.runtime.sendMessage({
+      action: "checkStatus",
+      blocking: true
+    });
+  },
+  stopBlocking: function stopBlocking() {
+    this.blockStatus = false;
+    chrome.runtime.sendMessage({
+      action: "checkStatus",
+      blocking: false
+    });
+  },
+  toggleBlocking: function toggleBlocking() {
+    if (this.blockStatus) {
+      console.log("stop blocking");
+      this.stopBlocking();
+    } else {
+      console.log("start blocking");
+      this.startBlocking();
+    }
+  },
   bgReceiver: function bgReceiver(msg, sender, res) {
     console.log(msg);
     console.log(sender);
     if (msg.action === "toggle") {
-      console.log("switch cs on or off");
+      mainObj.toggleBlocking();
       console.log("toggled");
     } else if (msg.action === "getStatus") {
-      console.log("get cs status");
-      res(this.blockStatus);
+      console.log("get cs status", mainObj.blockStatus);
+      res(mainObj.blockStatus);
     }
+    return true;
   },
   init: function init() {
     document.addEventListener("keydown", this.keyDownCB);

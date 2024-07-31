@@ -25,13 +25,13 @@ const mainObj = {
     startBlocking: function () {
         this.blockStatus = true
 
-        chrome.runtime.sendMessge({ action: "checkStatus", blocking: true })
+        chrome.runtime.sendMessage({ action: "checkStatus", blocking: true })
     },
     stopBlocking: function () {
 
         this.blockStatus = false
 
-        chrome.runtime.sendMessge({ action: "checkStatus", blocking: false })
+        chrome.runtime.sendMessage({ action: "checkStatus", blocking: false })
     },
     toggleBlocking: function () {
         if (this.blockStatus) {
@@ -52,16 +52,18 @@ const mainObj = {
         console.log(sender);
 
         if (msg.action === "toggle") {
+            mainObj.toggleBlocking()
             console.log("toggled");
-            this.toggleBlocking()
         }
 
         else if (msg.action === "getStatus") {
-            console.log("get cs status");
+            console.log("get cs status", mainObj.blockStatus);
 
-            res(this.blockStatus)
+            res(mainObj.blockStatus)
 
         }
+
+        return true
     },
 
     init: function () {

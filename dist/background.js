@@ -95993,6 +95993,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   console.log("tabs on updated");
   isBlockerActive();
 });
+chrome.runtime.onMessage.addListener(function (msg, sender, res) {
+  if (msg.action === "checkStatus") {
+    msg.blocking ? onIcon() : offIcon();
+  }
+});
 chrome.permissions.contains({
   origins: ["*://*/*"]
 }).then(function (res) {

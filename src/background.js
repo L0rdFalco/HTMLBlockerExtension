@@ -129,6 +129,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   isBlockerActive()
 })
 
+chrome.runtime.onMessage.addListener((msg, sender, res) => {
+
+  if (msg.action === "checkStatus") {
+    msg.blocking ? onIcon() : offIcon()
+
+
+  }
+
+})
+
 chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => active = res)
 
 isBlockerActive()
