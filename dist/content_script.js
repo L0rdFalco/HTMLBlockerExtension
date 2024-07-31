@@ -95956,7 +95956,7 @@ var cssFinder = function () {
   }
   return n;
 }();
-var X = true;
+var X = "CS_RES";
 var mainObj = {
   blockStatus: false,
   keyDownCB: function keyDownCB() {},
@@ -95984,14 +95984,14 @@ var mainObj = {
       this.startBlocking();
     }
   },
-  bgReceiver: function bgReceiver(msg, sender, res) {
+  bgReceiver: function bgReceiver(msg, sender, sendResponse) {
     console.log(msg);
     console.log(sender);
     if (msg.action === "toggle") {
       mainObj.toggleBlocking();
+      sendResponse(X);
       console.log("toggled");
     } else if (msg.action === "getStatus") {
-      console.log("get cs status", mainObj.blockStatus);
       res(mainObj.blockStatus);
     }
     return true;

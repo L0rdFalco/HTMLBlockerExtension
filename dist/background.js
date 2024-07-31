@@ -95952,35 +95952,36 @@ function _blockerClicked() {
           res = _context6.sent;
           console.log(res);
           if (res) {
-            _context6.next = 22;
+            _context6.next = 23;
             break;
           }
           _context6.prev = 12;
-          _context6.next = 15;
+          console.log("injecting content script");
+          _context6.next = 16;
           return chrome.scripting.executeScript({
             files: ["content_script.js"],
             target: {
               tabId: mTab.id
             }
           });
-        case 15:
-          _context6.next = 17;
+        case 16:
+          _context6.next = 18;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
             status: active
           });
-        case 17:
-          _context6.next = 22;
+        case 18:
+          _context6.next = 23;
           break;
-        case 19:
-          _context6.prev = 19;
+        case 20:
+          _context6.prev = 20;
           _context6.t0 = _context6["catch"](12);
           console.log("could not load content script");
-        case 22:
+        case 23:
         case "end":
           return _context6.stop();
       }
-    }, _callee6, null, [[12, 19]]);
+    }, _callee6, null, [[12, 20]]);
   }));
   return _blockerClicked.apply(this, arguments);
 }
