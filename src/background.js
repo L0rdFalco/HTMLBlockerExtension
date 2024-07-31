@@ -80,6 +80,14 @@ async function isBlockerActive() {
 }
 
 
+const csReceiver = (msg, sender, res) => {
+
+  if (msg.action === "checkStatus") {
+    msg.blocking ? onIcon() : offIcon()
+
+  }
+
+}
 
 
 async function blockerClicked() {
@@ -136,15 +144,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   isBlockerActive()
 })
 
-chrome.runtime.onMessage.addListener((msg, sender, res) => {
-
-  if (msg.action === "checkStatus") {
-    msg.blocking ? onIcon() : offIcon()
-
-
-  }
-
-})
+chrome.runtime.onMessage.addListener(csReceiver)
 
 chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => active = res)
 

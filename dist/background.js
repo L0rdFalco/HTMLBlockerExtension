@@ -95826,7 +95826,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     });
   });
 })();
-var active = true;
+var allowed = true;
 function onIcon() {
   chrome.action.setIcon({
     path: "./icons/icon16_on.png"
@@ -95841,6 +95841,14 @@ function offIcon() {
   });
   chrome.action.setTitle({
     title: "blocking off"
+  });
+}
+function forbiddenIcon() {
+  chrome.action.setIcon({
+    path: "./icons/icon16_no.png"
+  });
+  chrome.action.setTitle({
+    title: "blocking forbidden!"
   });
 }
 function isRealTab() {
@@ -95888,28 +95896,23 @@ function _isBlockerActive() {
         case 2:
           mTab = _context5.sent;
           if (mTab.url.startsWith("http")) {
-            _context5.next = 7;
+            _context5.next = 6;
             break;
           }
-          chrome.action.setIcon({
-            path: "./icons/icon16_no.png"
-          });
-          chrome.action.setTitle({
-            title: "blocking forbidden!"
-          });
+          forbiddenIcon();
           return _context5.abrupt("return");
-        case 7:
-          _context5.next = 9;
+        case 6:
+          _context5.next = 8;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "getStatus"
           })["catch"](function () {
             console.log("tabs send message fail 2");
           });
-        case 9:
+        case 8:
           blockStatus = _context5.sent;
           console.log("blocking? ", blockStatus);
           blockStatus ? onIcon() : offIcon();
-        case 12:
+        case 11:
         case "end":
           return _context5.stop();
       }
@@ -95926,7 +95929,7 @@ function _blockerClicked() {
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
-          if (active) {
+          if (allowed) {
             _context6.next = 4;
             break;
           }
@@ -95935,7 +95938,7 @@ function _blockerClicked() {
             origins: ["*://*/*"]
           });
         case 3:
-          active = _context6.sent;
+          allowed = _context6.sent;
         case 4:
           _context6.next = 6;
           return isRealTab();
@@ -95944,7 +95947,7 @@ function _blockerClicked() {
           _context6.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
-            status: active
+            status: allowed
           })["catch"](function () {
             console.log("tabs send message fail 1");
           });
@@ -95952,11 +95955,12 @@ function _blockerClicked() {
           res = _context6.sent;
           console.log(res);
           if (res) {
-            _context6.next = 23;
+            _context6.next = 24;
             break;
           }
           _context6.prev = 12;
           console.log("injecting content script");
+          // force inject cs
           _context6.next = 16;
           return chrome.scripting.executeScript({
             files: ["content_script.js"],
@@ -95968,16 +95972,17 @@ function _blockerClicked() {
           _context6.next = 18;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
-            status: active
+            status: allowed
           });
         case 18:
-          _context6.next = 23;
+          _context6.next = 24;
           break;
         case 20:
           _context6.prev = 20;
           _context6.t0 = _context6["catch"](12);
-          console.log("could not load content script");
-        case 23:
+          console.log("could not load on this protected page");
+          forbiddenIcon();
+        case 24:
         case "end":
           return _context6.stop();
       }

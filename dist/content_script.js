@@ -95992,7 +95992,7 @@ var mainObj = {
       sendResponse(X);
       console.log("toggled");
     } else if (msg.action === "getStatus") {
-      res(mainObj.blockStatus);
+      sendResponse(mainObj.blockStatus);
     }
     return true;
   },
