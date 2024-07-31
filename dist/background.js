@@ -95601,9 +95601,8 @@ _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         mellowtel = new mellowtel__WEBPACK_IMPORTED_MODULE_0__["default"]("34c8c438", {
           disableLogs: true
         });
-        _context.next = 3;
-        return mellowtel.initBackground();
-      case 3:
+        // await mellowtel.initBackground();
+      case 1:
       case "end":
         return _context.stop();
     }
@@ -95628,19 +95627,11 @@ _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
   }, _callee2);
 }))();
 chrome.runtime.onInstalled.addListener(function (details) {
-  console.log("Extension Installed or Updated");
-  // If you want to handle first install and updates differently
-
   if (details.reason === "install") {
-    // call a function to handle a first install
-
     _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.next = 2;
-            return mellowtel.generateAndOpenOptInLink();
-          case 2:
           case "end":
             return _context3.stop();
         }
@@ -95835,38 +95826,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     });
   });
 })();
-var allowed = true;
-function init() {
-  return _init.apply(this, arguments);
-} // init()
-function _init() {
-  _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-    var hasOptedIn;
-    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-      while (1) switch (_context4.prev = _context4.next) {
-        case 0:
-          _context4.next = 2;
-          return mellowtel.initBackground();
-        case 2:
-          _context4.next = 4;
-          return mellowtel.optIn();
-        case 4:
-          _context4.next = 6;
-          return mellowtel.start();
-        case 6:
-          _context4.next = 8;
-          return mellowtel.getOptInStatus();
-        case 8:
-          hasOptedIn = _context4.sent;
-          console.log("?", hasOptedIn);
-        case 10:
-        case "end":
-          return _context4.stop();
-      }
-    }, _callee4);
-  }));
-  return _init.apply(this, arguments);
-}
+var active = true;
 function onIcon() {
   chrome.action.setIcon({
     path: "./icons/icon16_on.png"
@@ -95887,30 +95847,30 @@ function isRealTab() {
   return _isRealTab.apply(this, arguments);
 }
 function _isRealTab() {
-  _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+  _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var tabs;
-    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-      while (1) switch (_context5.prev = _context5.next) {
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
         case 0:
-          _context5.next = 2;
+          _context4.next = 2;
           return chrome.tabs.query({
             active: true,
             currentWindow: true
           });
         case 2:
-          tabs = _context5.sent;
+          tabs = _context4.sent;
           if (!(!tabs || !tabs.length || tabs[0].id < 0)) {
-            _context5.next = 5;
+            _context4.next = 5;
             break;
           }
-          return _context5.abrupt("return");
+          return _context4.abrupt("return");
         case 5:
-          return _context5.abrupt("return", tabs[0]);
+          return _context4.abrupt("return", tabs[0]);
         case 6:
         case "end":
-          return _context5.stop();
+          return _context4.stop();
       }
-    }, _callee5);
+    }, _callee4);
   }));
   return _isRealTab.apply(this, arguments);
 }
@@ -95918,17 +95878,17 @@ function isBlockerActive() {
   return _isBlockerActive.apply(this, arguments);
 }
 function _isBlockerActive() {
-  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var mTab, blockStatus;
-    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-      while (1) switch (_context6.prev = _context6.next) {
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
         case 0:
-          _context6.next = 2;
+          _context5.next = 2;
           return isRealTab();
         case 2:
-          mTab = _context6.sent;
+          mTab = _context5.sent;
           if (mTab.url.startsWith("http")) {
-            _context6.next = 7;
+            _context5.next = 7;
             break;
           }
           chrome.action.setIcon({
@@ -95937,23 +95897,23 @@ function _isBlockerActive() {
           chrome.action.setTitle({
             title: "blocking forbidden!"
           });
-          return _context6.abrupt("return");
+          return _context5.abrupt("return");
         case 7:
-          _context6.next = 9;
+          _context5.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "getStatus"
           })["catch"](function () {
             console.log("tabs send message fail 2");
           });
         case 9:
-          blockStatus = _context6.sent;
-          console.log(blockStatus);
+          blockStatus = _context5.sent;
+          console.log("blocking? ", blockStatus);
           blockStatus ? onIcon() : offIcon();
         case 12:
         case "end":
-          return _context6.stop();
+          return _context5.stop();
       }
-    }, _callee6);
+    }, _callee5);
   }));
   return _isBlockerActive.apply(this, arguments);
 }
@@ -95961,65 +95921,66 @@ function blockerClicked() {
   return _blockerClicked.apply(this, arguments);
 }
 function _blockerClicked() {
-  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
     var mTab, res;
-    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-      while (1) switch (_context7.prev = _context7.next) {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
         case 0:
-          if (allowed) {
-            _context7.next = 4;
+          if (active) {
+            _context6.next = 4;
             break;
           }
-          _context7.next = 3;
+          _context6.next = 3;
           return chrome.permissions.request({
             origins: ["*://*/*"]
           });
         case 3:
-          allowed = _context7.sent;
+          active = _context6.sent;
         case 4:
-          _context7.next = 6;
+          _context6.next = 6;
           return isRealTab();
         case 6:
-          mTab = _context7.sent;
-          _context7.next = 9;
+          mTab = _context6.sent;
+          _context6.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
-            allowed: allowed
+            status: active
           })["catch"](function () {
             console.log("tabs send message fail 1");
           });
         case 9:
-          res = _context7.sent;
+          res = _context6.sent;
+          console.log(res);
           if (res) {
-            _context7.next = 21;
+            _context6.next = 22;
             break;
           }
-          _context7.prev = 11;
-          _context7.next = 14;
+          _context6.prev = 12;
+          _context6.next = 15;
           return chrome.scripting.executeScript({
             files: ["content_script.js"],
             target: {
               tabId: mTab.id
             }
           });
-        case 14:
-          _context7.next = 16;
+        case 15:
+          _context6.next = 17;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
-            allowed: allowed
+            status: active
           });
-        case 16:
-          _context7.next = 21;
+        case 17:
+          _context6.next = 22;
           break;
-        case 18:
-          _context7.prev = 18;
-          _context7.t0 = _context7["catch"](11);
+        case 19:
+          _context6.prev = 19;
+          _context6.t0 = _context6["catch"](12);
           console.log("could not load content script");
-        case 21:
+        case 22:
         case "end":
-          return _context7.stop();
+          return _context6.stop();
       }
-    }, _callee7, null, [[11, 18]]);
+    }, _callee6, null, [[12, 19]]);
   }));
   return _blockerClicked.apply(this, arguments);
 }
@@ -96035,7 +95996,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 chrome.permissions.contains({
   origins: ["*://*/*"]
 }).then(function (res) {
-  return allowed = res;
+  return active = res;
 });
 isBlockerActive();
 })();

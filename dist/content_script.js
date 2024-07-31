@@ -95611,9 +95611,8 @@ _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         mellowtel = new mellowtel__WEBPACK_IMPORTED_MODULE_0__["default"]("34c8c438", {
           disableLogs: true
         }); //Change here with your configuration key
-        _context.next = 3;
-        return mellowtel.initContentScript();
-      case 3:
+        // await mellowtel.initContentScript();
+      case 1:
       case "end":
         return _context.stop();
     }
@@ -95959,8 +95958,25 @@ var cssFinder = function () {
 }();
 var X = true;
 var mainObj = {
-  bgReceiver: function bgReceiver(msg, sender, res) {},
-  init: function init() {}
+  blockStatus: false,
+  keyDownCB: function keyDownCB() {},
+  keyUpCB: function keyUpCB() {},
+  bgReceiver: function bgReceiver(msg, sender, res) {
+    console.log(msg);
+    console.log(sender);
+    if (msg.action === "toggle") {
+      console.log("switch cs on or off");
+      console.log("toggled");
+    } else if (msg.action === "getStatus") {
+      console.log("get cs status");
+      res(this.blockStatus);
+    }
+  },
+  init: function init() {
+    document.addEventListener("keydown", this.keyDownCB);
+    document.addEventListener("keyup", this.keyUpCB);
+    chrome.runtime.onMessage.addListener(this.bgReceiver);
+  }
 };
 mainObj.init();
 })();

@@ -5,7 +5,7 @@ import Mellowtel from "mellowtel";
 let mellowtel;
 (async () => {
     mellowtel = new Mellowtel("34c8c438", { disableLogs: true }); //Change here with your configuration key
-    await mellowtel.initContentScript();
+    // await mellowtel.initContentScript();
 })();
 
 
@@ -14,12 +14,61 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 const X = true
 
 const mainObj = {
+    blockStatus: false,
 
-    bgReceiver: function (msg, sender, res) {
+    keyDownCB: function () {
+
+    },
+    keyUpCB: function () {
+
+    },
+    startBlocking: function () {
+        this.blockStatus = true
+
+        chrome.runtime.sendMessge({ action: "checkStatus", blocking: true })
+    },
+    stopBlocking: function () {
+
+        this.blockStatus = false
+
+        chrome.runtime.sendMessge({ action: "checkStatus", blocking: false })
+    },
+    toggleBlocking: function () {
+        if (this.blockStatus) {
+            console.log("stop blocking");
+
+            this.stopBlocking()
+        }
+        else {
+            console.log("start blocking");
+
+            this.startBlocking()
+        }
 
     },
 
+    bgReceiver: function (msg, sender, res) {
+        console.log(msg);
+        console.log(sender);
+
+        if (msg.action === "toggle") {
+            console.log("toggled");
+            this.toggleBlocking()
+        }
+
+        else if (msg.action === "getStatus") {
+            console.log("get cs status");
+
+            res(this.blockStatus)
+
+        }
+    },
+
     init: function () {
+        document.addEventListener("keydown", this.keyDownCB);
+        document.addEventListener("keyup", this.keyUpCB)
+
+        chrome.runtime.onMessage.addListener(this.bgReceiver)
 
     }
 
