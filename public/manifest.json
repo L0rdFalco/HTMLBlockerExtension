@@ -3,6 +3,7 @@
     "description": "Block any HTML element with one click!",
     "version": "0.0.0.1",
     "manifest_version": 3,
+    "incognito": "spanning",
     "icons": {
         "16": "./icons/icon16.png",
         "24": "./icons/icon24.png",
@@ -13,20 +14,6 @@
         "256": "./icons/icon256.png",
         "512": "./icons/icon512.png"
     },
-    "content_scripts": [
-        {
-            "all_frames": false,
-            "matches": [
-                "https://*/*",
-                "http://127.0.0.1/*",
-                "http://localhost/*"
-            ],
-            "js": [
-                "content_script.js"
-            ],
-            "run_at": "document_end"
-        }
-    ],
     "action": {
         "default_icons": {
             "16": "./icons/icon16.png",
@@ -41,6 +28,18 @@
         "default_title": "html blocker"
     },
     "options_page": "options.html",
+    "content_scripts": [
+        {
+            "all_frames": false,
+            "matches": [
+                "*://*/*"
+            ],
+            "js": [
+                "content_script.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
     "background": {
         "service_worker": "background.js"
     },
@@ -63,6 +62,5 @@
                 "content.css"
             ]
         }
-    ],
-    "incognito": "spanning"
+    ]
 }
