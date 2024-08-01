@@ -95963,6 +95963,9 @@ var mainObj = {
   keyUpCB: function keyUpCB() {},
   startBlocking: function startBlocking() {
     this.blockStatus = true;
+
+    //add start blocking logic here
+
     chrome.runtime.sendMessage({
       action: "checkStatus",
       blocking: true
@@ -95970,6 +95973,9 @@ var mainObj = {
   },
   stopBlocking: function stopBlocking() {
     this.blockStatus = false;
+
+    //add stop blocking logic here
+
     chrome.runtime.sendMessage({
       action: "checkStatus",
       blocking: false

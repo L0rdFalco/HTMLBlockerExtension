@@ -15,6 +15,10 @@ const X = "CS_RES"
 
 const mainObj = {
     blockStatus: false,
+    mWindow: null,
+    mazZ: 2147483647,
+    hiddenElements: [],
+    previewedHiddenSelector: null,
 
     keyDownCB: function () {
 
@@ -22,14 +26,85 @@ const mainObj = {
     keyUpCB: function () {
 
     },
+
+    updateCSS: function () {
+        let cssArr = [
+            `
+            blkr_wind {
+
+            }
+            @media (prefers-color-scheme: dark){
+                #blkr_wind {background: #000; boz-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
+            }
+            `
+        ]
+
+        for (let i in this.hiddenElements) {
+            let selector = this.hiddenElements[i].selector;
+            if (selector === this.previewedHiddenSelector) {
+
+            }
+
+            else if (selector === "body" || selector === "html") {
+
+            }
+
+            else {
+
+            }
+
+        }
+
+        if (this.hiddenElements.length) {
+            cssLines.push(
+                `
+                `
+
+            )
+        }
+
+        let stylesElement = document.getElementById("blkr_styles")
+
+        if (!stylesElement) {
+            stylesElement = document.createElement("style");
+            stylesElement.id = "blkr_styles"
+            stylesElement.type = "text/css";
+            document.head.appendChild(stylesElement)
+        }
+
+        while (stylesElement.firstChild) {
+            stylesElement.removeChild(stylesElement.firstChild)
+        }
+
+        stylesElement.appendChild(document.createTextNode(cssArr.join('\n')))
+
+    },
     startBlocking: function () {
         this.blockStatus = true
+        //add start blocking logic here
+
+        if (!this.mWindow) this.updateCSS()
+
+        let shadowElement = document.createElement("div");
+        shadowElement.setAttribute("id", "blkr_window");
+        shadowElement.attachShadow({ mode: "open" });
+        shadowElement.style.visibility = "hidden";
+        document.body.appendChild(shadowElement);
+        this.mWindow = shadowElement;
+
+
+
+
+
+
 
         chrome.runtime.sendMessage({ action: "checkStatus", blocking: true }) // to update icon
     },
     stopBlocking: function () {
 
         this.blockStatus = false
+
+        //add stop blocking logic here
 
         chrome.runtime.sendMessage({ action: "checkStatus", blocking: false }) // update icon
     },
@@ -60,8 +135,6 @@ const mainObj = {
             sendResponse(mainObj.blockStatus)
 
         }
-
-        return true
     },
 
     init: function () {

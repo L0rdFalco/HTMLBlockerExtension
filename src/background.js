@@ -148,6 +148,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.runtime.onMessage.addListener(csReceiver)
 
 //for ffx
-chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => active = res)
+chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => allowed = res)
 
 isBlockerActive()

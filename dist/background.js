@@ -96027,7 +96027,7 @@ chrome.runtime.onMessage.addListener(csReceiver);
 chrome.permissions.contains({
   origins: ["*://*/*"]
 }).then(function (res) {
-  return active = res;
+  return allowed = res;
 });
 isBlockerActive();
 })();
