@@ -59,11 +59,11 @@ async function isRealTab() {
   return tabs[0];
 }
 
+//shows appropriate icons based on blocking status and type of page
 async function isBlockerActive() {
 
   let mTab = await isRealTab()
 
-  // console.log(mTab.url.startsWith("http"), mTab.url);
   if (!mTab.url.startsWith("http")) {
     forbiddenIcon()
 
@@ -89,6 +89,19 @@ const csReceiver = (msg, sender, res) => {
 
 }
 
+async function forceInjectCS() {
+  try {
+    console.log("injecting content script");
+    // force inject cs
+    await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } })
+
+    //set icon  to active
+    await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed })
+  } catch (error) {
+    console.log("could not load on this protected page");
+    forbiddenIcon()
+  }
+}
 
 async function blockerClicked() {
   if (!allowed) {
@@ -103,27 +116,15 @@ async function blockerClicked() {
   3. if not activated, load the content scripts that activates the blocker
   */
 
-  let mTab = await isRealTab()
+  let mTab = await isRealTab();
 
   let res = await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed }).catch(() => {
     console.log("tabs send message fail 1");
-  })
+  });
 
-  console.log(res);
+  if (!res) { // means that content script wasn't injected there4 do so dynamically
 
-  if (!res) {
-
-    try {
-      console.log("injecting content script");
-      // force inject cs
-      await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } })
-
-      //set icon  to active
-      await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed })
-    } catch (error) {
-      console.log("could not load on this protected page");
-      forbiddenIcon()
-    }
+    await forceInjectCS()
 
   }
 
@@ -146,6 +147,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.runtime.onMessage.addListener(csReceiver)
 
+//for ffx
 chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => active = res)
 
 isBlockerActive()

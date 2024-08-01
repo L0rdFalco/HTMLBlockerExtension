@@ -95966,14 +95966,14 @@ var mainObj = {
     chrome.runtime.sendMessage({
       action: "checkStatus",
       blocking: true
-    });
+    }); // to update icon
   },
   stopBlocking: function stopBlocking() {
     this.blockStatus = false;
     chrome.runtime.sendMessage({
       action: "checkStatus",
       blocking: false
-    });
+    }); // update icon
   },
   toggleBlocking: function toggleBlocking() {
     if (this.blockStatus) {
@@ -95985,8 +95985,6 @@ var mainObj = {
     }
   },
   bgReceiver: function bgReceiver(msg, sender, sendResponse) {
-    console.log(msg);
-    console.log(sender);
     if (msg.action === "toggle") {
       mainObj.toggleBlocking();
       sendResponse(X);

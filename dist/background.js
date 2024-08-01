@@ -95853,7 +95853,7 @@ function forbiddenIcon() {
 }
 function isRealTab() {
   return _isRealTab.apply(this, arguments);
-}
+} //shows appropriate icons based on blocking status and type of page
 function _isRealTab() {
   _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var tabs;
@@ -95920,31 +95920,76 @@ function _isBlockerActive() {
   }));
   return _isBlockerActive.apply(this, arguments);
 }
+var csReceiver = function csReceiver(msg, sender, res) {
+  if (msg.action === "checkStatus") {
+    msg.blocking ? onIcon() : offIcon();
+  }
+};
+function forceInjectCS() {
+  return _forceInjectCS.apply(this, arguments);
+}
+function _forceInjectCS() {
+  _forceInjectCS = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.prev = 0;
+          console.log("injecting content script");
+          // force inject cs
+          _context6.next = 4;
+          return chrome.scripting.executeScript({
+            files: ["content_script.js"],
+            target: {
+              tabId: mTab.id
+            }
+          });
+        case 4:
+          _context6.next = 6;
+          return chrome.tabs.sendMessage(mTab.id, {
+            action: "toggle",
+            status: allowed
+          });
+        case 6:
+          _context6.next = 12;
+          break;
+        case 8:
+          _context6.prev = 8;
+          _context6.t0 = _context6["catch"](0);
+          console.log("could not load on this protected page");
+          forbiddenIcon();
+        case 12:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6, null, [[0, 8]]);
+  }));
+  return _forceInjectCS.apply(this, arguments);
+}
 function blockerClicked() {
   return _blockerClicked.apply(this, arguments);
 }
 function _blockerClicked() {
-  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+  _blockerClicked = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
     var mTab, res;
-    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-      while (1) switch (_context6.prev = _context6.next) {
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
         case 0:
           if (allowed) {
-            _context6.next = 4;
+            _context7.next = 4;
             break;
           }
-          _context6.next = 3;
+          _context7.next = 3;
           return chrome.permissions.request({
             origins: ["*://*/*"]
           });
         case 3:
-          allowed = _context6.sent;
+          allowed = _context7.sent;
         case 4:
-          _context6.next = 6;
+          _context7.next = 6;
           return isRealTab();
         case 6:
-          mTab = _context6.sent;
-          _context6.next = 9;
+          mTab = _context7.sent;
+          _context7.next = 9;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
             status: allowed
@@ -95952,41 +95997,18 @@ function _blockerClicked() {
             console.log("tabs send message fail 1");
           });
         case 9:
-          res = _context6.sent;
-          console.log(res);
+          res = _context7.sent;
           if (res) {
-            _context6.next = 24;
+            _context7.next = 13;
             break;
           }
-          _context6.prev = 12;
-          console.log("injecting content script");
-          // force inject cs
-          _context6.next = 16;
-          return chrome.scripting.executeScript({
-            files: ["content_script.js"],
-            target: {
-              tabId: mTab.id
-            }
-          });
-        case 16:
-          _context6.next = 18;
-          return chrome.tabs.sendMessage(mTab.id, {
-            action: "toggle",
-            status: allowed
-          });
-        case 18:
-          _context6.next = 24;
-          break;
-        case 20:
-          _context6.prev = 20;
-          _context6.t0 = _context6["catch"](12);
-          console.log("could not load on this protected page");
-          forbiddenIcon();
-        case 24:
+          _context7.next = 13;
+          return forceInjectCS();
+        case 13:
         case "end":
-          return _context6.stop();
+          return _context7.stop();
       }
-    }, _callee6, null, [[12, 20]]);
+    }, _callee7);
   }));
   return _blockerClicked.apply(this, arguments);
 }
@@ -95999,11 +96021,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   console.log("tabs on updated");
   isBlockerActive();
 });
-chrome.runtime.onMessage.addListener(function (msg, sender, res) {
-  if (msg.action === "checkStatus") {
-    msg.blocking ? onIcon() : offIcon();
-  }
-});
+chrome.runtime.onMessage.addListener(csReceiver);
+
+//for ffx
 chrome.permissions.contains({
   origins: ["*://*/*"]
 }).then(function (res) {

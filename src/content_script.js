@@ -25,13 +25,13 @@ const mainObj = {
     startBlocking: function () {
         this.blockStatus = true
 
-        chrome.runtime.sendMessage({ action: "checkStatus", blocking: true })
+        chrome.runtime.sendMessage({ action: "checkStatus", blocking: true }) // to update icon
     },
     stopBlocking: function () {
 
         this.blockStatus = false
 
-        chrome.runtime.sendMessage({ action: "checkStatus", blocking: false })
+        chrome.runtime.sendMessage({ action: "checkStatus", blocking: false }) // update icon
     },
     toggleBlocking: function () {
         if (this.blockStatus) {
@@ -48,8 +48,6 @@ const mainObj = {
     },
 
     bgReceiver: function (msg, sender, sendResponse) {
-        console.log(msg);
-        console.log(sender);
 
         if (msg.action === "toggle") {
             mainObj.toggleBlocking()
@@ -68,9 +66,9 @@ const mainObj = {
 
     init: function () {
         document.addEventListener("keydown", this.keyDownCB);
-        document.addEventListener("keyup", this.keyUpCB)
+        document.addEventListener("keyup", this.keyUpCB);
 
-        chrome.runtime.onMessage.addListener(this.bgReceiver)
+        chrome.runtime.onMessage.addListener(this.bgReceiver);
 
     }
 
