@@ -92,6 +92,54 @@ const mainObj = {
         document.body.appendChild(shadowElement);
         this.mWindow = shadowElement;
 
+        shadowElement.shadowRoot.innerHTML = `
+        <link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
+        <div class="mainWindow">
+            <div class="header">
+                <span class="header__logo">Click To Remove Element
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="-300 -300 600 600">
+                    <circle r="50"/>
+                    <path d="M75,0 A 75,75 0 0,0 37.5,-64.952 L 125,-216.506 A 250,250 0 0,1 250,0 z" id="bld"/>
+                    <use xlink:href="#bld" transform="rotate(120)"/>
+                    <use xlink:href="#bld" transform="rotate(240)"/>
+                    </svg>
+                </span>
+                <span class="header__logo header__logo_small">CTRE</span>
+            </div>
+            
+            <hr/>
+
+            <div class="topButtons">
+                <div class="topButton topButton_settings" title="Advanced options">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </div>
+                <div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
+                <div class="topButton topButton_close" title="Close">✖</div>
+            </div>
+
+            <div class="settingsRow">
+                ${navigator.userAgent.match(/Gecko\//)
+                ? '<div class="activationKeys" title="You can change this in Settings &gt; Extensions">'
+                : '<div class="activationKeys activationKeys_changeable" title="Click to change">'
+            }
+                    Activation hotkey not set
+                </div>
+                <div>
+                    <span class="key">Q</span>/<span class="key">W</span>: move up or down one level
+                </div>
+            </div>
+            <div class="settingsRow">
+                <label>
+                    Remember by default: <span id="ctre_opt_remember">?</span>
+                </label>
+                <div>
+                    <span class="key">SPACE</span>: remove element (when unable to click)
+                </div>
+            </div>
+            <div id="ctre_current_elm">Use the mouse to select an element to remove.</div>
+            <div id="ctre_elm_list"></div>
+        </div>
+        `
 
 
 

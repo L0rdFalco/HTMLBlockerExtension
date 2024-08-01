@@ -104,12 +104,6 @@ async function forceInjectCS() {
 }
 
 async function blockerClicked() {
-  if (!allowed) {
-    //for ffx
-    allowed = await chrome.permissions.request({ origins: ["*://*/*"] })
-
-  }
-
   /*
   1. check if its a real tab
   2. check if extension is activated on said tab by sending msg to content script
@@ -146,8 +140,5 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 })
 
 chrome.runtime.onMessage.addListener(csReceiver)
-
-//for ffx
-chrome.permissions.contains({ origins: ["*://*/*"] }).then(res => allowed = res)
 
 isBlockerActive()
