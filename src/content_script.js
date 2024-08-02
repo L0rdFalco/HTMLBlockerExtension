@@ -23,7 +23,7 @@ const mainObj = {
     $: function (q) {
 
         if (!this.mBlockerDiv) return null;
-        return this.mBlockerDiv.shadowElement.querySelector(q)
+        return this.mBlockerDiv.shadowRoot.querySelector(q)
     },
     $$: function (q) {
 
@@ -112,7 +112,6 @@ const mainObj = {
             stylesElement.removeChild(stylesElement.firstChild)
         }
 
-        console.log(stylesElement);
 
         stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
 
@@ -150,18 +149,6 @@ const mainObj = {
                 <div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
                 <div class="topButton topButton_close" title="Close">✖</div>
             </div>
-
-            <div class="settingsRow">
-                ${navigator.userAgent.match(/Gecko\//)
-                ? '<div class="activationKeys" title="You can change this in Settings &gt; Extensions">'
-                : '<div class="activationKeys activationKeys_changeable" title="Click to change">'
-            }
-                    Activation hotkey not set
-                </div>
-                <div>
-                    <span class="key">Q</span>/<span class="key">W</span>: move up or down one level
-                </div>
-            </div>
             <div class="settingsRow">
                 <label>
                     Remember by default: <span id="blkr_opt_remember">?</span>
@@ -192,20 +179,19 @@ const mainObj = {
             e.preventDefault()
 
         });
-        this.$(".blkr_opt_remember").addEventListener("click", function (e) {
+        this.$("#blkr_opt_remember").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
 
 
-        document.addEventListener("mouseover", this.mouseOverCB, true)
-        document.addEventListener("mousedown", this.hideSelectedEl, true)
-        document.addEventListener("mouseup", this.preventEvent, true)
-        document.addEventListener("click", this.preventEvent, true)
-        document.addEventListener("scroll", this.updateHighlighterPosition, true)
+        document.addEventListener("mouseover", mainObj.mouseOverCB, true)
+        document.addEventListener("mousedown", mainObj.hideSelectedEl, true)
+        document.addEventListener("mouseup", mainObj.preventEvent, true)
+        document.addEventListener("click", mainObj.preventEvent, true)
+        document.addEventListener("scroll", mainObj.updateHighlighterPosition, true)
 
         this.injectOverlays()
-
         this.updateElementsList();
         this.updateSettingsUI();
 
