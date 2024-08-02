@@ -15,26 +15,55 @@ const X = "CS_RES"
 
 const mainObj = {
     blockStatus: false,
-    mWindow: null,
+    mBlockerDiv: null,
     mazZ: 2147483647,
     hiddenElements: [],
     previewedHiddenSelector: null,
 
-    keyDownCB: function () {
+    $: function (q) {
+
+        if (!this.mBlockerDiv) return null;
+        return this.mBlockerDiv.shadowElement.querySelector(q)
+    },
+    $$: function (q) {
 
     },
-    keyUpCB: function () {
+    keyDownCB: function (e) {
+
+    },
+    keyUpCB: function (e) {
+
+    },
+    mouseOverCB: function (e) {
+
+    },
+    hideSelectedEl: function (e) {
+
+    },
+    preventEvent: function (e) {
+
+    },
+    updateHighlighterPosition: function (e) {
+
+    },
+    updateElementsList: function () {
+
+    },
+    updateSettingsUI: function () {
 
     },
 
-    updateCSS: function () {
+    injectCSS2Head: function () {
         let cssArr = [
             `
-            blkr_wind {
-
+            #blkr_wind {
+				position: fixed; bottom: 0; right: 10px;
+				background: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);
+				border-radius: 3px 3px 0 0;
+				z-index: ${this.maxZ};
             }
             @media (prefers-color-scheme: dark){
-                #blkr_wind {background: #000; boz-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
+                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
             }
             `
         ]
@@ -42,14 +71,17 @@ const mainObj = {
         for (let i in this.hiddenElements) {
             let selector = this.hiddenElements[i].selector;
             if (selector === this.previewedHiddenSelector) {
+                cssArr.push(selector + ' { outline: solid 5px rgba(0,214,255,0.5) !important; outline-offset: -5px; }')
 
             }
 
             else if (selector === "body" || selector === "html") {
+                cssArr.push(selector + ' { background: transparent !important; }')
 
             }
 
             else {
+                cssArr.push(selector + ' { display: none !important; }')
 
             }
 
@@ -58,7 +90,10 @@ const mainObj = {
         if (this.hiddenElements.length) {
             cssLines.push(
                 `
-                `
+				html, html body, html body > #ctre_wnd { /* safeguard against "*" rules */
+					display: block !important;
+				}
+				`
 
             )
         }
@@ -72,39 +107,38 @@ const mainObj = {
             document.head.appendChild(stylesElement)
         }
 
+        console.log("styles element first child: ", stylesElement.firstChild);
         while (stylesElement.firstChild) {
             stylesElement.removeChild(stylesElement.firstChild)
         }
 
-        stylesElement.appendChild(document.createTextNode(cssArr.join('\n')))
+        console.log(stylesElement);
+
+        stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
+
+    },
+
+    injectOverlays: function () {
 
     },
     startBlocking: function () {
-        this.blockStatus = true
         //add start blocking logic here
-
-        if (!this.mWindow) this.updateCSS()
+        if (!this.mBlockerDiv) this.injectCSS2Head() //fresh page
 
         let shadowElement = document.createElement("div");
-        shadowElement.setAttribute("id", "blkr_window");
+        shadowElement.setAttribute("id", "blkr_wind");
         shadowElement.attachShadow({ mode: "open" });
         shadowElement.style.visibility = "hidden";
         document.body.appendChild(shadowElement);
-        this.mWindow = shadowElement;
+        this.mBlockerDiv = shadowElement; // save the reference to shadow el to be used elsewhere
 
         shadowElement.shadowRoot.innerHTML = `
         <link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
         <div class="mainWindow">
             <div class="header">
-                <span class="header__logo">Click To Remove Element
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="-300 -300 600 600">
-                    <circle r="50"/>
-                    <path d="M75,0 A 75,75 0 0,0 37.5,-64.952 L 125,-216.506 A 250,250 0 0,1 250,0 z" id="bld"/>
-                    <use xlink:href="#bld" transform="rotate(120)"/>
-                    <use xlink:href="#bld" transform="rotate(240)"/>
-                    </svg>
+                <span class="header__logo">Click To Block HTML Element
                 </span>
-                <span class="header__logo header__logo_small">CTRE</span>
+                <span class="header__logo header__logo_small"> HML Element Blocker</span>
             </div>
             
             <hr/>
@@ -130,21 +164,53 @@ const mainObj = {
             </div>
             <div class="settingsRow">
                 <label>
-                    Remember by default: <span id="ctre_opt_remember">?</span>
+                    Remember by default: <span id="blkr_opt_remember">?</span>
                 </label>
                 <div>
                     <span class="key">SPACE</span>: remove element (when unable to click)
                 </div>
             </div>
-            <div id="ctre_current_elm">Use the mouse to select an element to remove.</div>
-            <div id="ctre_elm_list"></div>
+            <div id="blkr_current_elm">Use the mouse to select an element to remove.</div>
+            <div id="blkr_elm_list"></div>
         </div>
         `
 
+        //to only show shadowEl after styling has been injected
+        this.$("link").addEventListener("load", () => {
+            shadowElement.style.visibility = "visible"
+        })
+
+        this.$(".topButton_close").addEventListener("click", function (e) {
+            e.preventDefault()
+
+        });
+        this.$(".topButton_minimize").addEventListener("click", function (e) {
+            e.preventDefault()
+
+        });
+        this.$(".topButton_settings").addEventListener("click", function (e) {
+            e.preventDefault()
+
+        });
+        this.$(".blkr_opt_remember").addEventListener("click", function (e) {
+            e.preventDefault()
+
+        });
 
 
+        document.addEventListener("mouseover", this.mouseOverCB, true)
+        document.addEventListener("mousedown", this.hideSelectedEl, true)
+        document.addEventListener("mouseup", this.preventEvent, true)
+        document.addEventListener("click", this.preventEvent, true)
+        document.addEventListener("scroll", this.updateHighlighterPosition, true)
+
+        this.injectOverlays()
+
+        this.updateElementsList();
+        this.updateSettingsUI();
 
 
+        this.blockStatus = true;
 
         chrome.runtime.sendMessage({ action: "checkStatus", blocking: true }) // to update icon
     },
@@ -186,8 +252,12 @@ const mainObj = {
     },
 
     init: function () {
-        document.addEventListener("keydown", this.keyDownCB);
-        document.addEventListener("keyup", this.keyUpCB);
+
+        //for keyboard shortcuts?
+        /**
+         document.addEventListener("keydown", this.keyDownCB);
+         document.addEventListener("keyup", this.keyUpCB); 
+         */
 
         chrome.runtime.onMessage.addListener(this.bgReceiver);
 

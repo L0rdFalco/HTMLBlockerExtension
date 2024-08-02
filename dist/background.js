@@ -95974,37 +95974,26 @@ function _blockerClicked() {
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
-          if (allowed) {
-            _context7.next = 4;
-            break;
-          }
-          _context7.next = 3;
-          return chrome.permissions.request({
-            origins: ["*://*/*"]
-          });
-        case 3:
-          allowed = _context7.sent;
-        case 4:
-          _context7.next = 6;
+          _context7.next = 2;
           return isRealTab();
-        case 6:
+        case 2:
           mTab = _context7.sent;
-          _context7.next = 9;
+          _context7.next = 5;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "toggle",
             status: allowed
           })["catch"](function () {
             console.log("tabs send message fail 1");
           });
-        case 9:
+        case 5:
           res = _context7.sent;
           if (res) {
-            _context7.next = 13;
+            _context7.next = 9;
             break;
           }
-          _context7.next = 13;
+          _context7.next = 9;
           return forceInjectCS();
-        case 13:
+        case 9:
         case "end":
           return _context7.stop();
       }
@@ -96022,13 +96011,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   isBlockerActive();
 });
 chrome.runtime.onMessage.addListener(csReceiver);
-
-//for ffx
-chrome.permissions.contains({
-  origins: ["*://*/*"]
-}).then(function (res) {
-  return allowed = res;
-});
 isBlockerActive();
 })();
 
