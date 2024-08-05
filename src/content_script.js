@@ -19,6 +19,7 @@ const mainObj = {
     mazZ: 2147483647,
     hiddenElements: [],
     previewedHiddenSelector: null,
+    settings: {},
 
     $: function (q) {
 
@@ -51,6 +52,7 @@ const mainObj = {
     },
     updateSettingsUI: function () {
 
+        this.$("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
     },
 
     injectCSS2Head: function () {
@@ -90,7 +92,7 @@ const mainObj = {
         if (this.hiddenElements.length) {
             cssLines.push(
                 `
-				html, html body, html body > #ctre_wnd { /* safeguard against "*" rules */
+				html, html body, html body > #blkr_wind { /* safeguard against "*" rules */
 					display: block !important;
 				}
 				`
@@ -118,6 +120,28 @@ const mainObj = {
     },
 
     injectOverlays: function () {
+        for (let e of document.querySelectorAll("iframe", "embed")) {
+            console.log(e);
+            let rect = e.getBoundingClientRect()
+
+            let overlayEl = document.createElement("div");
+            overlayEl.className = "blkr_overlay";
+            overlayEl.style.position = "absolute";
+            overlayEl.style.left = rect.left + window.scrollX + "px";
+            overlayEl.style.top = rect.top + window.scrollY + "px";
+            overlayEl.style.width = rect.width + "px";
+            overlayEl.style.height = rect.height + "px";
+            overlayEl.style.background = 'rgba(128,128,128,0.2)';
+            overlayEl.style.zIndex = this.mazZ - 2;
+            overlayEl.relatedElement = e;
+
+            console.log("left", rect.left, window.scrollX);
+            console.log(overlayEl);
+
+            document.body.appendChild(overlayEl)
+
+
+        }
 
     },
     startBlocking: function () {
@@ -135,7 +159,7 @@ const mainObj = {
         <link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
         <div class="mainWindow">
             <div class="header">
-                <span class="header__logo">Click To Block HTML Element
+                <span class="header__logo">Point and Click To Block HTML Element
                 </span>
                 <span class="header__logo header__logo_small"> HML Element Blocker</span>
             </div>
@@ -151,11 +175,8 @@ const mainObj = {
             </div>
             <div class="settingsRow">
                 <label>
-                    Remember by default: <span id="blkr_opt_remember">?</span>
+                    Remember by default: <span id="rmbr_checkbox">?</span>
                 </label>
-                <div>
-                    <span class="key">SPACE</span>: remove element (when unable to click)
-                </div>
             </div>
             <div id="blkr_current_elm">Use the mouse to select an element to remove.</div>
             <div id="blkr_elm_list"></div>
@@ -179,7 +200,7 @@ const mainObj = {
             e.preventDefault()
 
         });
-        this.$("#blkr_opt_remember").addEventListener("click", function (e) {
+        this.$("#rmbr_checkbox").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
@@ -191,9 +212,9 @@ const mainObj = {
         document.addEventListener("click", mainObj.preventEvent, true)
         document.addEventListener("scroll", mainObj.updateHighlighterPosition, true)
 
+        this.updateSettingsUI();
         this.injectOverlays()
         this.updateElementsList();
-        this.updateSettingsUI();
 
 
         this.blockStatus = true;
