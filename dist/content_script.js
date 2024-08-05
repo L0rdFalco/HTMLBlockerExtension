@@ -95964,20 +95964,58 @@ var mainObj = {
   hiddenElements: [],
   previewedHiddenSelector: null,
   settings: {},
-  $: function $(q) {
+  getSingleEl: function getSingleEl(q) {
     if (!this.mBlockerDiv) return null;
     return this.mBlockerDiv.shadowRoot.querySelector(q);
   },
-  $$: function $$(q) {},
+  getAllEls: function getAllEls(q) {
+    if (!this.mBlockerDiv) return null;
+    return this.mBlockerDiv.shadowRoot.querySelectorAll(q);
+  },
   keyDownCB: function keyDownCB(e) {},
   keyUpCB: function keyUpCB(e) {},
   mouseOverCB: function mouseOverCB(e) {},
   hideSelectedEl: function hideSelectedEl(e) {},
   preventEvent: function preventEvent(e) {},
   updateHighlighterPosition: function updateHighlighterPosition(e) {},
-  updateElementsList: function updateElementsList() {},
+  updateElementsList: function updateElementsList() {
+    if (!this.mBlockerDiv) return;
+    var elmentList = this.getSingleEl("#blkr_elm_list");
+    var lines = [];
+    if (this.hiddenElements.length) {
+      elmentList.classList.add("hasContent");
+    } else {
+      elmentList.classList.remove("hasContent");
+    }
+    elmentList.innerHTML = lines.join("\n");
+    function onChangePermanent(e) {}
+    function onDeleteClick(e) {}
+    function onPreviewHoverOn(e) {}
+    function onPreviewHoverOff(e) {}
+    function onEditSelector(e) {}
+    var i = -1; // dont know exactly what this is for...
+    var _iterator4 = _createForOfIteratorHelper(this.getAllEls("#blkr_elm_list table tr")),
+      _step4;
+    try {
+      for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+        var tr = _step4.value;
+        console.log(tr);
+        tr.selector = this.hiddenElements[i].selector;
+        tr.querySelector("input").add("change", onChangePermanent, false);
+        tr.querySelector("a.ct_delete").add("click", onDeleteClick, false);
+        tr.querySelector(".ct_preview").add("mouseenter", onPreviewHoverOn, false);
+        tr.querySelector(".ct_preview").add("mouseleave", onPreviewHoverOff, false);
+        tr.querySelector("a.ct_edit_selector").add("click", onEditSelector, false);
+        i++;
+      }
+    } catch (err) {
+      _iterator4.e(err);
+    } finally {
+      _iterator4.f();
+    }
+  },
   updateSettingsUI: function updateSettingsUI() {
-    this.$("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>";
+    this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>";
   },
   injectCSS2Head: function injectCSS2Head() {
     var cssArr = ["\n            #blkr_wind {\n\t\t\t\tposition: fixed; bottom: 0; right: 10px;\n\t\t\t\tbackground: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);\n\t\t\t\tborder-radius: 3px 3px 0 0;\n\t\t\t\tz-index: ".concat(this.maxZ, ";\n            }\n            @media (prefers-color-scheme: dark){\n                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }\n            }\n            ")];
@@ -96007,12 +96045,13 @@ var mainObj = {
     }
     stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
   },
+  //what are these overlays  for?
   injectOverlays: function injectOverlays() {
-    var _iterator4 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
-      _step4;
+    var _iterator5 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
+      _step5;
     try {
-      for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-        var e = _step4.value;
+      for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+        var e = _step5.value;
         console.log(e);
         var rect = e.getBoundingClientRect();
         var overlayEl = document.createElement("div");
@@ -96022,17 +96061,15 @@ var mainObj = {
         overlayEl.style.top = rect.top + window.scrollY + "px";
         overlayEl.style.width = rect.width + "px";
         overlayEl.style.height = rect.height + "px";
-        overlayEl.style.background = 'rgba(128,128,128,0.2)';
+        overlayEl.style.background = 'rgba(128,128,128,1)';
         overlayEl.style.zIndex = this.mazZ - 2;
         overlayEl.relatedElement = e;
-        console.log("left", rect.left, window.scrollX);
-        console.log(overlayEl);
         document.body.appendChild(overlayEl);
       }
     } catch (err) {
-      _iterator4.e(err);
+      _iterator5.e(err);
     } finally {
-      _iterator4.f();
+      _iterator5.f();
     }
   },
   startBlocking: function startBlocking() {
@@ -96051,19 +96088,19 @@ var mainObj = {
     shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
 
     //to only show shadowEl after styling has been injected
-    this.$("link").addEventListener("load", function () {
+    this.getSingleEl("link").addEventListener("load", function () {
       shadowElement.style.visibility = "visible";
     });
-    this.$(".topButton_close").addEventListener("click", function (e) {
+    this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
       e.preventDefault();
     });
-    this.$(".topButton_minimize").addEventListener("click", function (e) {
+    this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
       e.preventDefault();
     });
-    this.$(".topButton_settings").addEventListener("click", function (e) {
+    this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
       e.preventDefault();
     });
-    this.$("#rmbr_checkbox").addEventListener("click", function (e) {
+    this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
       e.preventDefault();
     });
     document.addEventListener("mouseover", mainObj.mouseOverCB, true);
@@ -96109,12 +96146,6 @@ var mainObj = {
     }
   },
   init: function init() {
-    //for keyboard shortcuts?
-    /**
-     document.addEventListener("keydown", this.keyDownCB);
-     document.addEventListener("keyup", this.keyUpCB); 
-     */
-
     chrome.runtime.onMessage.addListener(this.bgReceiver);
   }
 };

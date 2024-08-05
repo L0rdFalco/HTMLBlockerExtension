@@ -21,12 +21,14 @@ const mainObj = {
     previewedHiddenSelector: null,
     settings: {},
 
-    $: function (q) {
+    getSingleEl: function (q) {
 
         if (!this.mBlockerDiv) return null;
         return this.mBlockerDiv.shadowRoot.querySelector(q)
     },
-    $$: function (q) {
+    getAllEls: function (q) {
+        if (!this.mBlockerDiv) return null;
+        return this.mBlockerDiv.shadowRoot.querySelectorAll(q)
 
     },
     keyDownCB: function (e) {
@@ -48,11 +50,66 @@ const mainObj = {
 
     },
     updateElementsList: function () {
+        if (!this.mBlockerDiv) return;
+
+        let elmentList = this.getSingleEl("#blkr_elm_list");
+        let lines = [];
+
+        if (this.hiddenElements.length) {
+
+            elmentList.classList.add("hasContent")
+
+        }
+
+        else {
+
+            elmentList.classList.remove("hasContent")
+
+        }
+
+        elmentList.innerHTML = lines.join("\n");
+
+        function onChangePermanent(e) {
+
+        }
+
+        function onDeleteClick(e) {
+
+        }
+
+        function onPreviewHoverOn(e) {
+
+        }
+
+        function onPreviewHoverOff(e) {
+
+        }
+
+        function onEditSelector(e) {
+
+        }
+
+
+        let i = -1 // dont know exactly what this is for...
+
+        for (let tr of this.getAllEls("#blkr_elm_list table tr")) {
+            console.log(tr);
+
+            tr.selector = this.hiddenElements[i].selector
+
+            tr.querySelector("input").add("change", onChangePermanent, false);
+            tr.querySelector("a.ct_delete").add("click", onDeleteClick, false);
+            tr.querySelector(".ct_preview").add("mouseenter", onPreviewHoverOn, false);
+            tr.querySelector(".ct_preview").add("mouseleave", onPreviewHoverOff, false);
+            tr.querySelector("a.ct_edit_selector").add("click", onEditSelector, false);
+
+            i++
+        }
 
     },
     updateSettingsUI: function () {
 
-        this.$("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
+        this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
     },
 
     injectCSS2Head: function () {
@@ -119,6 +176,7 @@ const mainObj = {
 
     },
 
+    //what are these overlays  for?
     injectOverlays: function () {
         for (let e of document.querySelectorAll("iframe", "embed")) {
             console.log(e);
@@ -131,12 +189,9 @@ const mainObj = {
             overlayEl.style.top = rect.top + window.scrollY + "px";
             overlayEl.style.width = rect.width + "px";
             overlayEl.style.height = rect.height + "px";
-            overlayEl.style.background = 'rgba(128,128,128,0.2)';
+            overlayEl.style.background = 'rgba(128,128,128,1)';
             overlayEl.style.zIndex = this.mazZ - 2;
             overlayEl.relatedElement = e;
-
-            console.log("left", rect.left, window.scrollX);
-            console.log(overlayEl);
 
             document.body.appendChild(overlayEl)
 
@@ -184,23 +239,23 @@ const mainObj = {
         `
 
         //to only show shadowEl after styling has been injected
-        this.$("link").addEventListener("load", () => {
+        this.getSingleEl("link").addEventListener("load", () => {
             shadowElement.style.visibility = "visible"
         })
 
-        this.$(".topButton_close").addEventListener("click", function (e) {
+        this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
-        this.$(".topButton_minimize").addEventListener("click", function (e) {
+        this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
-        this.$(".topButton_settings").addEventListener("click", function (e) {
+        this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
-        this.$("#rmbr_checkbox").addEventListener("click", function (e) {
+        this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
             e.preventDefault()
 
         });
@@ -259,12 +314,6 @@ const mainObj = {
     },
 
     init: function () {
-
-        //for keyboard shortcuts?
-        /**
-         document.addEventListener("keydown", this.keyDownCB);
-         document.addEventListener("keyup", this.keyUpCB); 
-         */
 
         chrome.runtime.onMessage.addListener(this.bgReceiver);
 
