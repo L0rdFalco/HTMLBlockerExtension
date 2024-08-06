@@ -59,8 +59,11 @@ async function isRealTab() {
   return tabs[0];
 }
 
-//shows appropriate icons based on blocking status and type of page
-async function isBlockerActive() {
+/*
+is blocker window visible
+shows appropriate icons based on blocking status and type of page
+*/
+async function isBlockingOn() {
 
   let mTab = await isRealTab()
 
@@ -130,15 +133,15 @@ chrome.action.onClicked.addListener(blockerClicked)
 
 chrome.tabs.onActivated.addListener((data) => {
   console.log("tabs on activated");
-  isBlockerActive()
+  isBlockingOn()
 })
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   console.log("tabs on updated");
 
-  isBlockerActive()
+  isBlockingOn()
 })
 
 chrome.runtime.onMessage.addListener(csReceiver)
 
-isBlockerActive()
+isBlockingOn()

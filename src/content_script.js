@@ -201,7 +201,7 @@ const mainObj = {
     },
     startBlocking: function () {
         //add start blocking logic here
-        if (!this.mBlockerDiv) this.injectCSS2Head() //fresh page
+        if (!this.mBlockerDiv) this.injectCSS2Head() //blocker  window isn't already drawn and showing
 
         let shadowElement = document.createElement("div");
         shadowElement.setAttribute("id", "blkr_wind");

@@ -1,0 +1,41 @@
+background script
+-runs immediately a page is loaded
+-sets up a listener to detect a new tab(sets appropriate icon)
+-sets up a listener to detect changes in a tab (sets appropriate icon)
+-sets the appropriate icon based on type of page using  tabs.sendMessage
+-sets up a click listener for the icon (to toggle blocking status)
+
+content script
+-loaded into page from the jump and runs init()
+
+init() function does the following:
+sets an chrome.runtime.onMessage listener
+
+when icon is clicked:
+-blocking status is toggled ir startBlocking()/ stopBlocking
+
+startBlocking()
+1. if blocker  window isn't showing, inject css to head that outlines the window
+2.  create shadow element with shadow root. It essentially fills out the window created above
+3. set up the following listeners
+    - minimise button click listener
+    - settings button click listener
+    -close button click listener
+    -remember checkbox button click listener
+    -mouseover listener on the whole document
+    -mousedown listener on the whole document
+    -mouseup listener on the whole document
+    -scroll listener on the whole document
+
+4. inject overlays on iframe and embed tags(what for?)
+5. set the default remember blocking preference for all elements
+6. create a table with a list of hidden elements(if they exist)
+7. on each hidden element set up the following listeners:
+    - change listener on input element
+    - click listener on delete button
+    - mouseenter listener on preview button
+    - mouseleave listener on preview button
+    - click listener on edit selector element
+
+
+
