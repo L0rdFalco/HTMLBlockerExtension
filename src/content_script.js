@@ -22,6 +22,7 @@ const mainObj = {
     settings: {},
     activeDialog: null, //dialog box to edit element settings
     hoveredElement: null,
+    markedElement: null,
     transpose: 0, //how far up the parent hierachy to go
 
     getSingleEl: function (q) {
@@ -50,16 +51,82 @@ const mainObj = {
 
 
     },
+    highlightElement: function () {
+        if (!mainObj.hoveredElement) return;
+
+        let markedEl = mainObj.hoveredElement;
+
+        if (markedEl.className === "blkr_overlay") {
+            markedEl = markedEl.relatedElement
+
+        }
+
+        let i = 0;
+
+        for (i = 0; i < mainObj.transpose; i++) {
+
+            if (markedEl.parentNode !== window.document) {
+                markedEl = markedEl.parentNode
+            }
+
+            else {
+                break
+            }
+        }
+
+        mainObj.transpose = i
+
+        if (markedEl === mainObj.markedElement) return
+
+        mainObj.markedElement = markedEl;
+
+        let highlighterEl = main.querySelector("#blkr_highlighter");
+
+        if (!highlighterEl) {
+            highlighterEl = document.createElement("div");
+            highlighterEl.id = "blkr_highlighter";
+            highlighterEl.style.pointerEvents = "none";
+            highlighterEl.style.position = "fixed";
+            highlighterEl.style.background = 'rgba(255,128,128,0.4)';
+
+
+            highlighterEl.style.zIndex = mainObj.mazZ - 1;
+            document.body.appendChild(highlighterEl);
+
+        }
+
+        mainObj.updateHighlighterPosition();
+
+        mainObj.getSingleEl("blkr_current_el").innerHTML = mainObj.getPathHTML()
+        mainObj.getSingleEl("blkr_currentEl .pathNode.active").scrollIntoView({ block: "center" })
+
+    },
+
+    updateHighlighterPosition: function (e) {
+
+    },
+    getPathHTML: function () {
+
+    },
+    unHighlightElement: function () {
+
+    },
     hideSelectedEl: function (e) {
 
     },
     preventEvent: function (e) {
 
     },
-    updateHighlighterPosition: function (e) {
+    isChildOfBlkrWind: function (sentEl) {
+        for (let i = 0; i < 8; i++) {
+            if (sentEl == mainObj.mBlockerDiv) return true;
+            sentEl = sentEl.parentNode;
+            if (!sentEl) break;
 
-    },
-    isChildOfBlkrWind: function () {
+
+        }
+
+        return false
 
     },
     updateElementsList: function () {
@@ -69,14 +136,15 @@ const mainObj = {
         let lines = [];
 
         if (this.hiddenElements.length) {
+            /*
+            TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
+            */
 
-            elmentList.classList.add("hasContent")
 
         }
 
         else {
-
-            elmentList.classList.remove("hasContent")
+            //TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
 
         }
 
@@ -124,12 +192,7 @@ const mainObj = {
 
         this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
     },
-    highlightElement: function () {
 
-    },
-    unHighlightElement: function () {
-
-    },
     injectCSS2Head: function () {
         let cssArr = [
             `
@@ -146,33 +209,13 @@ const mainObj = {
         ]
 
         for (let i in this.hiddenElements) {
-            let selector = this.hiddenElements[i].selector;
-            if (selector === this.previewedHiddenSelector) {
-                cssArr.push(selector + ' { outline: solid 5px rgba(0,214,255,0.5) !important; outline-offset: -5px; }')
-
-            }
-
-            else if (selector === "body" || selector === "html") {
-                cssArr.push(selector + ' { background: transparent !important; }')
-
-            }
-
-            else {
-                cssArr.push(selector + ' { display: none !important; }')
-
-            }
+            //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
 
         }
 
         if (this.hiddenElements.length) {
-            cssLines.push(
-                `
-				html, html body, html body > #blkr_wind { /* safeguard against "*" rules */
-					display: block !important;
-				}
-				`
+            //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
 
-            )
         }
 
         let stylesElement = document.getElementById("blkr_styles")
