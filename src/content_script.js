@@ -20,6 +20,9 @@ const mainObj = {
     hiddenElements: [],
     previewedHiddenSelector: null,
     settings: {},
+    activeDialog: null, //dialog box to edit element settings
+    hoveredElement: null,
+    transpose: 0, //how far up the parent hierachy to go
 
     getSingleEl: function (q) {
 
@@ -31,13 +34,20 @@ const mainObj = {
         return this.mBlockerDiv.shadowRoot.querySelectorAll(q)
 
     },
-    keyDownCB: function (e) {
-
-    },
-    keyUpCB: function (e) {
-
-    },
     mouseOverCB: function (e) {
+        if (mainObj.activeDialog) return;
+        if (mainObj.isChildOfBlkrWind(e.target)) {
+            //dont do any highlighting over the drawn blocker window
+            mainObj.unHighlightElement()
+
+        }
+        if (mainObj.hoveredElement != e.target) {
+            mainObj.transpose = 0;
+            mainObj.hoveredElement = e.target,
+                mainObj.highlightElement()
+
+        }
+
 
     },
     hideSelectedEl: function (e) {
@@ -49,8 +59,11 @@ const mainObj = {
     updateHighlighterPosition: function (e) {
 
     },
+    isChildOfBlkrWind: function () {
+
+    },
     updateElementsList: function () {
-        if (!this.mBlockerDiv) return;
+        if (!this.mBlockerDiv) return; // if window is not showing
 
         let elmentList = this.getSingleEl("#blkr_elm_list");
         let lines = [];
@@ -111,7 +124,12 @@ const mainObj = {
 
         this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
     },
+    highlightElement: function () {
 
+    },
+    unHighlightElement: function () {
+
+    },
     injectCSS2Head: function () {
         let cssArr = [
             `
@@ -197,6 +215,9 @@ const mainObj = {
 
 
         }
+
+    },
+    blockSavedElms: function () {
 
     },
     startBlocking: function () {
@@ -317,6 +338,7 @@ const mainObj = {
 
         chrome.runtime.onMessage.addListener(this.bgReceiver);
 
+        this.blockSavedElms()// to block previously selected elements immediately webpage is loaded
     }
 
 }
