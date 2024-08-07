@@ -52,9 +52,9 @@ const mainObj = {
 
     },
     highlightElement: function () {
-        if (!mainObj.hoveredElement) return;
+        if (!mainObj.markedElement) return;
 
-        let markedEl = mainObj.hoveredElement;
+        let markedEl = mainObj.markedElement;
 
         if (markedEl.className === "blkr_overlay") {
             markedEl = markedEl.relatedElement
@@ -76,7 +76,7 @@ const mainObj = {
 
         mainObj.transpose = i
 
-        if (markedEl === mainObj.markedElement) return
+        if (markedEl === mainObj.markedElement) return;
 
         mainObj.markedElement = markedEl;
 
