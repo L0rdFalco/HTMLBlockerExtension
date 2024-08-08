@@ -95853,7 +95853,11 @@ function forbiddenIcon() {
 }
 function isRealTab() {
   return _isRealTab.apply(this, arguments);
-} //shows appropriate icons based on blocking status and type of page
+}
+/*
+is blocker window visible
+shows appropriate icons based on blocking status and type of page
+*/
 function _isRealTab() {
   _isRealTab = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var tabs;
@@ -95882,11 +95886,11 @@ function _isRealTab() {
   }));
   return _isRealTab.apply(this, arguments);
 }
-function isBlockerActive() {
-  return _isBlockerActive.apply(this, arguments);
+function isBlockingOn() {
+  return _isBlockingOn.apply(this, arguments);
 }
-function _isBlockerActive() {
-  _isBlockerActive = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+function _isBlockingOn() {
+  _isBlockingOn = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var mTab, blockStatus;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
@@ -95918,7 +95922,7 @@ function _isBlockerActive() {
       }
     }, _callee5);
   }));
-  return _isBlockerActive.apply(this, arguments);
+  return _isBlockingOn.apply(this, arguments);
 }
 var csReceiver = function csReceiver(msg, sender, res) {
   if (msg.action === "checkStatus") {
@@ -96004,14 +96008,14 @@ function _blockerClicked() {
 chrome.action.onClicked.addListener(blockerClicked);
 chrome.tabs.onActivated.addListener(function (data) {
   console.log("tabs on activated");
-  isBlockerActive();
+  isBlockingOn();
 });
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   console.log("tabs on updated");
-  isBlockerActive();
+  isBlockingOn();
 });
 chrome.runtime.onMessage.addListener(csReceiver);
-isBlockerActive();
+isBlockingOn();
 })();
 
 /******/ })()

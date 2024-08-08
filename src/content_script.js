@@ -82,7 +82,7 @@ const mainObj = {
 
         mainObj.markedElement = markedEl;
 
-        let highlighterEl = main.querySelector("#blkr_highlighter");
+        let highlighterEl = document.querySelector("#blkr_highlighter");
 
         if (!highlighterEl) {
             highlighterEl = document.createElement("div");
@@ -99,12 +99,28 @@ const mainObj = {
 
         mainObj.updateHighlighterPosition();
 
-        mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML()
-        mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
+        mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
+        /**
+         TODO: FIND OUT WHAT THIS DOES
+         
+         mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
+          
+         *  */
 
     },
 
-    updateHighlighterPosition: function (e) {
+    updateHighlighterPosition: function () {
+        let rect = mainObj.markedElement?.getBoundingClientRect();
+
+        if (!rect) return;
+        let highlighterEl = document.querySelector("#blkr_highlighter");
+        if (!highlighterEl) return;
+
+        highlighterEl.style.left = rect.x + "px";
+        highlighterEl.style.top = rect.y + "px";
+        highlighterEl.style.width = rect.width + "px";
+        highlighterEl.style.height = rect.height + "px";
+
 
     },
     getPathHTML: function () {
@@ -242,7 +258,6 @@ const mainObj = {
     //what are these overlays  for?
     injectOverlays: function () {
         for (let e of document.querySelectorAll("iframe", "embed")) {
-            console.log(e);
             let rect = e.getBoundingClientRect()
 
             let overlayEl = document.createElement("div");
@@ -257,6 +272,7 @@ const mainObj = {
             overlayEl.relatedElement = e;
 
             document.body.appendChild(overlayEl)
+            console.log("iframe or embed overmaid with something");
 
 
         }
@@ -266,81 +282,88 @@ const mainObj = {
 
     },
     startBlocking: function () {
-        //add start blocking logic here
-        if (!this.mBlockerDiv) this.injectCSS2Head() //blocker  window isn't already drawn and showing
 
-        let shadowElement = document.createElement("div");
-        shadowElement.setAttribute("id", "blkr_wind");
-        shadowElement.attachShadow({ mode: "open" });
-        shadowElement.style.visibility = "hidden";
-        document.body.appendChild(shadowElement);
-        this.mBlockerDiv = shadowElement; // save the reference to shadow el to be used elsewhere
+        try {
 
-        shadowElement.shadowRoot.innerHTML = `
-        <link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
-        <div class="mainWindow">
-            <div class="header">
-                <span class="header__logo">Point and Click To Block HTML Element
-                </span>
-                <span class="header__logo header__logo_small"> HML Element Blocker</span>
-            </div>
-            
-            <hr/>
+            if (!this.mBlockerDiv) this.injectCSS2Head() //blocker  window isn't already drawn and showing
 
-            <div class="topButtons">
-                <div class="topButton topButton_settings" title="Advanced options">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            let shadowElement = document.createElement("div");
+            shadowElement.setAttribute("id", "blkr_wind");
+            shadowElement.attachShadow({ mode: "open" });
+            shadowElement.style.visibility = "hidden";
+            document.body.appendChild(shadowElement);
+            this.mBlockerDiv = shadowElement; // save the reference to shadow el to be used elsewhere
+
+            shadowElement.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
+            <div class="mainWindow">
+                <div class="header">
+                    <span class="header__logo">Point and Click To Block HTML Element
+                    </span>
+                    <span class="header__logo header__logo_small"> HML Element Blocker</span>
                 </div>
-                <div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
-                <div class="topButton topButton_close" title="Close">✖</div>
+                
+                <hr/>
+    
+                <div class="topButtons">
+                    <div class="topButton topButton_settings" title="Advanced options">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
+                    <div class="topButton topButton_close" title="Close">✖</div>
+                </div>
+                <div class="settingsRow">
+                    <label>
+                        Remember by default: <span id="rmbr_checkbox">?</span>
+                    </label>
+                </div>
+                <div id="blkr_current_elm">Use the mouse to select an element to remove.</div>
+                <div id="blkr_elm_list"></div>
             </div>
-            <div class="settingsRow">
-                <label>
-                    Remember by default: <span id="rmbr_checkbox">?</span>
-                </label>
-            </div>
-            <div id="blkr_current_elm">Use the mouse to select an element to remove.</div>
-            <div id="blkr_elm_list"></div>
-        </div>
-        `
+            `
 
-        //to only show shadowEl after styling has been injected
-        this.getSingleEl("link").addEventListener("load", () => {
-            shadowElement.style.visibility = "visible"
-        })
+            //to only show shadowEl after styling has been injected
+            this.getSingleEl("link").addEventListener("load", () => {
+                shadowElement.style.visibility = "visible"
+            })
 
-        this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
-            e.preventDefault()
+            this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
+                e.preventDefault()
 
-        });
-        this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
-            e.preventDefault()
+            });
+            this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
+                e.preventDefault()
 
-        });
-        this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
-            e.preventDefault()
+            });
+            this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
+                e.preventDefault()
 
-        });
-        this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
-            e.preventDefault()
+            });
+            this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
+                e.preventDefault()
 
-        });
+            });
 
 
-        document.addEventListener("mouseover", mainObj.mouseOverCB, true)
-        document.addEventListener("mousedown", mainObj.hideSelectedEl, true)
-        document.addEventListener("mouseup", mainObj.preventEvent, true)
-        document.addEventListener("click", mainObj.preventEvent, true)
-        document.addEventListener("scroll", mainObj.updateHighlighterPosition, true)
+            document.addEventListener("mouseover", mainObj.mouseOverCB, true)
+            document.addEventListener("mousedown", mainObj.hideSelectedEl, true)
+            document.addEventListener("mouseup", mainObj.preventEvent, true)
+            document.addEventListener("click", mainObj.preventEvent, true)
+            document.addEventListener("scroll", mainObj.updateHighlighterPosition, true)
 
-        this.updateSettingsUI();
-        this.injectOverlays()
-        this.updateElementsList();
+            this.updateSettingsUI();
+            this.injectOverlays()
+            this.updateElementsList();
 
 
-        this.blockStatus = true;
+            this.blockStatus = true;
 
-        chrome.runtime.sendMessage({ action: "checkStatus", blocking: true }) // to update icon
+            chrome.runtime.sendMessage({ action: "checkStatus", blocking: true }) // to update icon
+        } catch (error) {
+            console.log(error);
+
+        }
+        //add start blocking logic here
     },
     stopBlocking: function () {
 
