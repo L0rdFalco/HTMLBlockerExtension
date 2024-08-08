@@ -44,20 +44,20 @@ const mainObj = {
         }
         if (mainObj.hoveredElement != e.target) {
             mainObj.transpose = 0;
-            mainObj.hoveredElement = e.target,
-                mainObj.highlightElement()
+            mainObj.hoveredElement = e.target;
+            mainObj.highlightElement()
 
         }
 
 
     },
     highlightElement: function () {
-        if (!mainObj.markedElement) return;
+        if (!mainObj.hoveredElement) return;
 
-        let markedEl = mainObj.markedElement;
+        let markedEl = mainObj.hoveredElement;
 
         if (markedEl.className === "blkr_overlay") {
-            markedEl = markedEl.relatedElement
+            markedEl = markedEl.relatedElement;
 
         }
 
@@ -66,13 +66,15 @@ const mainObj = {
         for (i = 0; i < mainObj.transpose; i++) {
 
             if (markedEl.parentNode !== window.document) {
-                markedEl = markedEl.parentNode
+                markedEl = markedEl.parentNode;
             }
 
             else {
                 break
             }
         }
+
+        console.log("transpose value: ", i);
 
         mainObj.transpose = i
 
@@ -97,8 +99,8 @@ const mainObj = {
 
         mainObj.updateHighlighterPosition();
 
-        mainObj.getSingleEl("blkr_current_el").innerHTML = mainObj.getPathHTML()
-        mainObj.getSingleEl("blkr_currentEl .pathNode.active").scrollIntoView({ block: "center" })
+        mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML()
+        mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
 
     },
 
