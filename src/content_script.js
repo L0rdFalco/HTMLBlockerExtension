@@ -57,13 +57,13 @@ const mainObj = {
         let markedEl = mainObj.hoveredElement;
 
         if (markedEl.className === "blkr_overlay") {
-            markedEl = markedEl.relatedElement;
+            markedEl = markedEl.relatedElement; // the underlying iframe/embed
 
         }
 
         let i = 0;
 
-        for (i = 0; i < mainObj.transpose; i++) {
+        for (i = 0; i < mainObj.transpose; i++) { // what is this loop for exactly?
 
             if (markedEl.parentNode !== window.document) {
                 markedEl = markedEl.parentNode;
@@ -74,13 +74,14 @@ const mainObj = {
             }
         }
 
-        console.log("transpose value: ", i);
+        // console.log("transpose value: ", i);
 
         mainObj.transpose = i
 
         if (markedEl === mainObj.markedElement) return;
 
         mainObj.markedElement = markedEl;
+        // console.log("marked element: ", mainObj.markedElement);
 
         let highlighterEl = document.querySelector("#blkr_highlighter");
 
@@ -99,18 +100,61 @@ const mainObj = {
 
         mainObj.updateHighlighterPosition();
 
-        mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
-        /**
-         TODO: FIND OUT WHAT THIS DOES
-         
-         mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
-          
-         *  */
+        mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
+
+        // mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
+        // mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
+
+
+
+
+
+
+    },
+
+    getPathHTML: function (element, transpose) {
+        console.log(element);
+        console.log(transpose);
+        function getElmName(elm) {
+            if (elm.id) {
+                return "#" + elm.id
+            } else if (typeof elm.className == "string" && elm.className.trim().length) {
+                return elm.tagName.toLowerCase() + "." + elm.className.trim().split(" ").join(".")
+            } else {
+                return elm.tagName.toLowerCase()
+            }
+        }
+
+        let path = []
+        let currentElm = element
+
+        console.log("1 ", currentElm);
+
+        if (currentElm.className == "blkr_overlay") { // this is just a proxy for an iframe
+            currentElm = currentElm.relatedElement
+        }
+
+        while (currentElm) {
+            path.push(currentElm)
+            currentElm = currentElm.parentElement
+        }
+
+        console.log("2 ", path);
+        path = path.reverse()
+
+        let html = []
+        for (let i = 0; i < path.length; i++) {
+            html.push(`<span class="pathNode${path.length - 1 - i == transpose ? " active" : ""}">${getElmName(path[i])}</span>`)
+        }
+
+        console.log("--->  ", html);
+        return html.join('<span class="pathSeparator">&gt;</span>')
 
     },
 
     updateHighlighterPosition: function () {
         let rect = mainObj.markedElement?.getBoundingClientRect();
+
 
         if (!rect) return;
         let highlighterEl = document.querySelector("#blkr_highlighter");
