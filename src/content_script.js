@@ -25,6 +25,7 @@ const mainObj = {
     markedElement: null,
     transpose: 0, //how far up the parent hierachy to go
 
+
     getSingleEl: function (q) {
 
         if (!this.mBlockerDiv) return null;
@@ -168,7 +169,44 @@ const mainObj = {
     },
     hideSelectedEl: function (e) {
 
+        if (mainObj.markedElement) return;
+
+        if (e && mainObj.isChildOfBlkrWind(e.target)) return
+
+        let selector = mainObj.getSelector(mainObj.markedElement);
+        if (!selector) return
+
+
+        if (!selector || (e && e.button !== 0)) {
+
+            return
+        }
+
+        mainObj.unHighlightElement()
+
+        mainObj.hiddenElements.push()
+
+        mainObj.injectCSS2Head()
+        mainObj.updateElementsList()
+        mainObj.triggerResize()
+        mainObj.updateSavedElements()
+
+        e?.preventDefault()
+        e?.stopPropagation()
+
     },
+
+    getSelector: function (element) {
+
+    },
+    updateSavedElements: function () {
+
+    },
+
+    triggerResize: function () {
+
+    },
+
     preventEvent: function (e) {
 
     },
