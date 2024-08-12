@@ -36,10 +36,11 @@ const mainObj = {
 
     },
     mouseOverCB: function (e) {
-        if (mainObj.activeDialog) return;
+        if (mainObj.activeDialog) return; //if dialog box is showing on top of window
         if (mainObj.isChildOfBlkrWind(e.target)) {
             //dont do any highlighting over the drawn blocker window
             mainObj.unHighlightElement()
+            return // 2 avoid going to the next if statement
 
         }
         if (mainObj.hoveredElement != e.target) {
@@ -100,21 +101,14 @@ const mainObj = {
 
         mainObj.updateHighlighterPosition();
 
-        mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
 
-        // mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
-        // mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
-
-
-
-
-
+        mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
+        mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
 
     },
 
     getPathHTML: function (element, transpose) {
-        console.log(element);
-        console.log(transpose);
+
         function getElmName(elm) {
             if (elm.id) {
                 return "#" + elm.id
@@ -128,8 +122,6 @@ const mainObj = {
         let path = []
         let currentElm = element
 
-        console.log("1 ", currentElm);
-
         if (currentElm.className == "blkr_overlay") { // this is just a proxy for an iframe
             currentElm = currentElm.relatedElement
         }
@@ -139,7 +131,6 @@ const mainObj = {
             currentElm = currentElm.parentElement
         }
 
-        console.log("2 ", path);
         path = path.reverse()
 
         let html = []
@@ -147,8 +138,8 @@ const mainObj = {
             html.push(`<span class="pathNode${path.length - 1 - i == transpose ? " active" : ""}">${getElmName(path[i])}</span>`)
         }
 
-        console.log("--->  ", html);
-        return html.join('<span class="pathSeparator">&gt;</span>')
+        let editedHTML = html.join('<span class="pathSeparator">&gt;</span>')
+        return editedHTML
 
     },
 
@@ -167,10 +158,12 @@ const mainObj = {
 
 
     },
-    getPathHTML: function () {
-
-    },
     unHighlightElement: function () {
+        console.log(document.querySelector("#blkr_highlighter"));
+        document.querySelector("#blkr_highlighter")?.remove();
+        mainObj.markedElement = null;
+        mainObj.hoveredElement = null;
+        mainObj.getSingleEl("#blkr_current_elm").innerHTML = "Move mouse pointer to the unwanted element. Click it to remove!"
 
     },
     hideSelectedEl: function (e) {

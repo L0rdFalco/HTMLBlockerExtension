@@ -95583,7 +95583,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-var _mainObj;
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -95958,7 +95957,7 @@ var cssFinder = function () {
   return n;
 }();
 var X = "CS_RES";
-var mainObj = (_mainObj = {
+var mainObj = {
   blockStatus: false,
   mBlockerDiv: null,
   mazZ: 2147483647,
@@ -95981,10 +95980,11 @@ var mainObj = (_mainObj = {
     return this.mBlockerDiv.shadowRoot.querySelectorAll(q);
   },
   mouseOverCB: function mouseOverCB(e) {
-    if (mainObj.activeDialog) return;
+    if (mainObj.activeDialog) return; //if dialog box is showing on top of window
     if (mainObj.isChildOfBlkrWind(e.target)) {
       //dont do any highlighting over the drawn blocker window
       mainObj.unHighlightElement();
+      return; // 2 avoid going to the next if statement
     }
     if (mainObj.hoveredElement != e.target) {
       mainObj.transpose = 0;
@@ -96027,14 +96027,12 @@ var mainObj = (_mainObj = {
       document.body.appendChild(highlighterEl);
     }
     mainObj.updateHighlighterPosition();
-    mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose);
-
-    // mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
-    // mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
+    mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose);
+    mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({
+      block: "center"
+    });
   },
   getPathHTML: function getPathHTML(element, transpose) {
-    console.log(element);
-    console.log(transpose);
     function getElmName(elm) {
       if (elm.id) {
         return "#" + elm.id;
@@ -96046,7 +96044,6 @@ var mainObj = (_mainObj = {
     }
     var path = [];
     var currentElm = element;
-    console.log("1 ", currentElm);
     if (currentElm.className == "blkr_overlay") {
       // this is just a proxy for an iframe
       currentElm = currentElm.relatedElement;
@@ -96055,14 +96052,13 @@ var mainObj = (_mainObj = {
       path.push(currentElm);
       currentElm = currentElm.parentElement;
     }
-    console.log("2 ", path);
     path = path.reverse();
     var html = [];
     for (var i = 0; i < path.length; i++) {
       html.push("<span class=\"pathNode".concat(path.length - 1 - i == transpose ? " active" : "", "\">").concat(getElmName(path[i]), "</span>"));
     }
-    console.log("--->  ", html);
-    return html.join('<span class="pathSeparator">&gt;</span>');
+    var editedHTML = html.join('<span class="pathSeparator">&gt;</span>');
+    return editedHTML;
   },
   updateHighlighterPosition: function updateHighlighterPosition() {
     var _mainObj$markedElemen;
@@ -96074,176 +96070,198 @@ var mainObj = (_mainObj = {
     highlighterEl.style.top = rect.y + "px";
     highlighterEl.style.width = rect.width + "px";
     highlighterEl.style.height = rect.height + "px";
-  }
-}, _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_mainObj, "getPathHTML", function getPathHTML() {}), "unHighlightElement", function unHighlightElement() {}), "hideSelectedEl", function hideSelectedEl(e) {}), "preventEvent", function preventEvent(e) {}), "isChildOfBlkrWind", function isChildOfBlkrWind(sentEl) {
-  for (var i = 0; i < 8; i++) {
-    if (sentEl == mainObj.mBlockerDiv) return true;
-    sentEl = sentEl.parentNode;
-    if (!sentEl) break;
-  }
-  return false;
-}), "updateElementsList", function updateElementsList() {
-  if (!this.mBlockerDiv) return; // if window is not showing
-
-  var elmentList = this.getSingleEl("#blkr_elm_list");
-  var lines = [];
-  if (this.hiddenElements.length) {
-    /*
-    TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
-    */
-  } else {
-    //TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
-  }
-  elmentList.innerHTML = lines.join("\n");
-  function onChangePermanent(e) {}
-  function onDeleteClick(e) {}
-  function onPreviewHoverOn(e) {}
-  function onPreviewHoverOff(e) {}
-  function onEditSelector(e) {}
-  var i = -1; // dont know exactly what this is for...
-  var _iterator4 = _createForOfIteratorHelper(this.getAllEls("#blkr_elm_list table tr")),
-    _step4;
-  try {
-    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-      var tr = _step4.value;
-      console.log(tr);
-      tr.selector = this.hiddenElements[i].selector;
-      tr.querySelector("input").add("change", onChangePermanent, false);
-      tr.querySelector("a.ct_delete").add("click", onDeleteClick, false);
-      tr.querySelector(".ct_preview").add("mouseenter", onPreviewHoverOn, false);
-      tr.querySelector(".ct_preview").add("mouseleave", onPreviewHoverOff, false);
-      tr.querySelector("a.ct_edit_selector").add("click", onEditSelector, false);
-      i++;
+  },
+  unHighlightElement: function unHighlightElement() {
+    var _document$querySelect;
+    console.log(document.querySelector("#blkr_highlighter"));
+    (_document$querySelect = document.querySelector("#blkr_highlighter")) === null || _document$querySelect === void 0 || _document$querySelect.remove();
+    mainObj.markedElement = null;
+    mainObj.hoveredElement = null;
+    mainObj.getSingleEl("#blkr_current_elm").innerHTML = "Move mouse pointer to the unwanted element. Click it to remove!";
+  },
+  hideSelectedEl: function hideSelectedEl(e) {},
+  preventEvent: function preventEvent(e) {},
+  isChildOfBlkrWind: function isChildOfBlkrWind(sentEl) {
+    for (var i = 0; i < 8; i++) {
+      if (sentEl == mainObj.mBlockerDiv) return true;
+      sentEl = sentEl.parentNode;
+      if (!sentEl) break;
     }
-  } catch (err) {
-    _iterator4.e(err);
-  } finally {
-    _iterator4.f();
-  }
-}), "updateSettingsUI", function updateSettingsUI() {
-  this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>";
-}), "injectCSS2Head", function injectCSS2Head() {
-  var cssArr = ["\n            #blkr_wind {\n\t\t\t\tposition: fixed; bottom: 0; right: 10px;\n\t\t\t\tbackground: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);\n\t\t\t\tborder-radius: 3px 3px 0 0;\n\t\t\t\tz-index: ".concat(this.maxZ, ";\n            }\n            @media (prefers-color-scheme: dark){\n                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }\n            }\n            ")];
-  for (var i in this.hiddenElements) {
-    //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
-  }
-  if (this.hiddenElements.length) {
-    //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
-  }
-  var stylesElement = document.getElementById("blkr_styles");
-  if (!stylesElement) {
-    stylesElement = document.createElement("style");
-    stylesElement.id = "blkr_styles";
-    stylesElement.type = "text/css";
-    document.head.appendChild(stylesElement);
-  }
-  console.log("styles element first child: ", stylesElement.firstChild);
-  while (stylesElement.firstChild) {
-    stylesElement.removeChild(stylesElement.firstChild);
-  }
-  stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
-}), "injectOverlays", function injectOverlays() {
-  var _iterator5 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
-    _step5;
-  try {
-    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-      var e = _step5.value;
-      var rect = e.getBoundingClientRect();
-      var overlayEl = document.createElement("div");
-      overlayEl.className = "blkr_overlay";
-      overlayEl.style.position = "absolute";
-      overlayEl.style.left = rect.left + window.scrollX + "px";
-      overlayEl.style.top = rect.top + window.scrollY + "px";
-      overlayEl.style.width = rect.width + "px";
-      overlayEl.style.height = rect.height + "px";
-      overlayEl.style.background = 'rgba(128,128,128,1)';
-      overlayEl.style.zIndex = this.mazZ - 2;
-      overlayEl.relatedElement = e;
-      document.body.appendChild(overlayEl);
-      console.log("iframe or embed overmaid with something");
+    return false;
+  },
+  updateElementsList: function updateElementsList() {
+    if (!this.mBlockerDiv) return; // if window is not showing
+
+    var elmentList = this.getSingleEl("#blkr_elm_list");
+    var lines = [];
+    if (this.hiddenElements.length) {
+      /*
+      TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
+      */
+    } else {
+      //TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
     }
-  } catch (err) {
-    _iterator5.e(err);
-  } finally {
-    _iterator5.f();
-  }
-}), "blockSavedElms", function blockSavedElms() {}), _defineProperty(_defineProperty(_defineProperty(_defineProperty(_defineProperty(_mainObj, "startBlocking", function startBlocking() {
-  try {
-    if (!this.mBlockerDiv) this.injectCSS2Head(); //blocker  window isn't already drawn and showing
+    elmentList.innerHTML = lines.join("\n");
+    function onChangePermanent(e) {}
+    function onDeleteClick(e) {}
+    function onPreviewHoverOn(e) {}
+    function onPreviewHoverOff(e) {}
+    function onEditSelector(e) {}
+    var i = -1; // dont know exactly what this is for...
+    var _iterator4 = _createForOfIteratorHelper(this.getAllEls("#blkr_elm_list table tr")),
+      _step4;
+    try {
+      for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+        var tr = _step4.value;
+        console.log(tr);
+        tr.selector = this.hiddenElements[i].selector;
+        tr.querySelector("input").add("change", onChangePermanent, false);
+        tr.querySelector("a.ct_delete").add("click", onDeleteClick, false);
+        tr.querySelector(".ct_preview").add("mouseenter", onPreviewHoverOn, false);
+        tr.querySelector(".ct_preview").add("mouseleave", onPreviewHoverOff, false);
+        tr.querySelector("a.ct_edit_selector").add("click", onEditSelector, false);
+        i++;
+      }
+    } catch (err) {
+      _iterator4.e(err);
+    } finally {
+      _iterator4.f();
+    }
+  },
+  updateSettingsUI: function updateSettingsUI() {
+    this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>";
+  },
+  injectCSS2Head: function injectCSS2Head() {
+    var cssArr = ["\n            #blkr_wind {\n\t\t\t\tposition: fixed; bottom: 0; right: 10px;\n\t\t\t\tbackground: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);\n\t\t\t\tborder-radius: 3px 3px 0 0;\n\t\t\t\tz-index: ".concat(this.maxZ, ";\n            }\n            @media (prefers-color-scheme: dark){\n                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }\n            }\n            ")];
+    for (var i in this.hiddenElements) {
+      //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+    }
+    if (this.hiddenElements.length) {
+      //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+    }
+    var stylesElement = document.getElementById("blkr_styles");
+    if (!stylesElement) {
+      stylesElement = document.createElement("style");
+      stylesElement.id = "blkr_styles";
+      stylesElement.type = "text/css";
+      document.head.appendChild(stylesElement);
+    }
+    console.log("styles element first child: ", stylesElement.firstChild);
+    while (stylesElement.firstChild) {
+      stylesElement.removeChild(stylesElement.firstChild);
+    }
+    stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
+  },
+  //what are these overlays  for?
+  injectOverlays: function injectOverlays() {
+    var _iterator5 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
+      _step5;
+    try {
+      for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+        var e = _step5.value;
+        var rect = e.getBoundingClientRect();
+        var overlayEl = document.createElement("div");
+        overlayEl.className = "blkr_overlay";
+        overlayEl.style.position = "absolute";
+        overlayEl.style.left = rect.left + window.scrollX + "px";
+        overlayEl.style.top = rect.top + window.scrollY + "px";
+        overlayEl.style.width = rect.width + "px";
+        overlayEl.style.height = rect.height + "px";
+        overlayEl.style.background = 'rgba(128,128,128,1)';
+        overlayEl.style.zIndex = this.mazZ - 2;
+        overlayEl.relatedElement = e;
+        document.body.appendChild(overlayEl);
+        console.log("iframe or embed overmaid with something");
+      }
+    } catch (err) {
+      _iterator5.e(err);
+    } finally {
+      _iterator5.f();
+    }
+  },
+  blockSavedElms: function blockSavedElms() {},
+  startBlocking: function startBlocking() {
+    try {
+      if (!this.mBlockerDiv) this.injectCSS2Head(); //blocker  window isn't already drawn and showing
 
-    var shadowElement = document.createElement("div");
-    shadowElement.setAttribute("id", "blkr_wind");
-    shadowElement.attachShadow({
-      mode: "open"
-    });
-    shadowElement.style.visibility = "hidden";
-    document.body.appendChild(shadowElement);
-    this.mBlockerDiv = shadowElement; // save the reference to shadow el to be used elsewhere
+      var shadowElement = document.createElement("div");
+      shadowElement.setAttribute("id", "blkr_wind");
+      shadowElement.attachShadow({
+        mode: "open"
+      });
+      shadowElement.style.visibility = "hidden";
+      document.body.appendChild(shadowElement);
+      this.mBlockerDiv = shadowElement; // save the reference to shadow el to be used elsewhere
 
-    shadowElement.shadowRoot.innerHTML = "\n            <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n            <div class=\"mainWindow\">\n                <div class=\"header\">\n                    <span class=\"header__logo\">Point and Click To Block HTML Element\n                    </span>\n                    <span class=\"header__logo header__logo_small\"> HML Element Blocker</span>\n                </div>\n                \n                <hr/>\n    \n                <div class=\"topButtons\">\n                    <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                        <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                    </div>\n                    <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                    <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n                </div>\n                <div class=\"settingsRow\">\n                    <label>\n                        Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                    </label>\n                </div>\n                <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n                <div id=\"blkr_elm_list\"></div>\n            </div>\n            ");
+      shadowElement.shadowRoot.innerHTML = "\n            <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n            <div class=\"mainWindow\">\n                <div class=\"header\">\n                    <span class=\"header__logo\">Point and Click To Block HTML Element\n                    </span>\n                    <span class=\"header__logo header__logo_small\"> HML Element Blocker</span>\n                </div>\n                \n                <hr/>\n    \n                <div class=\"topButtons\">\n                    <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                        <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                    </div>\n                    <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                    <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n                </div>\n                <div class=\"settingsRow\">\n                    <label>\n                        Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                    </label>\n                </div>\n                <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n                <div id=\"blkr_elm_list\"></div>\n            </div>\n            ");
 
-    //to only show shadowEl after styling has been injected
-    this.getSingleEl("link").addEventListener("load", function () {
-      shadowElement.style.visibility = "visible";
-    });
-    this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
-      e.preventDefault();
-    });
-    this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
-      e.preventDefault();
-    });
-    this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
-      e.preventDefault();
-    });
-    this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
-      e.preventDefault();
-    });
-    document.addEventListener("mouseover", mainObj.mouseOverCB, true);
-    document.addEventListener("mousedown", mainObj.hideSelectedEl, true);
-    document.addEventListener("mouseup", mainObj.preventEvent, true);
-    document.addEventListener("click", mainObj.preventEvent, true);
-    document.addEventListener("scroll", mainObj.updateHighlighterPosition, true);
-    this.updateSettingsUI();
-    this.injectOverlays();
-    this.updateElementsList();
-    this.blockStatus = true;
+      //to only show shadowEl after styling has been injected
+      this.getSingleEl("link").addEventListener("load", function () {
+        shadowElement.style.visibility = "visible";
+      });
+      this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
+        e.preventDefault();
+      });
+      this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
+        e.preventDefault();
+      });
+      this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
+        e.preventDefault();
+      });
+      this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
+        e.preventDefault();
+      });
+      document.addEventListener("mouseover", mainObj.mouseOverCB, true);
+      document.addEventListener("mousedown", mainObj.hideSelectedEl, true);
+      document.addEventListener("mouseup", mainObj.preventEvent, true);
+      document.addEventListener("click", mainObj.preventEvent, true);
+      document.addEventListener("scroll", mainObj.updateHighlighterPosition, true);
+      this.updateSettingsUI();
+      this.injectOverlays();
+      this.updateElementsList();
+      this.blockStatus = true;
+      chrome.runtime.sendMessage({
+        action: "checkStatus",
+        blocking: true
+      }); // to update icon
+    } catch (error) {
+      console.log(error);
+    }
+    //add start blocking logic here
+  },
+  stopBlocking: function stopBlocking() {
+    this.blockStatus = false;
+
+    //add stop blocking logic here
+
     chrome.runtime.sendMessage({
       action: "checkStatus",
-      blocking: true
-    }); // to update icon
-  } catch (error) {
-    console.log(error);
+      blocking: false
+    }); // update icon
+  },
+  toggleBlocking: function toggleBlocking() {
+    if (this.blockStatus) {
+      console.log("stop blocking");
+      this.stopBlocking();
+    } else {
+      console.log("start blocking");
+      this.startBlocking();
+    }
+  },
+  bgReceiver: function bgReceiver(msg, sender, sendResponse) {
+    if (msg.action === "toggle") {
+      mainObj.toggleBlocking();
+      sendResponse(X);
+      console.log("toggled");
+    } else if (msg.action === "getStatus") {
+      sendResponse(mainObj.blockStatus);
+    }
+  },
+  init: function init() {
+    chrome.runtime.onMessage.addListener(this.bgReceiver);
+    this.blockSavedElms(); // to block previously selected elements immediately webpage is loaded
   }
-  //add start blocking logic here
-}), "stopBlocking", function stopBlocking() {
-  this.blockStatus = false;
-
-  //add stop blocking logic here
-
-  chrome.runtime.sendMessage({
-    action: "checkStatus",
-    blocking: false
-  }); // update icon
-}), "toggleBlocking", function toggleBlocking() {
-  if (this.blockStatus) {
-    console.log("stop blocking");
-    this.stopBlocking();
-  } else {
-    console.log("start blocking");
-    this.startBlocking();
-  }
-}), "bgReceiver", function bgReceiver(msg, sender, sendResponse) {
-  if (msg.action === "toggle") {
-    mainObj.toggleBlocking();
-    sendResponse(X);
-    console.log("toggled");
-  } else if (msg.action === "getStatus") {
-    sendResponse(mainObj.blockStatus);
-  }
-}), "init", function init() {
-  chrome.runtime.onMessage.addListener(this.bgReceiver);
-  this.blockSavedElms(); // to block previously selected elements immediately webpage is loaded
-}));
+};
 mainObj.init();
 })();
 
