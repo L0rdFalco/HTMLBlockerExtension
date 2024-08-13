@@ -1,0 +1,10 @@
+fill out these callbacks:
+hideSelectedEl
+preventEvent
+updateHighlighterPosition
+
+fill out these click listeners:
+topButton_close
+topButton_minimize
+topButton_settings
+rmbr_checkbox

@@ -19,7 +19,9 @@ const mainObj = {
     mazZ: 2147483647,
     hiddenElements: [],
     previewedHiddenSelector: null,
-    settings: {},
+    settings: {
+        remember: false
+    },
     activeDialog: null, //dialog box to edit element settings
     hoveredElement: null,
     markedElement: null,
@@ -171,35 +173,52 @@ const mainObj = {
 
         if (mainObj.markedElement) return;
 
-        if (e && mainObj.isChildOfBlkrWind(e.target)) return
+        if (e && mainObj.isChildOfBlkrWind(e.target)) return;
 
         let selector = mainObj.getSelector(mainObj.markedElement);
-        if (!selector) return
+        console.log("selector: ", selector, e.button);
+        if (!selector) return;
 
 
         if (!selector || (e && e.button !== 0)) {
+            e?.preventDefault();
+            e?.stopPropagation();
 
-            return
+            return;
         }
 
         mainObj.unHighlightElement()
 
-        mainObj.hiddenElements.push()
+        mainObj.hiddenElements.push({
+            selector: selector,
+            permanent: mainObj.settings.remember // to avoid undefined as a value
+        });
 
-        mainObj.injectCSS2Head()
-        mainObj.updateElementsList()
-        mainObj.triggerResize()
-        mainObj.updateSavedElements()
+
+        mainObj.injectCSS2Head() // to include hidden elements
+        mainObj.updateElementsList()// add hidden element to mblocker window with options
+        mainObj.triggerResize()//?
+        mainObj.refreshOverlays()
+        mainObj.setSavedElements()//save to storage
 
         e?.preventDefault()
         e?.stopPropagation()
 
     },
-
-    getSelector: function (element) {
+    refreshOverlays: function () {
 
     },
-    updateSavedElements: function () {
+
+    getSelector: function (element) {
+        if (!element) return null;
+        else if (elem.tagName === "BODY") return "body";
+        else if (elem.tagName === "HTML") return "html";
+
+        return cssFinder(element, { optimizedMinLength: 1 })
+
+
+    },
+    setSavedElements: function () {
 
     },
 
@@ -285,7 +304,6 @@ const mainObj = {
 
         this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
     },
-
     injectCSS2Head: function () {
         let cssArr = [
             `
@@ -302,7 +320,7 @@ const mainObj = {
         ]
 
         for (let i in this.hiddenElements) {
-            //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+
 
         }
 
@@ -353,7 +371,7 @@ const mainObj = {
         }
 
     },
-    blockSavedElms: function () {
+    getSavedElements: function () {
 
     },
     startBlocking: function () {
@@ -481,7 +499,7 @@ const mainObj = {
 
         chrome.runtime.onMessage.addListener(this.bgReceiver);
 
-        this.blockSavedElms()// to block previously selected elements immediately webpage is loaded
+        this.getSavedElements()// to block previously selected elements immediately webpage is loaded
     }
 
 }
