@@ -320,12 +320,33 @@ const mainObj = {
         ]
 
         for (let i in this.hiddenElements) {
+            let selector = mainObj.hiddenElements[i].selector;
+
+            if (selector === mainObj.previewedHiddenSelector) {
+                //TODO: fill this out after adding the associated logic
+
+            }
+
+            else if (selector === "body" || selector === "html") {
+                cssArr.push(selector + '{background: transparent !important; }')
+
+            }
+
+            else {
+                cssArr.push(selector + '{ display: none !important;}')
+
+            }
 
 
         }
 
         if (this.hiddenElements.length) {
-            //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+            cssArr.push(`
+            html, html body, html body > #ctre_wnd { /* safeguard against "*" rules */
+            display: block !important;
+        }
+            `)
+
 
         }
 
@@ -339,7 +360,7 @@ const mainObj = {
         }
 
         console.log("styles element first child: ", stylesElement.firstChild);
-        while (stylesElement.firstChild) {
+        while (stylesElement.firstChild) { // to make sure its empty?
             stylesElement.removeChild(stylesElement.firstChild)
         }
 
