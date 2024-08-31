@@ -143,4 +143,9 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 })
 
 
+chrome.runtime.onMessage.addListener((msg, sender, res) => {
+
+  if (msg.action == "blockStatusCS") msg.blocking ? onIcon() : offIcon()
+})
+
 isBlockingOn()
