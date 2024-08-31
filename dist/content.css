@@ -403,7 +403,7 @@ hr {
 	}
 
 	hr {
-		border-color: #333;
+		border-color: #2341a1;
 	}
 
 	.header__logo svg {
@@ -437,13 +437,13 @@ hr {
 	}
 
 	.key {
-		background: #333;
+		background: #2341a1;
 		color: #999;
 		border: solid 1px #666;
 	}
 
 	#blkr_current_elm {
-		border-color: #333;
+		border-color: #2341a1;
 	}
 
 	#blkr_current_elm .pathSeparator,
@@ -457,12 +457,12 @@ hr {
 	}
 
 	#blkr_elm_list {
-		border-color: #333;
+		border-color: #2341a1;
 	}
 
 	#blkr_elm_list tr.ct_heading td {
 		color: #fff;
-		background: #333;
+		background: #2341a1;
 	}
 
 	#blkr_elm_list td {
@@ -479,7 +479,7 @@ hr {
 
 	.footer {
 		color: #fff;
-		border-color: #333;
+		border-color: #2341a1;
 	}
 
 	.footer a:hover {

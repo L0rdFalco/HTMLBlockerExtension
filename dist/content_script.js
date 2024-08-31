@@ -95963,7 +95963,9 @@ var mainObj = {
   mazZ: 2147483647,
   hiddenElements: [],
   previewedHiddenSelector: null,
-  settings: {},
+  settings: {
+    remember: false
+  },
   activeDialog: null,
   //dialog box to edit element settings
   hoveredElement: null,
@@ -96079,7 +96081,44 @@ var mainObj = {
     mainObj.hoveredElement = null;
     mainObj.getSingleEl("#blkr_current_elm").innerHTML = "Move mouse pointer to the unwanted element. Click it to remove!";
   },
-  hideSelectedEl: function hideSelectedEl(e) {},
+  hideSelectedEl: function hideSelectedEl(e) {
+    console.log("hiding...", mainObj.markedElement);
+    if (!mainObj.markedElement) return;
+    if (e && mainObj.isChildOfBlkrWind(e.target)) return;
+    var selector = mainObj.getSelector(mainObj.markedElement);
+    console.log("selector: ", selector, e.button);
+    if (!selector) return;
+    if (!selector || e && e.button !== 0) {
+      e === null || e === void 0 || e.preventDefault();
+      e === null || e === void 0 || e.stopPropagation();
+      return;
+    }
+    mainObj.unHighlightElement();
+    mainObj.hiddenElements.push({
+      selector: selector,
+      permanent: mainObj.settings.remember
+    });
+    mainObj.injectCSS2Head(); // to include hidden elements
+    mainObj.updateElementsList(); // add hidden element to mblocker window with options
+    mainObj.triggerResize(); //?
+    mainObj.refreshOverlays();
+    mainObj.setSavedElements(); //save to storage
+
+    e === null || e === void 0 || e.preventDefault();
+    e === null || e === void 0 || e.stopPropagation();
+  },
+  refreshOverlays: function refreshOverlays() {},
+  getSelector: function getSelector(element) {
+    if (!element) return null;else if (element.tagName === "BODY") return "body";else if (element.tagName === "HTML") return "html";
+    return cssFinder(element, {
+      optimizedMinLength: 1
+    });
+  },
+  setSavedElements: function setSavedElements() {},
+  triggerResize: function triggerResize() {
+    var ev = document.createEvent("UIEvent");
+    ev.init;
+  },
   preventEvent: function preventEvent(e) {},
   isChildOfBlkrWind: function isChildOfBlkrWind(sentEl) {
     for (var i = 0; i < 8; i++) {
@@ -96090,16 +96129,28 @@ var mainObj = {
     return false;
   },
   updateElementsList: function updateElementsList() {
-    if (!this.mBlockerDiv) return; // if window is not showing
+    if (!this.mBlockerDiv) return; // if blocker window is not showing
 
     var elmentList = this.getSingleEl("#blkr_elm_list");
     var lines = [];
     if (this.hiddenElements.length) {
-      /*
-      TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
-      */
+      lines.push('<table><tr class="ct_heading"><td>Removed element</td><td>Remember?</td><td></td></tr>');
+      var _iterator4 = _createForOfIteratorHelper(mainObj.hiddenElements),
+        _step4;
+      try {
+        for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+          var elm = _step4.value;
+          lines.push("\n                <tr>\n\t\t\t\t\t<td class=\"ct_selector\"><a href=\"\" class=\"ct_edit_selector\">edit</a>".concat(escapeHTML(elm.selector), "</td>\n\t\t\t\t\t<td><input type=\"checkbox\"").concat(elm.permanent ? ' checked' : '', "></td>\n\t\t\t\t\t<td><span class=\"ct_preview\">\uD83D\uDC41</span> <a href=\"\" class=\"ct_delete\">\u2716</a></td>\n\t\t\t\t</tr>\n                "));
+        }
+      } catch (err) {
+        _iterator4.e(err);
+      } finally {
+        _iterator4.f();
+      }
+      lines.push('</table>');
+      elmentList.classList.add("hasContent");
     } else {
-      //TODO: FILL THIS OUT AFTER ADDING HIDDEN ELEMENT LOGIC
+      elmentList.classList.remove("hasContent");
     }
     elmentList.innerHTML = lines.join("\n");
     function onChangePermanent(e) {}
@@ -96107,25 +96158,29 @@ var mainObj = {
     function onPreviewHoverOn(e) {}
     function onPreviewHoverOff(e) {}
     function onEditSelector(e) {}
-    var i = -1; // dont know exactly what this is for...
-    var _iterator4 = _createForOfIteratorHelper(this.getAllEls("#blkr_elm_list table tr")),
-      _step4;
+    var i = -1; // a hack to skip the heading
+    var _iterator5 = _createForOfIteratorHelper(this.getAllEls("#blkr_elm_list table tr")),
+      _step5;
     try {
-      for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-        var tr = _step4.value;
+      for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+        var tr = _step5.value;
         console.log(tr);
+        if (i < 0) {
+          i++;
+          continue; // skip the first element going to the next iteration
+        }
         tr.selector = this.hiddenElements[i].selector;
-        tr.querySelector("input").add("change", onChangePermanent, false);
-        tr.querySelector("a.ct_delete").add("click", onDeleteClick, false);
-        tr.querySelector(".ct_preview").add("mouseenter", onPreviewHoverOn, false);
-        tr.querySelector(".ct_preview").add("mouseleave", onPreviewHoverOff, false);
-        tr.querySelector("a.ct_edit_selector").add("click", onEditSelector, false);
+        tr.querySelector("input").addEventListener("change", onChangePermanent, false);
+        tr.querySelector("a.ct_delete").addEventListener("click", onDeleteClick, false);
+        tr.querySelector(".ct_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
+        tr.querySelector(".ct_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
+        tr.querySelector("a.ct_edit_selector").addEventListener("click", onEditSelector, false);
         i++;
       }
     } catch (err) {
-      _iterator4.e(err);
+      _iterator5.e(err);
     } finally {
-      _iterator4.f();
+      _iterator5.f();
     }
   },
   updateSettingsUI: function updateSettingsUI() {
@@ -96134,10 +96189,17 @@ var mainObj = {
   injectCSS2Head: function injectCSS2Head() {
     var cssArr = ["\n            #blkr_wind {\n\t\t\t\tposition: fixed; bottom: 0; right: 10px;\n\t\t\t\tbackground: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);\n\t\t\t\tborder-radius: 3px 3px 0 0;\n\t\t\t\tz-index: ".concat(this.maxZ, ";\n            }\n            @media (prefers-color-scheme: dark){\n                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }\n            }\n            ")];
     for (var i in this.hiddenElements) {
-      //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+      var selector = mainObj.hiddenElements[i].selector;
+      if (selector === mainObj.previewedHiddenSelector) {
+        //TODO: fill this out after adding the associated logic
+      } else if (selector === "body" || selector === "html") {
+        cssArr.push(selector + '{background: transparent !important; }');
+      } else {
+        cssArr.push(selector + '{ display: none !important;}');
+      }
     }
     if (this.hiddenElements.length) {
-      //TODO: FILL THIS OUT AFTER ADDING THE HIDDEN ELEMENT LOGIC
+      cssArr.push("\n            html, html body, html body > #ctre_wnd { /* safeguard against \"*\" rules */\n            display: block !important;\n        }\n            ");
     }
     var stylesElement = document.getElementById("blkr_styles");
     if (!stylesElement) {
@@ -96148,17 +96210,18 @@ var mainObj = {
     }
     console.log("styles element first child: ", stylesElement.firstChild);
     while (stylesElement.firstChild) {
+      // to make sure its empty?
       stylesElement.removeChild(stylesElement.firstChild);
     }
     stylesElement.appendChild(document.createTextNode(cssArr.join('\n')));
   },
   //what are these overlays  for?
   injectOverlays: function injectOverlays() {
-    var _iterator5 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
-      _step5;
+    var _iterator6 = _createForOfIteratorHelper(document.querySelectorAll("iframe", "embed")),
+      _step6;
     try {
-      for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-        var e = _step5.value;
+      for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
+        var e = _step6.value;
         var rect = e.getBoundingClientRect();
         var overlayEl = document.createElement("div");
         overlayEl.className = "blkr_overlay";
@@ -96174,12 +96237,12 @@ var mainObj = {
         console.log("iframe or embed overmaid with something");
       }
     } catch (err) {
-      _iterator5.e(err);
+      _iterator6.e(err);
     } finally {
-      _iterator5.f();
+      _iterator6.f();
     }
   },
-  blockSavedElms: function blockSavedElms() {},
+  getSavedElements: function getSavedElements() {},
   startBlocking: function startBlocking() {
     try {
       if (!this.mBlockerDiv) this.injectCSS2Head(); //blocker  window isn't already drawn and showing
@@ -96259,10 +96322,13 @@ var mainObj = {
   },
   init: function init() {
     chrome.runtime.onMessage.addListener(this.bgReceiver);
-    this.blockSavedElms(); // to block previously selected elements immediately webpage is loaded
+    this.getSavedElements(); // to block previously selected elements immediately webpage is loaded
   }
 };
 mainObj.init();
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
 })();
 
 /******/ })()

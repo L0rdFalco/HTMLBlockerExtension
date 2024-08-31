@@ -44,13 +44,13 @@ function offIcon() {
   chrome.action.setTitle({ title: "blocking off" })
 }
 
-function forbiddenIcon() {
+function noIcon() {
   chrome.action.setIcon({ path: "./icons/icon16_no.png" })
   chrome.action.setTitle({ title: "blocking forbidden!" })
 }
 
 
-async function isRealTab() {
+async function isSiteViable() {
 
   let tabs = await chrome.tabs.query({ active: true, currentWindow: true })
 
@@ -59,18 +59,22 @@ async function isRealTab() {
   return tabs[0];
 }
 
+async function toggleBlocker(mTab) {
+  await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed })
+
+
+}
+
 /*
 is blocker window visible
 shows appropriate icons based on blocking status and type of page
 */
 async function isBlockingOn() {
 
-  let mTab = await isRealTab()
+  let mTab = await isSiteViable()
 
   if (!mTab.url.startsWith("http")) {
-    forbiddenIcon()
-
-    return
+    return noIcon();
   }
 
   let blockStatus = await chrome.tabs.sendMessage(mTab.id, { action: "getStatus" }).catch(() => {
@@ -82,54 +86,40 @@ async function isBlockingOn() {
   blockStatus ? onIcon() : offIcon()
 }
 
-
-const csReceiver = (msg, sender, res) => {
-
-  if (msg.action === "checkStatus") {
-    msg.blocking ? onIcon() : offIcon()
-
-  }
-
-}
-
-async function forceInjectCS() {
+async function forceInjectCS(mTab) {
   try {
     console.log("injecting content script");
     // force inject cs
     await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } })
 
     //set icon  to active
-    await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed })
+    await toggleBlocker(mTab)
   } catch (error) {
     console.log("could not load on this protected page");
-    forbiddenIcon()
+    noIcon()
   }
 }
 
-async function blockerClicked() {
+chrome.action.onClicked.addListener(async function () {
   /*
   1. check if its a real tab
   2. check if extension is activated on said tab by sending msg to content script
   3. if not activated, load the content scripts that activates the blocker
   */
 
-  let mTab = await isRealTab();
+  let mTab = await isSiteViable();
 
-  let res = await chrome.tabs.sendMessage(mTab.id, { action: "toggle", status: allowed }).catch(() => {
-    console.log("tabs send message fail 1");
-  });
+  await toggleBlocker(mTab)
+
 
   if (!res) { // means that content script wasn't injected there4 do so dynamically
 
-    await forceInjectCS()
+    await forceInjectCS(mTab)
 
   }
 
 }
-
-
-
-chrome.action.onClicked.addListener(blockerClicked)
+)
 
 chrome.tabs.onActivated.addListener((data) => {
   console.log("tabs on activated");
@@ -142,6 +132,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   isBlockingOn()
 })
 
-chrome.runtime.onMessage.addListener(csReceiver)
+chrome.runtime.onMessage.addListener((msg, sender, res) => {
+
+  if (msg.action === "checkStatus") {
+    msg.blocking ? onIcon() : offIcon()
+
+  }
+
+})
 
 isBlockingOn()
