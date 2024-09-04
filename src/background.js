@@ -142,10 +142,10 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
 
-  else if (msg.action === "persist_hidden_elms") {
+  else if (msg.action === "persist_perm_hidden_elms") {
     //save to indexDB
 
-    set('web:' + msg.website, msg.data);
+    set(`web:${msg.website}`, msg.data);
 
   }
 
