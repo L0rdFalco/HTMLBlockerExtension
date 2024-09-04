@@ -43,7 +43,7 @@ const mainObj = {
     hoveredElement: null,
     markedElement: null,
     transpose: 0,
-    settings: { remember: false },
+    settings: { remember: true },
 
 
     getSingleEl: function (q) {
@@ -266,7 +266,7 @@ const mainObj = {
         mainObj.updateElementsListUI();// update blocker window with hidden elements
         mainObj.triggerResize()//?
         mainObj.refreshOverlays();
-        mainObj.setSavedElements()
+        mainObj.persistHiddenEls()
 
     },
     preventEventCB: function (e) {
@@ -388,11 +388,28 @@ const mainObj = {
     triggerResize: function () {
 
     },
-    refreshOverlays: function () {
+    removeOverlays: function () {
+        let overlays = document.querySelectorAll("blkr_overlay")
+        if (!overlays) return;
+        for (let i = 0; i < overlays.length; i++) {
+            let e = overlays[i]
+            e.parentNode.removeChild(e)
+        }
 
     },
-    setSavedElements: function () {
+    refreshOverlays: function () {
 
+        mainObj.removeOverlays()
+        mainObj.injectOverlays()
+
+    },
+    persistHiddenEls: function () {
+
+        chrome.runtime.sendMessage({
+            action: "persist_hidden_elms",
+            website: location.hostname.replace(/^www\./, ''),
+            data: JSON.stringify(mainObj.hiddenElements.filter(elm => elm.permanent))
+        })
     },
 
     loadBlockingTools: function () {
@@ -463,9 +480,9 @@ const mainObj = {
         document.addEventListener("click", mainObj.preventEventCB, true)
         document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true)
 
-        this.updateRemBxSetting();
-        this.injectOverlays();
-        this.updateElementsListUI()
+        this.updateRemBxSetting();//done
+        this.injectOverlays();//done
+        this.updateElementsListUI() // not finished
 
         this.areToolsLoaded = true;
 
