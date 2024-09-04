@@ -96023,10 +96023,10 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   areToolsLoaded();
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, res) {
-  if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_hidden_elms") {
+  if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
     //save to indexDB
 
-    (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)('web:' + msg.website, msg.data);
+    (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
   }
   return true;
 });

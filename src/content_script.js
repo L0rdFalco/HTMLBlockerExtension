@@ -274,6 +274,10 @@ const mainObj = {
 
     },
     preventEventCB: function (e) {
+        if (mainObj.isChildOfBlkrWind(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
 
     },
     updateHighlighterPositionCB: function () {
@@ -478,11 +482,11 @@ const mainObj = {
 
         })
 
-        document.addEventListener("mouseover", mainObj.mouseOverCB, true)
-        document.addEventListener("mousedown", mainObj.hideSelectedElCB, true)
-        document.addEventListener("mouseup", mainObj.preventEventCB, true)
-        document.addEventListener("click", mainObj.preventEventCB, true)
-        document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true)
+        document.addEventListener("mouseover", mainObj.mouseOverCB, true) // done
+        document.addEventListener("mousedown", mainObj.hideSelectedElCB, true) // done
+        document.addEventListener("mouseup", mainObj.preventEventCB, true) // done
+        document.addEventListener("click", mainObj.preventEventCB, true)// done
+        document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true) //done
 
         this.updateRemBxSetting();//done
         this.injectOverlays();//done
@@ -491,8 +495,6 @@ const mainObj = {
         this.areToolsLoaded = true;
 
         chrome.runtime.sendMessage({ action: "toolsVisibStatus", visible: true }) //  message to change the icon
-
-
 
     },
 

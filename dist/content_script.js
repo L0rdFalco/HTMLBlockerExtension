@@ -551,8 +551,11 @@ var mainObj = {
     mainObj.injectCSS2Head(); // what actually causes element to disappear
     mainObj.updateElementsListUI(); // update blocker window with hidden elements
     mainObj.triggerResize(); //?
-    mainObj.refreshOverlays();
-    mainObj.persistHiddenEls();
+    mainObj.refreshOverlays(); //to redraw overlays on the resized window?
+    mainObj.persistHiddenEls(); // save permanent elements to storage
+
+    e === null || e === void 0 || e.preventDefault();
+    e === null || e === void 0 || e.stopPropagation();
   },
   preventEventCB: function preventEventCB(e) {},
   updateHighlighterPositionCB: function updateHighlighterPositionCB() {
@@ -662,7 +665,7 @@ var mainObj = {
   },
   persistHiddenEls: function persistHiddenEls() {
     chrome.runtime.sendMessage({
-      action: "persist_hidden_elms",
+      action: "persist_perm_hidden_elms",
       website: location.hostname.replace(/^www\./, ''),
       data: JSON.stringify(mainObj.hiddenElements.filter(function (elm) {
         return elm.permanent;
