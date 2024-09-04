@@ -101,6 +101,21 @@ hr {
 	transition: transform 0.5s;
 }
 
+.topButton_hideImages {
+	color: #fff;
+	background: #d44d0f;
+}
+
+.topButton_hideImages:hover {
+	color: #d44d0f;
+	background: #fff;
+}
+
+.topButton_hideImages i {
+	display: inline-block;
+	cursor: pointer;
+}
+
 .topButton_close {
 	border-radius: 0 3px 0 0;
 	color: #f00;

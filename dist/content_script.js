@@ -557,7 +557,12 @@ var mainObj = {
     e === null || e === void 0 || e.preventDefault();
     e === null || e === void 0 || e.stopPropagation();
   },
-  preventEventCB: function preventEventCB(e) {},
+  preventEventCB: function preventEventCB(e) {
+    if (mainObj.isChildOfBlkrWind(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  },
   updateHighlighterPositionCB: function updateHighlighterPositionCB() {
     var _mainObj$markedElemen;
     var rect = (_mainObj$markedElemen = mainObj.markedElement) === null || _mainObj$markedElemen === void 0 ? void 0 : _mainObj$markedElemen.getBoundingClientRect();
@@ -683,7 +688,7 @@ var mainObj = {
     shadowElement.style.visibility = "hidden";
     document.body.appendChild(shadowElement);
     this.mBlockerDiv = shadowElement;
-    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
+    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
     this.getSingleEl("link").addEventListener("load", function () {
       shadowElement.style.visibility = "visible";
     });
@@ -699,11 +704,12 @@ var mainObj = {
     this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
       e.preventDefault();
     });
-    document.addEventListener("mouseover", mainObj.mouseOverCB, true);
-    document.addEventListener("mousedown", mainObj.hideSelectedElCB, true);
-    document.addEventListener("mouseup", mainObj.preventEventCB, true);
-    document.addEventListener("click", mainObj.preventEventCB, true);
-    document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true);
+    document.addEventListener("mouseover", mainObj.mouseOverCB, true); // done
+    document.addEventListener("mousedown", mainObj.hideSelectedElCB, true); // done
+    document.addEventListener("mouseup", mainObj.preventEventCB, true); // done
+    document.addEventListener("click", mainObj.preventEventCB, true); // done
+    document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true); //done
+
     this.updateRemBxSetting(); //done
     this.injectOverlays(); //done
     this.updateElementsListUI(); // not finished
