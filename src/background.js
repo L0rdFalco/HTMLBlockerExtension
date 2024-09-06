@@ -147,6 +147,10 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
     set(`web:${msg.website}`, msg.data);
 
+    get(`web:${msg.website}`).then(data => {
+      console.log("curr db items: ", data);
+    })
+
   }
 
   return true

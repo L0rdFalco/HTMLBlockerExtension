@@ -607,13 +607,13 @@ var mainObj = {
     var elementListEl = this.getSingleEl("#blkr_elm_list");
     var lines = [];
     if (this.hiddenElements.length) {
-      lines.push('<table><tr class="ct_heading"><td>Removed element</td><td>Remember?</td><td></td></tr>');
+      lines.push('<table><tr class="bl_heading"><td>Removed element(s)</td><td>Remember?</td><td></td></tr>');
       var _iterator5 = _createForOfIteratorHelper(mainObj.hiddenElements),
         _step5;
       try {
         for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
           var elm = _step5.value;
-          lines.push("\n                <tr>\n\t\t\t\t\t<td class=\"ct_selector\"><a href=\"\" class=\"ct_edit_selector\">edit</a>".concat(escapeHTML(elm.selector), "</td>\n\t\t\t\t\t<td><input type=\"checkbox\"").concat(elm.permanent ? ' checked' : '', "></td>\n\t\t\t\t\t<td><span class=\"ct_preview\">\uD83D\uDC41</span> <a href=\"\" class=\"ct_delete\">\u2716</a></td>\n\t\t\t\t</tr>\n                "));
+          lines.push("\n                <tr>\n\t\t\t\t\t<td class=\"bl_selector\"><a href=\"\" class=\"bl_edit_selector\">edit</a>".concat(escapeHTML(elm.selector), "</td>\n\t\t\t\t\t<td><input type=\"checkbox\"").concat(elm.permanent ? ' checked' : '', "></td>\n\t\t\t\t\t<td><span class=\"bl_preview\">\uD83D\uDC41</span> <a href=\"\" class=\"bl_delete\">\u2716</a></td>\n\t\t\t\t</tr>\n                "));
         }
       } catch (err) {
         _iterator5.e(err);
@@ -632,7 +632,7 @@ var mainObj = {
     function onPreviewHoverOff(e) {}
     function onEditSelector(e) {}
     var i = -1;
-    var _iterator6 = _createForOfIteratorHelper(this.getAllElements()),
+    var _iterator6 = _createForOfIteratorHelper(this.getAllElements("#blkr_elm_list table tr")),
       _step6;
     try {
       for (_iterator6.s(); !(_step6 = _iterator6.n()).done;) {
@@ -643,10 +643,10 @@ var mainObj = {
         }
         tr.selector = this.hiddenElements[i].selector;
         tr.querySelector("input").addEventListener("change", onChangePermanent, false);
-        tr.querySelector("a.ct_delete").addEventListener("click", onDeleteClick, false);
-        tr.querySelector(".ct_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
-        tr.querySelector(".ct_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
-        tr.querySelector("a.ct_edit_selector").addEventListener("click", onEditSelector, false);
+        tr.querySelector("a.bl_delete").addEventListener("click", onDeleteClick, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
+        tr.querySelector("a.bl_edit_selector").addEventListener("click", onEditSelector, false);
         i++;
       }
     } catch (err) {
@@ -739,6 +739,17 @@ var mainObj = {
 mainObj.init();
 function escapeHTML(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function closest(el, selector) {
+  var retval = null;
+  while (el) {
+    if (el.matches(selector)) {
+      retval = el;
+      break;
+    }
+    el = el.parentElement;
+  }
+  return retval;
 }
 /******/ })()
 ;

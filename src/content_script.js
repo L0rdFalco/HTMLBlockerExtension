@@ -326,13 +326,13 @@ const mainObj = {
         let elementListEl = this.getSingleEl("#blkr_elm_list");
         let lines = [];
         if (this.hiddenElements.length) {
-            lines.push('<table><tr class="ct_heading"><td>Removed element</td><td>Remember?</td><td></td></tr>');
+            lines.push('<table><tr class="bl_heading"><td>Removed element(s)</td><td>Remember?</td><td></td></tr>');
             for (let elm of mainObj.hiddenElements) {
                 lines.push(`
                 <tr>
-					<td class="ct_selector"><a href="" class="ct_edit_selector">edit</a>${escapeHTML(elm.selector)}</td>
+					<td class="bl_selector"><a href="" class="bl_edit_selector">edit</a>${escapeHTML(elm.selector)}</td>
 					<td><input type="checkbox"${elm.permanent ? ' checked' : ''}></td>
-					<td><span class="ct_preview">👁</span> <a href="" class="ct_delete">✖</a></td>
+					<td><span class="bl_preview">👁</span> <a href="" class="bl_delete">✖</a></td>
 				</tr>
                 `)
             }
@@ -371,7 +371,7 @@ const mainObj = {
 
         let i = -1;
 
-        for (let tr of this.getAllElements()) {
+        for (let tr of this.getAllElements("#blkr_elm_list table tr")) {
             if (i < 0) {
                 i++;
                 continue;
@@ -380,10 +380,10 @@ const mainObj = {
             tr.selector = this.hiddenElements[i].selector;
 
             tr.querySelector("input").addEventListener("change", onChangePermanent, false);
-            tr.querySelector("a.ct_delete").addEventListener("click", onDeleteClick, false);
-            tr.querySelector(".ct_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
-            tr.querySelector(".ct_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
-            tr.querySelector("a.ct_edit_selector").addEventListener("click", onEditSelector, false);
+            tr.querySelector("a.bl_delete").addEventListener("click", onDeleteClick, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
+            tr.querySelector("a.bl_edit_selector").addEventListener("click", onEditSelector, false);
 
             i++
 
@@ -531,5 +531,19 @@ mainObj.init()
 
 function escapeHTML(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+}
+
+function closest(el, selector) {
+
+    var retval = null
+    while (el) {
+        if (el.matches(selector)) {
+            retval = el
+            break
+        }
+        el = el.parentElement
+    }
+    return retval
 
 }

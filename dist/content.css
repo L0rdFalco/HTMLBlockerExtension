@@ -234,7 +234,7 @@ hr {
 	border-spacing: 0;
 }
 
-#blkr_elm_list tr.ct_heading td {
+#blkr_elm_list tr.bl_heading td {
 	position: sticky;
 	top: 0;
 	color: #999;
@@ -266,12 +266,12 @@ hr {
 	white-space: nowrap;
 }
 
-#blkr_elm_list tr:not(.ct_heading) td:nth-child(1) {
+#blkr_elm_list tr:not(.bl_heading) td:nth-child(1) {
 	font-family: monospace;
 	font-size: 11px;
 }
 
-#blkr_elm_list .ct_edit_selector {
+#blkr_elm_list .bl_edit_selector {
 	font-family: sans-serif;
 	float: right;
 	opacity: 0;
@@ -279,27 +279,27 @@ hr {
 	text-decoration: none;
 }
 
-#blkr_elm_list .ct_edit_selector:hover {
+#blkr_elm_list .bl_edit_selector:hover {
 	color: #0c0954;
 }
 
-#blkr_elm_list tr:hover .ct_edit_selector {
+#blkr_elm_list tr:hover .bl_edit_selector {
 	opacity: 1;
 }
 
-#blkr_elm_list a.ct_delete {
+#blkr_elm_list a.bl_delete {
 	color: #f00;
 	padding: 4px;
 	text-decoration: none;
 	font-size: 14px;
 }
 
-#blkr_elm_list a.ct_delete:hover {
+#blkr_elm_list a.bl_delete:hover {
 	color: #fff;
 	background: #f00;
 }
 
-#blkr_elm_list .ct_preview {
+#blkr_elm_list .bl_preview {
 	cursor: zoom-in;
 	color: #0fb4d4;
 	padding: 4px;
@@ -307,12 +307,12 @@ hr {
 	font-size: 14px;
 }
 
-#blkr_elm_list .ct_preview:hover {
+#blkr_elm_list .bl_preview:hover {
 	background: #0fb4d4;
 	color: #fff;
 }
 
-.ct_selector {
+.bl_selector {
 	word-break: break-all;
 }
 
@@ -475,7 +475,7 @@ hr {
 		border-color: #2341a1;
 	}
 
-	#blkr_elm_list tr.ct_heading td {
+	#blkr_elm_list tr.bl_heading td {
 		color: #fff;
 		background: #2341a1;
 	}
@@ -488,7 +488,7 @@ hr {
 		background: #111;
 	}
 
-	#blkr_elm_list .ct_edit_selector:hover {
+	#blkr_elm_list .bl_edit_selector:hover {
 		color: #fff;
 	}
 
