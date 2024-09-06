@@ -637,11 +637,11 @@ var mainObj = {
           continue;
         }
         tr.selector = this.hiddenElements[i].selector;
-        tr.querySelector("input").addEventListener("change", mainObj.onChangePermanent, false);
-        tr.querySelector("a.bl_delete").addEventListener("click", mainObj.onDeleteClick, false);
-        tr.querySelector(".bl_preview").addEventListener("mouseenter", mainObj.onPreviewHoverOn, false);
-        tr.querySelector(".bl_preview").addEventListener("mouseleave", mainObj.onPreviewHoverOff, false);
-        tr.querySelector("a.bl_edit_selector").addEventListener("click", mainObj.onEditSelector, false);
+        tr.querySelector("input").addEventListener("change", cbObj.onChangePermanent, false);
+        tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseenter", cbObj.onPreviewHoverOn, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseleave", cbObj.onPreviewHoverOff, false);
+        tr.querySelector("a.bl_edit_selector").addEventListener("click", cbObj.onEditSelector, false);
         i++;
       }
     } catch (err) {
@@ -650,28 +650,6 @@ var mainObj = {
       _iterator6.f();
     }
   },
-  onChangePermanent: function onChangePermanent(e) {
-    /*
-    
-    console.log(this);
-    console.log(e.target);
-    console.log((e.target.parentElement).parentElement);
-    console.log((e.target.parentNode).parentNode);
-    
-    */
-
-    var tr = closest(this, "tr");
-    var i = mainObj.hiddenElements.findIndex(function (el) {
-      return el.selector === tr.selector;
-    });
-    var hiddenEl = mainObj.hiddenElements[i];
-    hiddenEl.permanent = this.checked;
-    mainObj.persistHiddenEls();
-  },
-  onDeleteClick: function onDeleteClick(e) {},
-  onPreviewHoverOn: function onPreviewHoverOn(e) {},
-  onPreviewHoverOff: function onPreviewHoverOff(e) {},
-  onEditSelector: function onEditSelector(e) {},
   triggerResize: function triggerResize() {},
   removeOverlays: function removeOverlays() {
     var overlays = document.querySelectorAll("blkr_overlay");
@@ -752,6 +730,30 @@ var mainObj = {
     console.log("cs init");
     chrome.runtime.onMessage.addListener(this.bgReceiverCB);
   }
+};
+var cbObj = {
+  onChangePermanent: function onChangePermanent(e) {
+    /*
+    
+    console.log(this);
+    console.log(e.target);
+    console.log((e.target.parentElement).parentElement);
+    console.log((e.target.parentNode).parentNode);
+    
+    */
+
+    var tr = closest(this, "tr");
+    var i = mainObj.hiddenElements.findIndex(function (el) {
+      return el.selector === tr.selector;
+    });
+    var hiddenEl = mainObj.hiddenElements[i];
+    hiddenEl.permanent = this.checked;
+    mainObj.persistHiddenEls();
+  },
+  onDeleteClick: function onDeleteClick(e) {},
+  onPreviewHoverOn: function onPreviewHoverOn(e) {},
+  onPreviewHoverOff: function onPreviewHoverOff(e) {},
+  onEditSelector: function onEditSelector(e) {}
 };
 mainObj.init();
 function escapeHTML(str) {

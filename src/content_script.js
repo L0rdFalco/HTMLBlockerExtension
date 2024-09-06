@@ -33,6 +33,8 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 
+
+
 const mainObj = {
     areToolsLoaded: false,
     activeDialog: null,
@@ -360,11 +362,11 @@ const mainObj = {
 
             tr.selector = this.hiddenElements[i].selector;
 
-            tr.querySelector("input").addEventListener("change", mainObj.onChangePermanent, false);
-            tr.querySelector("a.bl_delete").addEventListener("click", mainObj.onDeleteClick, false);
-            tr.querySelector(".bl_preview").addEventListener("mouseenter", mainObj.onPreviewHoverOn, false);
-            tr.querySelector(".bl_preview").addEventListener("mouseleave", mainObj.onPreviewHoverOff, false);
-            tr.querySelector("a.bl_edit_selector").addEventListener("click", mainObj.onEditSelector, false);
+            tr.querySelector("input").addEventListener("change", cbObj.onChangePermanent, false);
+            tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseenter", cbObj.onPreviewHoverOn, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseleave", cbObj.onPreviewHoverOff, false);
+            tr.querySelector("a.bl_edit_selector").addEventListener("click", cbObj.onEditSelector, false);
 
             i++
 
@@ -373,44 +375,7 @@ const mainObj = {
 
     },
 
-    onChangePermanent: function (e) {
-        /*
-        
-        console.log(this);
-        console.log(e.target);
-        console.log((e.target.parentElement).parentElement);
-        console.log((e.target.parentNode).parentNode);
-        
-        */
 
-        let tr = closest(this, "tr");
-        let i = mainObj.hiddenElements.findIndex((el) => {
-            return el.selector === tr.selector
-        })
-
-        let hiddenEl = mainObj.hiddenElements[i]
-
-        hiddenEl.permanent = this.checked
-
-        mainObj.persistHiddenEls()
-
-    },
-
-    onDeleteClick: function (e) {
-
-    },
-
-    onPreviewHoverOn: function (e) {
-
-    },
-
-    onPreviewHoverOff: function (e) {
-
-    },
-
-    onEditSelector: function (e) {
-
-    },
 
     triggerResize: function () {
 
@@ -545,7 +510,46 @@ const mainObj = {
     }
 
 }
+const cbObj = {
+    onChangePermanent: function (e) {
+        /*
+        
+        console.log(this);
+        console.log(e.target);
+        console.log((e.target.parentElement).parentElement);
+        console.log((e.target.parentNode).parentNode);
+        
+        */
 
+        let tr = closest(this, "tr");
+        let i = mainObj.hiddenElements.findIndex((el) => {
+            return el.selector === tr.selector
+        })
+
+        let hiddenEl = mainObj.hiddenElements[i]
+
+        hiddenEl.permanent = this.checked
+
+        mainObj.persistHiddenEls()
+
+    },
+
+    onDeleteClick: function (e) {
+
+    },
+
+    onPreviewHoverOn: function (e) {
+
+    },
+
+    onPreviewHoverOff: function (e) {
+
+    },
+
+    onEditSelector: function (e) {
+
+    },
+}
 mainObj.init()
 
 function escapeHTML(str) {
