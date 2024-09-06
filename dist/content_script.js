@@ -626,7 +626,15 @@ var mainObj = {
       elementListEl.classList.remove("hasContent");
     }
     elementListEl.innerHTML = lines.join("\n");
-    function onChangePermanent(e) {}
+    function onChangePermanent(e) {
+      var tr = closest(this, "tr");
+      var i = mainObj.hiddenElements.findIndex(function (el) {
+        return el.selector === tr.selector;
+      });
+      var hiddenEl = mainObj.hiddenElements[i];
+      hiddenEl.permanent = this.checked;
+      mainObj.persistHiddenEls();
+    }
     function onDeleteClick(e) {}
     function onPreviewHoverOn(e) {}
     function onPreviewHoverOff(e) {}

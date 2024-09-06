@@ -351,6 +351,17 @@ const mainObj = {
 
         function onChangePermanent(e) {
 
+            let tr = closest(this, "tr");
+            let i = mainObj.hiddenElements.findIndex((el) => {
+                return el.selector === tr.selector
+            })
+
+            let hiddenEl = mainObj.hiddenElements[i]
+
+            hiddenEl.permanent = this.checked
+
+            mainObj.persistHiddenEls()
+
         }
 
         function onDeleteClick(e) {
