@@ -349,36 +349,6 @@ const mainObj = {
 
         elementListEl.innerHTML = lines.join("\n")
 
-        function onChangePermanent(e) {
-
-            let tr = closest(this, "tr");
-            let i = mainObj.hiddenElements.findIndex((el) => {
-                return el.selector === tr.selector
-            })
-
-            let hiddenEl = mainObj.hiddenElements[i]
-
-            hiddenEl.permanent = this.checked
-
-            mainObj.persistHiddenEls()
-
-        }
-
-        function onDeleteClick(e) {
-
-        }
-
-        function onPreviewHoverOn(e) {
-
-        }
-
-        function onPreviewHoverOff(e) {
-
-        }
-
-        function onEditSelector(e) {
-
-        }
 
         let i = -1;
 
@@ -390,20 +360,58 @@ const mainObj = {
 
             tr.selector = this.hiddenElements[i].selector;
 
-            tr.querySelector("input").addEventListener("change", onChangePermanent, false);
-            tr.querySelector("a.bl_delete").addEventListener("click", onDeleteClick, false);
-            tr.querySelector(".bl_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
-            tr.querySelector(".bl_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
-            tr.querySelector("a.bl_edit_selector").addEventListener("click", onEditSelector, false);
+            tr.querySelector("input").addEventListener("change", mainObj.onChangePermanent, false);
+            tr.querySelector("a.bl_delete").addEventListener("click", mainObj.onDeleteClick, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseenter", mainObj.onPreviewHoverOn, false);
+            tr.querySelector(".bl_preview").addEventListener("mouseleave", mainObj.onPreviewHoverOff, false);
+            tr.querySelector("a.bl_edit_selector").addEventListener("click", mainObj.onEditSelector, false);
 
             i++
 
 
         }
 
+    },
 
+    onChangePermanent: function (e) {
+        /*
+        
+        console.log(this);
+        console.log(e.target);
+        console.log((e.target.parentElement).parentElement);
+        console.log((e.target.parentNode).parentNode);
+        
+        */
+
+        let tr = closest(this, "tr");
+        let i = mainObj.hiddenElements.findIndex((el) => {
+            return el.selector === tr.selector
+        })
+
+        let hiddenEl = mainObj.hiddenElements[i]
+
+        hiddenEl.permanent = this.checked
+
+        mainObj.persistHiddenEls()
 
     },
+
+    onDeleteClick: function (e) {
+
+    },
+
+    onPreviewHoverOn: function (e) {
+
+    },
+
+    onPreviewHoverOff: function (e) {
+
+    },
+
+    onEditSelector: function (e) {
+
+    },
+
     triggerResize: function () {
 
     },

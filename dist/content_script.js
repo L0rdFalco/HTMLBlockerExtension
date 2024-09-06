@@ -626,19 +626,6 @@ var mainObj = {
       elementListEl.classList.remove("hasContent");
     }
     elementListEl.innerHTML = lines.join("\n");
-    function onChangePermanent(e) {
-      var tr = closest(this, "tr");
-      var i = mainObj.hiddenElements.findIndex(function (el) {
-        return el.selector === tr.selector;
-      });
-      var hiddenEl = mainObj.hiddenElements[i];
-      hiddenEl.permanent = this.checked;
-      mainObj.persistHiddenEls();
-    }
-    function onDeleteClick(e) {}
-    function onPreviewHoverOn(e) {}
-    function onPreviewHoverOff(e) {}
-    function onEditSelector(e) {}
     var i = -1;
     var _iterator6 = _createForOfIteratorHelper(this.getAllElements("#blkr_elm_list table tr")),
       _step6;
@@ -650,11 +637,11 @@ var mainObj = {
           continue;
         }
         tr.selector = this.hiddenElements[i].selector;
-        tr.querySelector("input").addEventListener("change", onChangePermanent, false);
-        tr.querySelector("a.bl_delete").addEventListener("click", onDeleteClick, false);
-        tr.querySelector(".bl_preview").addEventListener("mouseenter", onPreviewHoverOn, false);
-        tr.querySelector(".bl_preview").addEventListener("mouseleave", onPreviewHoverOff, false);
-        tr.querySelector("a.bl_edit_selector").addEventListener("click", onEditSelector, false);
+        tr.querySelector("input").addEventListener("change", mainObj.onChangePermanent, false);
+        tr.querySelector("a.bl_delete").addEventListener("click", mainObj.onDeleteClick, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseenter", mainObj.onPreviewHoverOn, false);
+        tr.querySelector(".bl_preview").addEventListener("mouseleave", mainObj.onPreviewHoverOff, false);
+        tr.querySelector("a.bl_edit_selector").addEventListener("click", mainObj.onEditSelector, false);
         i++;
       }
     } catch (err) {
@@ -663,6 +650,28 @@ var mainObj = {
       _iterator6.f();
     }
   },
+  onChangePermanent: function onChangePermanent(e) {
+    /*
+    
+    console.log(this);
+    console.log(e.target);
+    console.log((e.target.parentElement).parentElement);
+    console.log((e.target.parentNode).parentNode);
+    
+    */
+
+    var tr = closest(this, "tr");
+    var i = mainObj.hiddenElements.findIndex(function (el) {
+      return el.selector === tr.selector;
+    });
+    var hiddenEl = mainObj.hiddenElements[i];
+    hiddenEl.permanent = this.checked;
+    mainObj.persistHiddenEls();
+  },
+  onDeleteClick: function onDeleteClick(e) {},
+  onPreviewHoverOn: function onPreviewHoverOn(e) {},
+  onPreviewHoverOff: function onPreviewHoverOff(e) {},
+  onEditSelector: function onEditSelector(e) {},
   triggerResize: function triggerResize() {},
   removeOverlays: function removeOverlays() {
     var overlays = document.querySelectorAll("blkr_overlay");
