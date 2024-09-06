@@ -33,7 +33,27 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 
+const helpersObj = {
+    escapeHTML: function (str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
+    },
+
+    closest: function (el, selector) {
+
+        var retval = null
+        while (el) {
+            if (el.matches(selector)) {
+                retval = el
+                break
+            }
+            el = el.parentElement
+        }
+        return retval
+
+    }
+
+}
 
 const mainObj = {
     areToolsLoaded: false,
@@ -208,7 +228,7 @@ const mainObj = {
 
         }
 
-        mainObj.updateHighlighterPositionCB()
+        cbObj.updateHighlighterPosition()
 
         mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose)
         mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({ block: "center" })
@@ -227,76 +247,6 @@ const mainObj = {
         this.areToolsLoaded ? this.removeBlockingTools() : this.loadBlockingTools()
     },
 
-    mouseOverCB: function (e) {
-        if (mainObj.activeDialog) return null;
-        if (mainObj.isChildOfBlkrWind(e.target)) {
-            return mainObj.removeHighlighter()
-
-        }
-
-        if (mainObj.hoveredElement !== e.target) {
-            mainObj.transpose = 0;
-            mainObj.hoveredElement = e.target;
-            mainObj.injectHighlighter()
-
-        }
-
-    },
-    hideSelectedElCB: function (e) {
-        if (!e) return;
-        if (!mainObj.markedElement) return;
-        if (e.target && mainObj.isChildOfBlkrWind(e.target)) return;
-
-        let selector = mainObj.getSelector(mainObj.markedElement)
-
-        if (!selector) return;
-
-        if (e && (e.button !== 0)) {
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-        }
-
-        mainObj.removeHighlighter();
-
-        mainObj.hiddenElements.push({
-            selector: selector,
-            permanent: mainObj.settings.remember
-        })
-
-        mainObj.injectCSS2Head() // what actually causes element to disappear
-        mainObj.updateElementsListUI();// update blocker window with hidden elements
-        mainObj.triggerResize()//?
-        mainObj.refreshOverlays();//to redraw overlays on the resized window?
-        mainObj.persistHiddenEls()// save permanent elements to storage
-
-        e?.preventDefault();
-        e?.stopPropagation();
-
-
-    },
-    preventEventCB: function (e) {
-        if (mainObj.isChildOfBlkrWind(e.target)) return;
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-
-    },
-    updateHighlighterPositionCB: function () {
-        let rect = mainObj.markedElement?.getBoundingClientRect();
-
-        if (!rect) return;
-
-        let highlighterEl = document.querySelector("#blkr_highlighter");
-        if (!highlighterEl) return;
-
-        highlighterEl.style.left = rect.x + "px";
-        highlighterEl.style.top = rect.y + "px";
-        highlighterEl.style.width = rect.width + "px";
-        highlighterEl.style.height = rect.height + "px";
-
-
-    },
 
     updateRemBxSetting: function () {
         this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
@@ -332,7 +282,7 @@ const mainObj = {
             for (let elm of mainObj.hiddenElements) {
                 lines.push(`
                 <tr>
-					<td class="bl_selector"><a href="" class="bl_edit_selector">edit</a>${escapeHTML(elm.selector)}</td>
+					<td class="bl_selector"><a href="" class="bl_edit_selector">edit</a>${helpersObj.escapeHTML(elm.selector)}</td>
 					<td><input type="checkbox"${elm.permanent ? ' checked' : ''}></td>
 					<td><span class="bl_preview">👁</span> <a href="" class="bl_delete">✖</a></td>
 				</tr>
@@ -468,11 +418,11 @@ const mainObj = {
 
         })
 
-        document.addEventListener("mouseover", mainObj.mouseOverCB, true) // done
-        document.addEventListener("mousedown", mainObj.hideSelectedElCB, true) // done
-        document.addEventListener("mouseup", mainObj.preventEventCB, true) // done
-        document.addEventListener("click", mainObj.preventEventCB, true)// done
-        document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true) //done
+        document.addEventListener("mouseover", cbObj.mouseOver, true) // done
+        document.addEventListener("mousedown", cbObj.hideSelectedEl, true) // done
+        document.addEventListener("mouseup", cbObj.preventEvent, true) // done
+        document.addEventListener("click", cbObj.preventEvent, true)// done
+        document.addEventListener("scroll", cbObj.updateHighlighterPosition, true) //done
 
         this.updateRemBxSetting();//done
         this.injectOverlays();//done
@@ -489,24 +439,10 @@ const mainObj = {
         console.log("remove blocking tools");
     },
 
-    bgReceiverCB: function (msg, sender, sendResponse) {
-        if (msg.action === "getStatus") {
 
-            sendResponse(mainObj.areToolsLoaded)
-
-        }
-
-        else if (msg.action === "toggle") {
-            mainObj.toggleBlockerTools()
-
-            sendResponse(X)
-
-        }
-
-    },
     init: function () {
         console.log("cs init");
-        chrome.runtime.onMessage.addListener(this.bgReceiverCB)
+        chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
     }
 
 }
@@ -521,7 +457,7 @@ const cbObj = {
         
         */
 
-        let tr = closest(this, "tr");
+        let tr = helpersObj.closest(this, "tr");
         let i = mainObj.hiddenElements.findIndex((el) => {
             return el.selector === tr.selector
         })
@@ -549,24 +485,94 @@ const cbObj = {
     onEditSelector: function (e) {
 
     },
+
+    bgReceiver: function (msg, sender, sendResponse) {
+        if (msg.action === "getStatus") {
+
+            sendResponse(mainObj.areToolsLoaded)
+
+        }
+
+        else if (msg.action === "toggle") {
+            mainObj.toggleBlockerTools()
+
+            sendResponse(X)
+
+        }
+
+    },
+    mouseOver: function (e) {
+        if (mainObj.activeDialog) return null;
+        if (mainObj.isChildOfBlkrWind(e.target)) {
+            return mainObj.removeHighlighter()
+
+        }
+
+        if (mainObj.hoveredElement !== e.target) {
+            mainObj.transpose = 0;
+            mainObj.hoveredElement = e.target;
+            mainObj.injectHighlighter()
+
+        }
+
+    },
+    hideSelectedEl: function (e) {
+        if (!e) return;
+        if (!mainObj.markedElement) return;
+        if (e.target && mainObj.isChildOfBlkrWind(e.target)) return;
+
+        let selector = mainObj.getSelector(mainObj.markedElement)
+
+        if (!selector) return;
+
+        if (e && (e.button !== 0)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+
+        mainObj.removeHighlighter();
+
+        mainObj.hiddenElements.push({
+            selector: selector,
+            permanent: mainObj.settings.remember
+        })
+
+        mainObj.injectCSS2Head() // what actually causes element to disappear
+        mainObj.updateElementsListUI();// update blocker window with hidden elements
+        mainObj.triggerResize()//?
+        mainObj.refreshOverlays();//to redraw overlays on the resized window?
+        mainObj.persistHiddenEls()// save permanent elements to storage
+
+        e?.preventDefault();
+        e?.stopPropagation();
+
+
+    },
+    preventEvent: function (e) {
+        if (mainObj.isChildOfBlkrWind(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+
+    },
+    updateHighlighterPosition: function () {
+        let rect = mainObj.markedElement?.getBoundingClientRect();
+
+        if (!rect) return;
+
+        let highlighterEl = document.querySelector("#blkr_highlighter");
+        if (!highlighterEl) return;
+
+        highlighterEl.style.left = rect.x + "px";
+        highlighterEl.style.top = rect.y + "px";
+        highlighterEl.style.width = rect.width + "px";
+        highlighterEl.style.height = rect.height + "px";
+
+
+    },
+
 }
+
 mainObj.init()
 
-function escapeHTML(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-
-}
-
-function closest(el, selector) {
-
-    var retval = null
-    while (el) {
-        if (el.matches(selector)) {
-            retval = el
-            break
-        }
-        el = el.parentElement
-    }
-    return retval
-
-}

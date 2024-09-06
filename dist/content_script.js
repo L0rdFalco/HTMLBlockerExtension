@@ -391,6 +391,22 @@ var cssFinder = function () {
   return n;
 }();
 var X = "!!r33ln00ꓭ";
+var helpersObj = {
+  escapeHTML: function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  },
+  closest: function closest(el, selector) {
+    var retval = null;
+    while (el) {
+      if (el.matches(selector)) {
+        retval = el;
+        break;
+      }
+      el = el.parentElement;
+    }
+    return retval;
+  }
+};
 var mainObj = {
   areToolsLoaded: false,
   activeDialog: null,
@@ -505,7 +521,7 @@ var mainObj = {
       highlighterEl.style.zIndex = mainObj.maxZ - 1;
       document.body.appendChild(highlighterEl);
     }
-    mainObj.updateHighlighterPositionCB();
+    cbObj.updateHighlighterPosition();
     mainObj.getSingleEl("#blkr_current_elm").innerHTML = mainObj.getPathHTML(mainObj.hoveredElement, mainObj.transpose);
     mainObj.getSingleEl("#blkr_current_elm .pathNode.active").scrollIntoView({
       block: "center"
@@ -520,59 +536,6 @@ var mainObj = {
   },
   toggleBlockerTools: function toggleBlockerTools() {
     this.areToolsLoaded ? this.removeBlockingTools() : this.loadBlockingTools();
-  },
-  mouseOverCB: function mouseOverCB(e) {
-    if (mainObj.activeDialog) return null;
-    if (mainObj.isChildOfBlkrWind(e.target)) {
-      return mainObj.removeHighlighter();
-    }
-    if (mainObj.hoveredElement !== e.target) {
-      mainObj.transpose = 0;
-      mainObj.hoveredElement = e.target;
-      mainObj.injectHighlighter();
-    }
-  },
-  hideSelectedElCB: function hideSelectedElCB(e) {
-    if (!e) return;
-    if (!mainObj.markedElement) return;
-    if (e.target && mainObj.isChildOfBlkrWind(e.target)) return;
-    var selector = mainObj.getSelector(mainObj.markedElement);
-    if (!selector) return;
-    if (e && e.button !== 0) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    mainObj.removeHighlighter();
-    mainObj.hiddenElements.push({
-      selector: selector,
-      permanent: mainObj.settings.remember
-    });
-    mainObj.injectCSS2Head(); // what actually causes element to disappear
-    mainObj.updateElementsListUI(); // update blocker window with hidden elements
-    mainObj.triggerResize(); //?
-    mainObj.refreshOverlays(); //to redraw overlays on the resized window?
-    mainObj.persistHiddenEls(); // save permanent elements to storage
-
-    e === null || e === void 0 || e.preventDefault();
-    e === null || e === void 0 || e.stopPropagation();
-  },
-  preventEventCB: function preventEventCB(e) {
-    if (mainObj.isChildOfBlkrWind(e.target)) return;
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  },
-  updateHighlighterPositionCB: function updateHighlighterPositionCB() {
-    var _mainObj$markedElemen;
-    var rect = (_mainObj$markedElemen = mainObj.markedElement) === null || _mainObj$markedElemen === void 0 ? void 0 : _mainObj$markedElemen.getBoundingClientRect();
-    if (!rect) return;
-    var highlighterEl = document.querySelector("#blkr_highlighter");
-    if (!highlighterEl) return;
-    highlighterEl.style.left = rect.x + "px";
-    highlighterEl.style.top = rect.y + "px";
-    highlighterEl.style.width = rect.width + "px";
-    highlighterEl.style.height = rect.height + "px";
   },
   updateRemBxSetting: function updateRemBxSetting() {
     this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>";
@@ -613,7 +576,7 @@ var mainObj = {
       try {
         for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
           var elm = _step5.value;
-          lines.push("\n                <tr>\n\t\t\t\t\t<td class=\"bl_selector\"><a href=\"\" class=\"bl_edit_selector\">edit</a>".concat(escapeHTML(elm.selector), "</td>\n\t\t\t\t\t<td><input type=\"checkbox\"").concat(elm.permanent ? ' checked' : '', "></td>\n\t\t\t\t\t<td><span class=\"bl_preview\">\uD83D\uDC41</span> <a href=\"\" class=\"bl_delete\">\u2716</a></td>\n\t\t\t\t</tr>\n                "));
+          lines.push("\n                <tr>\n\t\t\t\t\t<td class=\"bl_selector\"><a href=\"\" class=\"bl_edit_selector\">edit</a>".concat(helpersObj.escapeHTML(elm.selector), "</td>\n\t\t\t\t\t<td><input type=\"checkbox\"").concat(elm.permanent ? ' checked' : '', "></td>\n\t\t\t\t\t<td><span class=\"bl_preview\">\uD83D\uDC41</span> <a href=\"\" class=\"bl_delete\">\u2716</a></td>\n\t\t\t\t</tr>\n                "));
         }
       } catch (err) {
         _iterator5.e(err);
@@ -699,11 +662,11 @@ var mainObj = {
     this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
       e.preventDefault();
     });
-    document.addEventListener("mouseover", mainObj.mouseOverCB, true); // done
-    document.addEventListener("mousedown", mainObj.hideSelectedElCB, true); // done
-    document.addEventListener("mouseup", mainObj.preventEventCB, true); // done
-    document.addEventListener("click", mainObj.preventEventCB, true); // done
-    document.addEventListener("scroll", mainObj.updateHighlighterPositionCB, true); //done
+    document.addEventListener("mouseover", cbObj.mouseOver, true); // done
+    document.addEventListener("mousedown", cbObj.hideSelectedEl, true); // done
+    document.addEventListener("mouseup", cbObj.preventEvent, true); // done
+    document.addEventListener("click", cbObj.preventEvent, true); // done
+    document.addEventListener("scroll", cbObj.updateHighlighterPosition, true); //done
 
     this.updateRemBxSetting(); //done
     this.injectOverlays(); //done
@@ -718,17 +681,9 @@ var mainObj = {
   removeBlockingTools: function removeBlockingTools() {
     console.log("remove blocking tools");
   },
-  bgReceiverCB: function bgReceiverCB(msg, sender, sendResponse) {
-    if (msg.action === "getStatus") {
-      sendResponse(mainObj.areToolsLoaded);
-    } else if (msg.action === "toggle") {
-      mainObj.toggleBlockerTools();
-      sendResponse(X);
-    }
-  },
   init: function init() {
     console.log("cs init");
-    chrome.runtime.onMessage.addListener(this.bgReceiverCB);
+    chrome.runtime.onMessage.addListener(cbObj.bgReceiver);
   }
 };
 var cbObj = {
@@ -742,7 +697,7 @@ var cbObj = {
     
     */
 
-    var tr = closest(this, "tr");
+    var tr = helpersObj.closest(this, "tr");
     var i = mainObj.hiddenElements.findIndex(function (el) {
       return el.selector === tr.selector;
     });
@@ -753,23 +708,70 @@ var cbObj = {
   onDeleteClick: function onDeleteClick(e) {},
   onPreviewHoverOn: function onPreviewHoverOn(e) {},
   onPreviewHoverOff: function onPreviewHoverOff(e) {},
-  onEditSelector: function onEditSelector(e) {}
+  onEditSelector: function onEditSelector(e) {},
+  bgReceiver: function bgReceiver(msg, sender, sendResponse) {
+    if (msg.action === "getStatus") {
+      sendResponse(mainObj.areToolsLoaded);
+    } else if (msg.action === "toggle") {
+      mainObj.toggleBlockerTools();
+      sendResponse(X);
+    }
+  },
+  mouseOver: function mouseOver(e) {
+    if (mainObj.activeDialog) return null;
+    if (mainObj.isChildOfBlkrWind(e.target)) {
+      return mainObj.removeHighlighter();
+    }
+    if (mainObj.hoveredElement !== e.target) {
+      mainObj.transpose = 0;
+      mainObj.hoveredElement = e.target;
+      mainObj.injectHighlighter();
+    }
+  },
+  hideSelectedEl: function hideSelectedEl(e) {
+    if (!e) return;
+    if (!mainObj.markedElement) return;
+    if (e.target && mainObj.isChildOfBlkrWind(e.target)) return;
+    var selector = mainObj.getSelector(mainObj.markedElement);
+    if (!selector) return;
+    if (e && e.button !== 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    mainObj.removeHighlighter();
+    mainObj.hiddenElements.push({
+      selector: selector,
+      permanent: mainObj.settings.remember
+    });
+    mainObj.injectCSS2Head(); // what actually causes element to disappear
+    mainObj.updateElementsListUI(); // update blocker window with hidden elements
+    mainObj.triggerResize(); //?
+    mainObj.refreshOverlays(); //to redraw overlays on the resized window?
+    mainObj.persistHiddenEls(); // save permanent elements to storage
+
+    e === null || e === void 0 || e.preventDefault();
+    e === null || e === void 0 || e.stopPropagation();
+  },
+  preventEvent: function preventEvent(e) {
+    if (mainObj.isChildOfBlkrWind(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  },
+  updateHighlighterPosition: function updateHighlighterPosition() {
+    var _mainObj$markedElemen;
+    var rect = (_mainObj$markedElemen = mainObj.markedElement) === null || _mainObj$markedElemen === void 0 ? void 0 : _mainObj$markedElemen.getBoundingClientRect();
+    if (!rect) return;
+    var highlighterEl = document.querySelector("#blkr_highlighter");
+    if (!highlighterEl) return;
+    highlighterEl.style.left = rect.x + "px";
+    highlighterEl.style.top = rect.y + "px";
+    highlighterEl.style.width = rect.width + "px";
+    highlighterEl.style.height = rect.height + "px";
+  }
 };
 mainObj.init();
-function escapeHTML(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-function closest(el, selector) {
-  var retval = null;
-  while (el) {
-    if (el.matches(selector)) {
-      retval = el;
-      break;
-    }
-    el = el.parentElement;
-  }
-  return retval;
-}
 /******/ })()
 ;
 //# sourceMappingURL=content_script.js.map
