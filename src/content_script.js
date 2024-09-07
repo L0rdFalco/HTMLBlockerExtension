@@ -137,6 +137,7 @@ const mainObj = {
             let selector = mainObj.hiddenElements[i].selector;
 
             if (selector === mainObj.previewedHiddenSelector) {
+                cssArr.push(selector + ' { outline: solid 5px rgba(0,214,255,0.5) !important; outline-offset: -5px; }')
 
             }
 
@@ -470,8 +471,6 @@ const cbObj = {
     },
 
     onDeleteClick: function (e) {
-        console.log(this);
-        console.log(e.target);
         let tr = helpersObj.closest(this, "tr")
 
         if (tr.selector) {
@@ -491,14 +490,45 @@ const cbObj = {
     },
 
     onPreviewHoverOn: function (e) {
+        let selector = helpersObj.closest(this, "tr").selector
+
+        if (!selector) return;
+        mainObj.previewedHiddenSelector = selector;
+        mainObj.injectCSS2Head();
 
     },
 
     onPreviewHoverOff: function (e) {
+        let selector = helpersObj.closest(this, "tr").selector;
+        if (!selector) return;
+
+        console.log(selector, mainObj.previewedHiddenSelector);
+
+        if (mainObj.previewedHiddenSelector == selector) {
+            mainObj.previewedHiddenSelector = null;
+            mainObj.injectCSS2Head()
+        }
 
     },
 
     onEditSelector: function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        let tr = closest(this, 'tr')
+
+        if (tr.selector) {
+            let hiddenElement = mainObj.hiddenElements.find(elm => elm.selector == tr.selector)
+            let newSelector = prompt('Customize CSS selector\n\nhints:\n[id^="Abc"] matches #AbcWhatever\n[class*="Abc"] matches .somethingAbcSomething', hiddenElement.selector)
+            if (newSelector) {
+                hiddenElement.selector = newSelector
+
+                mainObj.updateCSS()
+                mainObj.refreshOverlays()
+                mainObj.updateElementList()
+                mainObj.updateSavedElements()
+            }
+        }
 
     },
 

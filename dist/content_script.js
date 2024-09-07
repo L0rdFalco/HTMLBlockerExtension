@@ -466,7 +466,9 @@ var mainObj = {
     var cssArr = ["\n            #blkr_wind {\n\t\t\t\tposition: fixed; bottom: 0; right: 10px;\n\t\t\t\tbackground: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);\n\t\t\t\tborder-radius: 3px 3px 0 0;\n\t\t\t\tz-index: ".concat(this.maxZ, ";\n            }\n            @media (prefers-color-scheme: dark){\n                #blkr_wind {background: #2b3754; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }\n            }\n        ")];
     for (var i in this.hiddenElements) {
       var selector = mainObj.hiddenElements[i].selector;
-      if (selector === mainObj.previewedHiddenSelector) {} else if (selector === "body" || selector === "html") {
+      if (selector === mainObj.previewedHiddenSelector) {
+        cssArr.push(selector + ' { outline: solid 5px rgba(0,214,255,0.5) !important; outline-offset: -5px; }');
+      } else if (selector === "body" || selector === "html") {
         cssArr.push(selector + '{background: transparent !important; }');
       } else {
         cssArr.push(selector + '{ display: none !important;}');
@@ -705,10 +707,54 @@ var cbObj = {
     hiddenEl.permanent = this.checked;
     mainObj.persistHiddenEls();
   },
-  onDeleteClick: function onDeleteClick(e) {},
-  onPreviewHoverOn: function onPreviewHoverOn(e) {},
-  onPreviewHoverOff: function onPreviewHoverOff(e) {},
-  onEditSelector: function onEditSelector(e) {},
+  onDeleteClick: function onDeleteClick(e) {
+    var tr = helpersObj.closest(this, "tr");
+    if (tr.selector) {
+      var i = mainObj.hiddenElements.findIndex(function (elm) {
+        return elm.selector === tr.selector;
+      });
+      mainObj.hiddenElements.splice(i, 1);
+    }
+    mainObj.injectCSS2Head();
+    mainObj.refreshOverlays();
+    mainObj.updateElementsListUI();
+    mainObj.persistHiddenEls();
+    e.preventDefault();
+    e.stopPropagation();
+  },
+  onPreviewHoverOn: function onPreviewHoverOn(e) {
+    var selector = helpersObj.closest(this, "tr").selector;
+    if (!selector) return;
+    mainObj.previewedHiddenSelector = selector;
+    mainObj.injectCSS2Head();
+  },
+  onPreviewHoverOff: function onPreviewHoverOff(e) {
+    var selector = helpersObj.closest(this, "tr").selector;
+    if (!selector) return;
+    console.log(selector, mainObj.previewedHiddenSelector);
+    if (mainObj.previewedHiddenSelector == selector) {
+      mainObj.previewedHiddenSelector = null;
+      mainObj.injectCSS2Head();
+    }
+  },
+  onEditSelector: function onEditSelector(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var tr = closest(this, 'tr');
+    if (tr.selector) {
+      var hiddenElement = mainObj.hiddenElements.find(function (elm) {
+        return elm.selector == tr.selector;
+      });
+      var newSelector = prompt('Customize CSS selector\n\nhints:\n[id^="Abc"] matches #AbcWhatever\n[class*="Abc"] matches .somethingAbcSomething', hiddenElement.selector);
+      if (newSelector) {
+        hiddenElement.selector = newSelector;
+        mainObj.updateCSS();
+        mainObj.refreshOverlays();
+        mainObj.updateElementList();
+        mainObj.updateSavedElements();
+      }
+    }
+  },
   bgReceiver: function bgReceiver(msg, sender, sendResponse) {
     if (msg.action === "getStatus") {
       sendResponse(mainObj.areToolsLoaded);
