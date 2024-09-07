@@ -426,7 +426,7 @@ const mainObj = {
 
         this.updateRemBxSetting();//done
         this.injectOverlays();//done
-        this.updateElementsListUI() // not finished
+        this.updateElementsListUI() // done
 
         this.areToolsLoaded = true;
 
@@ -437,6 +437,8 @@ const mainObj = {
     removeBlockingTools: function () {
 
         console.log("remove blocking tools");
+
+        mainObj.areToolsLoaded = false;
     },
 
 
@@ -512,8 +514,8 @@ const cbObj = {
     },
 
     onEditSelector: function (e) {
-        e.preventDefault()
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
 
         let tr = closest(this, 'tr')
 
@@ -525,7 +527,7 @@ const cbObj = {
 
                 mainObj.updateCSS()
                 mainObj.refreshOverlays()
-                mainObj.updateElementList()
+                mainObj.updateElementsListUI()
                 mainObj.updateSavedElements()
             }
         }
