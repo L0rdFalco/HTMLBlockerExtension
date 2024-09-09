@@ -32,7 +32,53 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 
+//pay extra attention to this on next run
 class SettingsDialog {
+    constructor(shadowRoot, close) {
+        this.elm = document.createElement("div");
+        this.elm.className = "dialog dialog_advOptions"
+        this.elm.innerHTML = `
+        <div class="header">
+        <span class="header__logo">Advanced options</span>
+    </div>
+
+    <hr/>
+
+    <div class="topButtons">
+        <div class="topButton topButton_close" title="Close">✖</div>
+    </div>
+
+    <div class="advOptions">
+        <div class="advOptions__row">
+            <button class="advOptions__export">Export elements</button>
+            <p class="advOptions__rowHelp">Exports a list of all the permanently removed elements from all the websites to a JSON file.</p>
+        </div>
+
+        <div class="advOptions__row">
+            <button class="advOptions__import"><input type="file">Import elements</button>
+            <p class="advOptions__rowHelp">Loads a list of permanently removed elements from a previously exported file.</p>
+        </div>
+    </div>
+    `
+        shadowRoot.appendChild(this.elm)
+
+        this.elm.querySelector(".topButton_close").addEventListener("click", (e) => {
+            close() //?
+
+        })
+        this.elm.querySelector(".advOptions__export").addEventListener("click", (e) => {
+
+        })
+        this.elm.querySelector(".advOptions__import input").addEventListener("change", (e) => {
+
+        })
+
+    }
+
+    destroy() {
+        this.elm.remove()
+
+    }
 
 }
 const helpersObj = {
