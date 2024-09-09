@@ -96027,8 +96027,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, res) {
     //save to indexDB
 
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
+  } else if (msg.action === "extract_perm_hidden_elms") {
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.get)("web:".concat(msg.website)).then(function (data) {
-      console.log("curr db items: ", data);
+      res(data || "[]");
     });
   }
   return true;

@@ -643,6 +643,17 @@ var mainObj = {
       }))
     });
   },
+  loadHiddenEls: function loadHiddenEls() {
+    chrome.runtime.sendMessage({
+      action: "extract_perm_hidden_elms",
+      website: location.hostname.replace(/^www\./, '')
+    }, function (data) {
+      mainObj.hiddenElements = JSON.parse(data);
+      mainObj.injectCSS2Head();
+      mainObj.updateElementsListUI();
+    });
+    chrome.runtime.sendMessage({}, function (data) {});
+  },
   deactivateDialog: function deactivateDialog() {},
   activateDialog: function activateDialog(cls) {},
   loadBlockingTools: function loadBlockingTools() {
@@ -715,6 +726,7 @@ var mainObj = {
   init: function init() {
     console.log("cs init");
     chrome.runtime.onMessage.addListener(cbObj.bgReceiver);
+    this.loadHiddenEls();
   }
 };
 var cbObj = {

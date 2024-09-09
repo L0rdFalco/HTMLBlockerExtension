@@ -356,6 +356,26 @@ const mainObj = {
             data: JSON.stringify(mainObj.hiddenElements.filter(elm => elm.permanent))
         })
     },
+    loadHiddenEls: function () {
+
+        chrome.runtime.sendMessage({
+            action: "extract_perm_hidden_elms",
+            website: location.hostname.replace(/^www\./, '')
+        }, function (data) {
+            mainObj.hiddenElements = JSON.parse(data)
+            mainObj.injectCSS2Head();
+            mainObj.updateElementsListUI();
+
+        })
+
+        chrome.runtime.sendMessage({
+
+        }, function (data) {
+
+        })
+
+
+    },
     deactivateDialog: function () {
 
     },
@@ -473,6 +493,8 @@ const mainObj = {
     init: function () {
         console.log("cs init");
         chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
+
+        this.loadHiddenEls();
     }
 
 }
