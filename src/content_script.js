@@ -105,6 +105,7 @@ const helpersObj = {
 
 const mainObj = {
     areToolsLoaded: false,
+    areImagesBlocked: false,
     activeDialog: null,
     mBlockerDiv: null,
     maxZ: 2147483647,
@@ -429,6 +430,14 @@ const mainObj = {
 
     },
 
+    showImages: function () {
+        //send msg to backend for show images
+    },
+    blockImages: function () {
+
+        //send images to bg script to block images
+    },
+
     loadBlockingTools: function () {
         console.log("loading tools");
 
@@ -475,6 +484,10 @@ const mainObj = {
         this.getSingleEl("link").addEventListener("load", () => {
             shadowElement.style.visibility = "visible";
 
+        })
+        this.getSingleEl(".topButton_hideImages").addEventListener("click", (e) => {
+            e.preventDefault();
+            this.areImagesBlocked ? showImages() : blockImages()
         })
         this.getSingleEl(".topButton_close").addEventListener("click", (e) => {
             e.preventDefault();
