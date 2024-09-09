@@ -32,6 +32,9 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 
+class SettingsDialog {
+
+}
 const helpersObj = {
     escapeHTML: function (str) {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -356,6 +359,9 @@ const mainObj = {
     deactivateDialog: function () {
 
     },
+    activateDialog: function (cls) {
+
+    },
 
     loadBlockingTools: function () {
         console.log("loading tools");
@@ -405,19 +411,24 @@ const mainObj = {
 
         })
         this.getSingleEl(".topButton_close").addEventListener("click", (e) => {
-            mainObj.removeBlockingTools()
             e.preventDefault();
+            mainObj.removeBlockingTools()
 
         })
         this.getSingleEl(".topButton_minimize").addEventListener("click", (e) => {
             e.preventDefault();
+            mainObj.getSingleEl(".mainWindow").classList.toggle("minimized")
 
         })
         this.getSingleEl(".topButton_settings").addEventListener("click", (e) => {
             e.preventDefault();
+            mainObj.activateDialog(SettingsDialog)
 
         })
         this.getSingleEl("#rmbr_checkbox").addEventListener("click", (e) => {
+            mainObj.settings.remember = !mainObj.settings.remember;
+            mainObj.persistHiddenEls();
+            mainObj.updateElementsListUI();
             e.preventDefault();
 
         })
