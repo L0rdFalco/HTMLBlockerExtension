@@ -637,6 +637,7 @@ var mainObj = {
       }))
     });
   },
+  deactivateDialog: function deactivateDialog() {},
   loadBlockingTools: function loadBlockingTools() {
     console.log("loading tools");
     if (!this.mBlockerDiv) this.injectCSS2Head();
@@ -653,6 +654,7 @@ var mainObj = {
       shadowElement.style.visibility = "visible";
     });
     this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
+      mainObj.removeBlockingTools();
       e.preventDefault();
     });
     this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
@@ -672,7 +674,7 @@ var mainObj = {
 
     this.updateRemBxSetting(); //done
     this.injectOverlays(); //done
-    this.updateElementsListUI(); // not finished
+    this.updateElementsListUI(); // done
 
     this.areToolsLoaded = true;
     chrome.runtime.sendMessage({
@@ -682,6 +684,21 @@ var mainObj = {
   },
   removeBlockingTools: function removeBlockingTools() {
     console.log("remove blocking tools");
+    mainObj.deactivateDialog();
+    mainObj.removeHighlighter();
+    mainObj.removeOverlays();
+    mainObj.mBlockerDiv.parentNode.removeChild(mainObj.mBlockerDiv);
+    document.removeEventListener("mouseover", cbObj.mouseOver, true); // done
+    document.removeEventListener("mousedown", cbObj.hideSelectedEl, true); // done
+    document.removeEventListener("mouseup", cbObj.preventEvent, true); // done
+    document.removeEventListener("click", cbObj.preventEvent, true); // done
+    document.removeEventListener("scroll", cbObj.updateHighlighterPosition, true); //done
+
+    chrome.runtime.sendMessage({
+      action: "toolsVisibStatus",
+      visible: false
+    });
+    mainObj.areToolsLoaded = false;
   },
   init: function init() {
     console.log("cs init");
@@ -750,7 +767,7 @@ var cbObj = {
         hiddenElement.selector = newSelector;
         mainObj.updateCSS();
         mainObj.refreshOverlays();
-        mainObj.updateElementList();
+        mainObj.updateElementsListUI();
         mainObj.updateSavedElements();
       }
     }

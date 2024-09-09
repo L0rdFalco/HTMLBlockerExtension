@@ -353,6 +353,9 @@ const mainObj = {
             data: JSON.stringify(mainObj.hiddenElements.filter(elm => elm.permanent))
         })
     },
+    deactivateDialog: function () {
+
+    },
 
     loadBlockingTools: function () {
         console.log("loading tools");
@@ -402,6 +405,7 @@ const mainObj = {
 
         })
         this.getSingleEl(".topButton_close").addEventListener("click", (e) => {
+            mainObj.removeBlockingTools()
             e.preventDefault();
 
         })
@@ -437,6 +441,19 @@ const mainObj = {
     removeBlockingTools: function () {
 
         console.log("remove blocking tools");
+        mainObj.deactivateDialog()
+        mainObj.removeHighlighter()
+        mainObj.removeOverlays()
+
+        mainObj.mBlockerDiv.parentNode.removeChild(mainObj.mBlockerDiv)
+        document.removeEventListener("mouseover", cbObj.mouseOver, true) // done
+        document.removeEventListener("mousedown", cbObj.hideSelectedEl, true) // done
+        document.removeEventListener("mouseup", cbObj.preventEvent, true) // done
+        document.removeEventListener("click", cbObj.preventEvent, true)// done
+        document.removeEventListener("scroll", cbObj.updateHighlighterPosition, true) //done
+
+
+        chrome.runtime.sendMessage({ action: "toolsVisibStatus", visible: false })
 
         mainObj.areToolsLoaded = false;
     },
