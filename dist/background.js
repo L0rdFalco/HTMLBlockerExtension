@@ -96004,76 +96004,76 @@ function _forceInjectCS() {
   }));
   return _forceInjectCS.apply(this, arguments);
 }
-chrome.runtime.onStartup.addListener(function () {
-  imgBlockingInit();
-  getSettings();
-});
-chrome.windows.onFocusChanged.addListener(function () {
-  getSettings();
-});
-chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-  var mTab, res;
-  return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-    while (1) switch (_context3.prev = _context3.next) {
-      case 0:
-        _context3.prev = 0;
-        _context3.next = 3;
-        return isSiteViable();
-      case 3:
-        mTab = _context3.sent;
-        _context3.next = 6;
-        return toggleTools(mTab.id);
-      case 6:
-        res = _context3.sent;
-        if (res) {
-          _context3.next = 12;
-          break;
-        }
-        _context3.next = 10;
-        return forceInjectCS(mTab);
-      case 10:
-        _context3.next = 12;
-        return toggleTools(mTab.id);
-      case 12:
-        _context3.next = 17;
-        break;
-      case 14:
-        _context3.prev = 14;
-        _context3.t0 = _context3["catch"](0);
-        console.log("icon click error");
-      case 17:
-      case "end":
-        return _context3.stop();
-    }
-  }, _callee3, null, [[0, 14]]);
-})));
-chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
-  areToolsLoaded();
-  getSettings();
-});
-chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
-  areToolsLoaded();
-  getSettings();
-});
 chrome.runtime.onInstalled.addListener(function (details) {
   imgBlockingInit();
   if (details.reason === "install" || details.reason === "update") {
-    _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-        while (1) switch (_context4.prev = _context4.next) {
+    _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
           case 0:
           case "end":
-            return _context4.stop();
+            return _context3.stop();
         }
-      }, _callee4);
+      }, _callee3);
     }))();
   }
   if (details.reason === "install") {
-    initSetup("NEW");
+    appSetup("NEW");
   }
   if (details.reason === "update") {
-    initSetup("UPD");
+    appSetup("UPD");
   }
+});
+chrome.runtime.onStartup.addListener(function () {
+  imgBlockingInit();
+  getTabSettings();
+});
+chrome.windows.onFocusChanged.addListener(function () {
+  getTabSettings();
+});
+chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+  var mTab, res;
+  return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+    while (1) switch (_context4.prev = _context4.next) {
+      case 0:
+        _context4.prev = 0;
+        _context4.next = 3;
+        return isSiteViable();
+      case 3:
+        mTab = _context4.sent;
+        _context4.next = 6;
+        return toggleTools(mTab.id);
+      case 6:
+        res = _context4.sent;
+        if (res) {
+          _context4.next = 12;
+          break;
+        }
+        _context4.next = 10;
+        return forceInjectCS(mTab);
+      case 10:
+        _context4.next = 12;
+        return toggleTools(mTab.id);
+      case 12:
+        _context4.next = 17;
+        break;
+      case 14:
+        _context4.prev = 14;
+        _context4.t0 = _context4["catch"](0);
+        console.log("icon click error");
+      case 17:
+      case "end":
+        return _context4.stop();
+    }
+  }, _callee4, null, [[0, 14]]);
+})));
+chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
+  areToolsLoaded();
+  getTabSettings();
+});
+chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
+  areToolsLoaded();
+  getTabSettings();
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, res) {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
@@ -96087,7 +96087,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, res) {
   }
   return true;
 });
-function getSettings(callback) {
+function getTabSettings() {
   //set icon based on the image content settings
   chrome.tabs.query({
     active: true,
@@ -96101,7 +96101,6 @@ function getSettings(callback) {
       if (!url) return;
       matchForbiddenOrigin = url ? url.match(forbiddenOrigin, "") : true;
       if (matchForbiddenOrigin) updateIcon("FBD");else updateIcon("ALLW");
-      if (callback) callback();
     } else {
       console.log("no active tab");
     }
@@ -96121,18 +96120,8 @@ function toggleContextMenu() {
     contextMenuId = null;
   }
 }
-function getLocalStoragePrefs(callback) {
-  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], function (data) {
-    prefs = data.image_on_off_prefs || prefs;
-    rules = data.imgTF_rules || rules;
-    if (rules.length) {
-      importRules(rules);
-    }
-    if (callback) callback();
-  });
-}
 function importRules(localStorageRules) {}
-function initSetup(msg) {
+function appSetup(msg) {
   //import rules
   //set appropriate badge text
   if (rules.length) {
@@ -96141,8 +96130,13 @@ function initSetup(msg) {
   updateIcon(msg);
 }
 function imgBlockingInit() {
-  getLocalStoragePrefs(function () {
-    getSettings();
+  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], function (data) {
+    prefs = data.image_on_off_prefs || prefs;
+    rules = data.imgTF_rules || rules;
+    if (rules.length) {
+      importRules(rules);
+    }
+    getTabSettings();
     toggleContextMenu();
   });
 }

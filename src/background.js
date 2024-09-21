@@ -119,6 +119,26 @@ async function forceInjectCS(mTab) {
 
 }
 
+chrome.runtime.onInstalled.addListener(function (details) {
+  imgBlockingInit()
+
+  if (details.reason === "install" || details.reason === "update") {
+    (async () => {
+      // await mellowtel.generateAndOpenOptInLink();
+    })();
+  }
+
+  if (details.reason === "install") {
+    appSetup("NEW")
+  }
+
+  if (details.reason === "update") {
+    appSetup("UPD")
+  }
+
+});
+
+
 chrome.runtime.onStartup.addListener(() => {
   imgBlockingInit()
   getTabSettings()
@@ -165,28 +185,6 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
   getTabSettings()
 
 })
-
-chrome.runtime.onInstalled.addListener(function (details) {
-  imgBlockingInit()
-
-  if (details.reason === "install" || details.reason === "update") {
-    (async () => {
-      // await mellowtel.generateAndOpenOptInLink();
-    })();
-  }
-
-  if (details.reason === "install") {
-    initSetup("NEW")
-  }
-
-  if (details.reason === "update") {
-    initSetup("UPD")
-  }
-
-});
-
-
-
 
 
 chrome.runtime.onMessage.addListener((msg, sender, res) => {
@@ -264,7 +262,7 @@ function importRules(localStorageRules) {
 
 }
 
-function initSetup(msg) {
+function appSetup(msg) {
   //import rules
   //set appropriate badge text
   if (rules.length) {
