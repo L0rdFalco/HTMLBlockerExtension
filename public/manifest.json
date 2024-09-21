@@ -1,7 +1,7 @@
 {
-    "name": "v1_HTML Element Blocker",
-    "description": "Block any HTML element with one click!",
-    "version": "0.0.0.1",
+    "name": "v1_HTML Element and Image Blocker",
+    "description": "Block any HTML element and webpage images with one click!",
+    "version": "0.0.0.2",
     "manifest_version": 3,
     "incognito": "spanning",
     "icons": {
@@ -25,7 +25,7 @@
             "256": "./icons/icon256.png",
             "512": "./icons/icon512.png"
         },
-        "default_title": "html blocker"
+        "default_title": "Elblckr"
     },
     "options_page": "options.html",
     "content_scripts": [
@@ -48,7 +48,9 @@
         "scripting",
         "activeTab",
         "storage",
-        "declarativeNetRequest"
+        "declarativeNetRequest",
+        "contentSettings",
+        "contextMenues"
     ],
     "host_permissions": [
         "*://*/*"

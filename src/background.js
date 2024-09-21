@@ -158,4 +158,31 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
   return true
 })
 
+
+function getSettings() {
+
+}
+
+function toggleContextMenu() {
+
+}
+
+function getLocalStoragePrefs(callback) {
+
+}
+
+
+
+function imgBlockingInit() {
+
+  getLocalStoragePrefs(() => {
+    getSettings();
+    toggleContextMenu();
+  })
+
+}
+
+
+
+
 areToolsLoaded()
