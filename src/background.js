@@ -260,21 +260,6 @@ function toggleContextMenu() {
 
 }
 
-function getLocalStoragePrefs(callback) {
-
-  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], (data) => {
-    prefs = data.image_on_off_prefs || prefs;
-    rules = data.imgTF_rules || rules;
-
-    if (rules.length) {
-      importRules(rules)
-    }
-
-    if (callback) callback()
-  })
-
-}
-
 function importRules(localStorageRules) {
 
 }
@@ -293,8 +278,14 @@ function initSetup(msg) {
 
 
 function imgBlockingInit() {
+  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], (data) => {
+    prefs = data.image_on_off_prefs || prefs;
+    rules = data.imgTF_rules || rules;
 
-  getLocalStoragePrefs(() => {
+    if (rules.length) {
+      importRules(rules)
+    }
+
     getTabSettings();
     toggleContextMenu();
   })
