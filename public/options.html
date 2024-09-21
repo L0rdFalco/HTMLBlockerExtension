@@ -10,14 +10,68 @@
 </head>
 
 <body>
-    <div class="container">
 
-        <div class="options">
-            <h2>Set App Defaults here:</h2>
-            <button class="drawer_button" id="meltel_config">configure</button>
-        </div>
+    <h2>Image On/Off Options:</h2>
 
-        <script src="options.js"></script>
+    <p><label for="contextMenu"><input id="contextMenu" type="checkbox" />
+            Add image exceptions shortcut to the context menu</label><br />
+    </p>
+
+    <p><label for="autoRefresh" title="Automaticly reload page after enabling/disabling images"><input id="autoRefresh"
+                type="checkbox" />
+            Auto-Reload on ON/OFF</label><br /><br />
+    </p>
+
+    <p><label for="allSubdomains"><input id="allSubdomains" type="checkbox" />
+            Enable/disable images for all subdomains instead of single host only</label><br />
+    </p>
+
+    <p><label for="allPorts"><input id="allPorts" type="checkbox" />
+            Enable/disable images for all ports instead of just one</label><br /><br />
+    </p>
+
+    <h3>Icon</h3>
+
+
+    <p> <input id="lightIcon" type="radio" name="icon" /> <label for='lightIcon'>Light Icon</label> <img
+            src="icon16.png" valign="middle" />
+    </p>
+    <p> <input id="defaultIcon" type="radio" name="icon" /> <label for='defaultIcon'>Default Icon</label> <img
+            src="icon16.png" valign="middle" />
+    </p>
+    <p> <input id="darkIcon" type="radio" name="icon" /> <label for='darkIcon'>Dark Icon</label> <img src="icon16.png"
+            valign="middle" />
+    </p>
+
+    <br />
+    <h3>Image settings</h3>
+    <p>
+        <button id="openImageSettings">Open Image settings</button> <button id="clearImageSettings"
+            title="Clear all rules set by Image On/Off">Clear image settings set by this extension</button><br /><br />
+    </p>
+
+    <h3>Local Storage rules</h3>
+
+    <p>Every existing rule is saved here and can be reintroduced at will. (Incognito rules aren't saved)</p>
+
+    <p><textarea name="imgTF_rules" id="imgTF_rules" cols="30" rows="10" style="width:100%;"></textarea></p>
+
+    <p>
+        <button id="importRules">Add these rules to image exceptions </button> <button id="clearLocalStorageRules">Clear
+            Local Storage rules</button>
+        <br>
+        <br />
+    </p>
+
+
+    <div class="options">
+        <h2>Set App Defaults here:</h2>
+        <button class="drawer_button" id="meltel_config">configure</button>
+    </div>
+
+    </a>
+
+    <script src="options.js"></script>
 </body>
 
 </html>
