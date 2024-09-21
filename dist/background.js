@@ -96018,15 +96018,14 @@ chrome.runtime.onInstalled.addListener(function (details) {
     }))();
   }
   if (details.reason === "install") {
-    appSetup("NEW");
+    setTabRules();
   }
   if (details.reason === "update") {
-    appSetup("UPD");
+    setTabRules();
   }
 });
 chrome.runtime.onStartup.addListener(function () {
   imgBlockingInit();
-  getTabSettings();
 });
 chrome.windows.onFocusChanged.addListener(function () {
   getTabSettings();
@@ -96087,8 +96086,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, res) {
   }
   return true;
 });
+chrome.contextMenus.onClicked.addListener(function (info, tab) {
+  if (info.menuItemId === "imgContextMenu") openImgPanel();
+});
 function getTabSettings() {
-  //set icon based on the image content settings
+  //extracts required tab data
   chrome.tabs.query({
     active: true,
     currentWindow: true
@@ -96098,12 +96100,15 @@ function getTabSettings() {
       incognito = tab.incognito;
       url = tab.url;
       tabId = tab.id;
-      if (!url) return;
-      matchForbiddenOrigin = url ? url.match(forbiddenOrigin, "") : true;
-      if (matchForbiddenOrigin) updateIcon("FBD");else updateIcon("ALLW");
     } else {
       console.log("no active tab");
     }
+  });
+}
+function openImgPanel() {
+  chrome.tabs.create({
+    url: "chrome://settings/content/images",
+    active: true
   });
 }
 function toggleContextMenu() {
@@ -96120,21 +96125,15 @@ function toggleContextMenu() {
     contextMenuId = null;
   }
 }
-function importRules(localStorageRules) {}
-function appSetup(msg) {
-  //import rules
-  //set appropriate badge text
-  if (rules.length) {
-    importRules(rules);
-  }
-  updateIcon(msg);
+function setTabRules() {
+  if (rules.length) {}
 }
 function imgBlockingInit() {
   chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], function (data) {
     prefs = data.image_on_off_prefs || prefs;
     rules = data.imgTF_rules || rules;
     if (rules.length) {
-      importRules(rules);
+      setTabRules(rules);
     }
     getTabSettings();
     toggleContextMenu();

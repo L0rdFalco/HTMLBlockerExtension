@@ -205,6 +205,9 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
   return true
 })
 
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "imgContextMenu") openImgPanel()
+})
 
 function getTabSettings() {
   //extracts required tab data
@@ -227,6 +230,10 @@ function getTabSettings() {
 
 }
 
+function openImgPanel() {
+  chrome.tabs.create({ url: "chrome://settings/content/images", active: true })
+
+}
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {
     contextMenuId = chrome.contextMenus.create({
