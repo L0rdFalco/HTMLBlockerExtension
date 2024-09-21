@@ -96090,20 +96090,43 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
   if (info.menuItemId === "imgContextMenu") openImgPanel();
 });
 function getTabData() {
-  //extracts required tab data
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, function (tabs) {
-    var tab = tabs[0];
-    if (tab) {
-      incognito = tab.incognito;
-      url = tab.url;
-      tabId = tab.id;
-    } else {
-      console.log("no active tab");
-    }
-  });
+  return _getTabData.apply(this, arguments);
+}
+function _getTabData() {
+  _getTabData = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+    var tabs, tab;
+    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+      while (1) switch (_context9.prev = _context9.next) {
+        case 0:
+          _context9.prev = 0;
+          _context9.next = 3;
+          return chrome.tabs.query({
+            active: true,
+            currentWindow: true
+          });
+        case 3:
+          tabs = _context9.sent;
+          tab = tabs[0];
+          if (tab) {
+            incognito = tab.incognito;
+            url = tab.url;
+            tabId = tab.id;
+          } else {
+            console.log("no active tab");
+          }
+          _context9.next = 11;
+          break;
+        case 8:
+          _context9.prev = 8;
+          _context9.t0 = _context9["catch"](0);
+          console.log("getTabData error");
+        case 11:
+        case "end":
+          return _context9.stop();
+      }
+    }, _callee9, null, [[0, 8]]);
+  }));
+  return _getTabData.apply(this, arguments);
 }
 function openImgPanel() {
   chrome.tabs.create({

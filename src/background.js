@@ -209,9 +209,11 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "imgContextMenu") openImgPanel()
 })
 
-function getTabData() {
+async function getTabData() {
   //extracts required tab data
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
 
     const tab = tabs[0];
 
@@ -226,7 +228,9 @@ function getTabData() {
 
     }
 
-  })
+  } catch (error) {
+    console.log("getTabData error");
+  }
 
 }
 
