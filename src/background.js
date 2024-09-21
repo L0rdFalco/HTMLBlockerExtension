@@ -29,7 +29,8 @@ let prefs = {
 
 let icon = "defaultIcon";
 let forbiddenOrigin = /(chrome\:\/\/)/g;
-let rules = []
+let rules = [];
+let contextMenuId = null;
 
 
 function onIcon() {
@@ -206,12 +207,28 @@ function getSettings() {
 }
 
 function toggleContextMenu() {
+  if (prefs.showContextMenu && !contextMenuId) {
+    contextMenuId = chrome.contextMenus.create({
+      id: "imgContextMenu",
+      title: "settings-> img exceptions",
+      type: "normal",
+      contexts: ["all"]
+    })
+
+  }
+
+  if (!prefs.showContextMenu && contextMenuId) {
+    chrome.contextMenus.remove(contextMenuId)
+    contextMenuId = null;
+
+  }
+
 
 }
 
 function getLocalStoragePrefs(callback) {
 
-  chrome.storage.local.get([], (data) => {
+  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], (data) => {
     prefs = data.image_on_off_prefs || prefs;
     rules = data.imgTF_rules || rules;
 
