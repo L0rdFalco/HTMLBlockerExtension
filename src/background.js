@@ -14,9 +14,23 @@ let mellowtel;
 
 })();
 
-
-
 let allowed = true;
+
+let prefs = {
+  showContextMenu: false,
+  autoRefresh: true,
+  allProtocols: false,
+  allSubdomains: false,
+  allPorts: false,
+  lightIcon: false,
+  darkIcon: false,
+  defaultIcon: true
+}
+
+let icon = "defaultIcon";
+let forbiddenOrigin = /(chrome\:\/\/)/g;
+let rules = []
+
 
 function onIcon() {
   chrome.action.setIcon({ path: "./icons/icon16_on.png" });
@@ -34,6 +48,11 @@ function noIcon() {
 
   chrome.action.setIcon({ path: "./icons/icon16_no.png" });
   chrome.action.setTitle({ title: "NO!" })
+}
+
+function updateIcon(msg) {
+  chrome.icon.seBadgeText({ text: msg })
+
 }
 
 async function isSiteViable() {
@@ -96,6 +115,7 @@ async function forceInjectCS(mTab) {
 }
 
 chrome.runtime.onStartup.addListener(() => {
+  imgBlockingInit()
 
 })
 
@@ -137,6 +157,7 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 })
 
 chrome.runtime.onInstalled.addListener(function (details) {
+  imgBlockingInit()
 
   if (details.reason === "install" || details.reason === "update") {
     (async () => {
@@ -145,11 +166,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
 
   if (details.reason === "install") {
-    onInstall()
+    initSetup("NEW")
   }
 
   if (details.reason === "update") {
-    onUpdate()
+    initSetup("UPD")
   }
 
 });
@@ -180,6 +201,7 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
 
 function getSettings() {
+  //set icon based on the image content settings
 
 }
 
@@ -189,16 +211,34 @@ function toggleContextMenu() {
 
 function getLocalStoragePrefs(callback) {
 
+  chrome.storage.local.get([], (data) => {
+    prefs = data.image_on_off_prefs || prefs;
+    rules = data.imgTF_rules || rules;
+
+    if (rules.length) {
+      importRules(rules)
+    }
+
+    if (callback) callback()
+  })
+
 }
 
-function onInstall() {
+function importRules(rules) {
 
 }
 
-function onUpdate() {
+function initSetup(msg) {
+  //import rules
+  //set appropriate badge text
+  if (rules.length) {
+    importRules(rules)
+  }
+
+  chrome.action.setBadgeText(msg)
+
 
 }
-
 
 
 function imgBlockingInit() {
