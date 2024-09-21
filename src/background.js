@@ -121,12 +121,12 @@ async function forceInjectCS(mTab) {
 
 chrome.runtime.onStartup.addListener(() => {
   imgBlockingInit()
-  getSettings()
+  getTabSettings()
 
 })
 
 chrome.windows.onFocusChanged.addListener(() => {
-  getSettings()
+  getTabSettings()
 
 })
 
@@ -154,7 +154,7 @@ chrome.action.onClicked.addListener(async function () {
 
 chrome.tabs.onActivated.addListener((tabId, changeInfo, tab) => {
   areToolsLoaded()
-  getSettings()
+  getTabSettings()
 
 })
 
@@ -162,7 +162,7 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
   areToolsLoaded()
 
-  getSettings()
+  getTabSettings()
 
 })
 
@@ -210,7 +210,7 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 })
 
 
-function getSettings(callback) {
+function getTabSettings() {
   //set icon based on the image content settings
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
@@ -229,7 +229,6 @@ function getSettings(callback) {
 
       else updateIcon("ALLW")
 
-      if (callback) callback()
     }
 
     else {
@@ -296,7 +295,7 @@ function initSetup(msg) {
 function imgBlockingInit() {
 
   getLocalStoragePrefs(() => {
-    getSettings();
+    getTabSettings();
     toggleContextMenu();
   })
 
