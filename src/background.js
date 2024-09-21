@@ -221,10 +221,14 @@ async function getTabData() {
       incognito = tab.incognito;
       url = tab.url;
       tabId = tab.id;
+
+      return [incognito, url, tabId]
     }
 
     else {
       console.log("no active tab");
+
+      return []
 
     }
 
