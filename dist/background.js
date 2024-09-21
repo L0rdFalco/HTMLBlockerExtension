@@ -96018,17 +96018,17 @@ chrome.runtime.onInstalled.addListener(function (details) {
     }))();
   }
   if (details.reason === "install") {
-    setTabRules();
+    setContentRules();
   }
   if (details.reason === "update") {
-    setTabRules();
+    setContentRules();
   }
 });
 chrome.runtime.onStartup.addListener(function () {
   imgBlockingInit();
 });
 chrome.windows.onFocusChanged.addListener(function () {
-  getTabSettings();
+  getTabData();
 });
 chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
   var mTab, res;
@@ -96068,11 +96068,11 @@ chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__
 })));
 chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
   areToolsLoaded();
-  getTabSettings();
+  getTabData();
 });
 chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   areToolsLoaded();
-  getTabSettings();
+  getTabData();
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, res) {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
@@ -96089,7 +96089,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, res) {
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   if (info.menuItemId === "imgContextMenu") openImgPanel();
 });
-function getTabSettings() {
+function getTabData() {
   //extracts required tab data
   chrome.tabs.query({
     active: true,
@@ -96125,17 +96125,17 @@ function toggleContextMenu() {
     contextMenuId = null;
   }
 }
-function setTabRules() {
+function setContentRules() {
   if (rules.length) {}
 }
 function imgBlockingInit() {
   chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], function (data) {
     prefs = data.image_on_off_prefs || prefs;
     rules = data.imgTF_rules || rules;
-    if (rules.length) {
-      setTabRules(rules);
-    }
-    getTabSettings();
+    setContentRules(rules); //importRules
+
+    getTabData(); //getSettings
+
     toggleContextMenu();
   });
 }

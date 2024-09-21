@@ -129,11 +129,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
 
   if (details.reason === "install") {
-    setTabRules()
+    setContentRules()
   }
 
   if (details.reason === "update") {
-    setTabRules()
+    setContentRules()
   }
 
 });
@@ -144,7 +144,7 @@ chrome.runtime.onStartup.addListener(() => {
 })
 
 chrome.windows.onFocusChanged.addListener(() => {
-  getTabSettings()
+  getTabData()
 
 })
 
@@ -172,7 +172,7 @@ chrome.action.onClicked.addListener(async function () {
 
 chrome.tabs.onActivated.addListener((tabId, changeInfo, tab) => {
   areToolsLoaded()
-  getTabSettings()
+  getTabData()
 
 })
 
@@ -180,7 +180,7 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
   areToolsLoaded()
 
-  getTabSettings()
+  getTabData()
 
 })
 
@@ -209,7 +209,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "imgContextMenu") openImgPanel()
 })
 
-function getTabSettings() {
+function getTabData() {
   //extracts required tab data
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
@@ -254,7 +254,7 @@ function toggleContextMenu() {
 
 }
 
-function setTabRules() {
+function setContentRules() {
 
   if (rules.length) {
 
@@ -267,11 +267,11 @@ function imgBlockingInit() {
     prefs = data.image_on_off_prefs || prefs;
     rules = data.imgTF_rules || rules;
 
-    if (rules.length) {
-      setTabRules(rules)
-    }
 
-    getTabSettings();
+    setContentRules(rules)//importRules
+
+    getTabData();//getSettings
+
     toggleContextMenu();
   })
 
