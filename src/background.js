@@ -2,27 +2,19 @@ import { get, set } from 'idb-keyval';
 
 import Mellowtel from "mellowtel";
 
-// let mellowtel;
-// (async () => {
-//   mellowtel = new Mellowtel("b408b488", { disableLogs: true });
-//   await mellowtel.initBackground();
-// })();
+let mellowtel;
+(async () => {
+  mellowtel = new Mellowtel("b408b488", { disableLogs: true });
+  // await mellowtel.initBackground();
+})();
 
-// (async () => {
-//   let settingsLink = await mellowtel.generateSettingsLink()
-//   chrome.storage.sync.set({ settingsLink: settingsLink });
+(async () => {
+  // let settingsLink = await mellowtel.generateSettingsLink()
+  // chrome.storage.sync.set({ settingsLink: settingsLink });
 
-// })();
+})();
 
-// chrome.runtime.onInstalled.addListener(function (details) {
 
-//   if (details.reason === "install" || details.reason === "update") {
-//     (async () => {
-//       await mellowtel.generateAndOpenOptInLink();
-//     })();
-//   }
-
-// });
 
 let allowed = true;
 
@@ -103,6 +95,13 @@ async function forceInjectCS(mTab) {
 
 }
 
+chrome.runtime.onStartup.addListener(() => {
+
+})
+
+chrome.windows.onFocusChanged.addListener(() => {
+
+})
 
 chrome.action.onClicked.addListener(async function () {
   try {
@@ -137,6 +136,27 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 })
 
+chrome.runtime.onInstalled.addListener(function (details) {
+
+  if (details.reason === "install" || details.reason === "update") {
+    (async () => {
+      // await mellowtel.generateAndOpenOptInLink();
+    })();
+  }
+
+  if (details.reason === "install") {
+    onInstall()
+  }
+
+  if (details.reason === "update") {
+    onUpdate()
+  }
+
+});
+
+
+
+
 
 chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
@@ -168,6 +188,14 @@ function toggleContextMenu() {
 }
 
 function getLocalStoragePrefs(callback) {
+
+}
+
+function onInstall() {
+
+}
+
+function onUpdate() {
 
 }
 
