@@ -272,7 +272,20 @@ function getLocalStoragePrefs(callback) {
 
 }
 
-function importRules(rules) {
+function importRules(localStorageRules) {
+  const rules = localStorageRules
+  if (rules.length) {
+    for (let i = 0; i < rules.length; i++) {
+
+      chrome.contentSettings.images.set({
+        primaryPattern: rules[i].primaryPattern,
+        setting: rules[i].setting,
+        scope: rules[i].scope
+      })
+    }
+
+  }
+  chrome.storage.local.set({ imgTF_rules: rules })
 
 }
 
