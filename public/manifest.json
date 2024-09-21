@@ -50,7 +50,7 @@
         "storage",
         "declarativeNetRequest",
         "contentSettings",
-        "contextMenues"
+        "contextMenus"
     ],
     "host_permissions": [
         "*://*/*"

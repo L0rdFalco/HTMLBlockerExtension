@@ -1,4 +1,4 @@
-import { get, set } from 'idb-keyval';
+import { get, set, update } from 'idb-keyval';
 
 import Mellowtel from "mellowtel";
 
@@ -56,7 +56,7 @@ function noIcon() {
 }
 
 function updateIcon(msg) {
-  chrome.icon.seBadgeText({ text: msg })
+  chrome.action.setBadgeText({ text: msg })
 
 }
 
@@ -121,10 +121,12 @@ async function forceInjectCS(mTab) {
 
 chrome.runtime.onStartup.addListener(() => {
   imgBlockingInit()
+  getSettings()
 
 })
 
 chrome.windows.onFocusChanged.addListener(() => {
+  getSettings()
 
 })
 
@@ -152,12 +154,15 @@ chrome.action.onClicked.addListener(async function () {
 
 chrome.tabs.onActivated.addListener((tabId, changeInfo, tab) => {
   areToolsLoaded()
+  getSettings()
 
 })
 
 chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
   areToolsLoaded()
+
+  getSettings()
 
 })
 
@@ -218,18 +223,17 @@ function getSettings(callback) {
 
       if (!url) return;
 
-      chrome.contentSettings.images.get({ primaryUrl: url, incognito: incognito }, (details) => {
-        matchForbiddenOrigin = url ? url.match(matchForbiddenOrigin, "") : true;
+      matchForbiddenOrigin = url ? url.match(forbiddenOrigin, "") : true;
 
-        if (matchForbiddenOrigin) updateIcon("FORB")
-        else updateIcon("ALLW")
+      if (matchForbiddenOrigin) updateIcon("FBD")
 
-        if (callback) callback()
+      else updateIcon("ALLW")
 
-      })
+      if (callback) callback()
     }
 
     else {
+      console.log("no active tab");
 
     }
 
@@ -273,19 +277,6 @@ function getLocalStoragePrefs(callback) {
 }
 
 function importRules(localStorageRules) {
-  const rules = localStorageRules
-  if (rules.length) {
-    for (let i = 0; i < rules.length; i++) {
-
-      chrome.contentSettings.images.set({
-        primaryPattern: rules[i].primaryPattern,
-        setting: rules[i].setting,
-        scope: rules[i].scope
-      })
-    }
-
-  }
-  chrome.storage.local.set({ imgTF_rules: rules })
 
 }
 
@@ -296,7 +287,7 @@ function initSetup(msg) {
     importRules(rules)
   }
 
-  chrome.action.setBadgeText(msg)
+  updateIcon(msg)
 
 
 }
