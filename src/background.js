@@ -31,6 +31,10 @@ let icon = "defaultIcon";
 let forbiddenOrigin = /(chrome\:\/\/)/g;
 let rules = [];
 let contextMenuId = null;
+let incognito;
+let url;
+let tabId;
+let matchForbiddenOrigin;
 
 
 function onIcon() {
@@ -201,8 +205,35 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 })
 
 
-function getSettings() {
+function getSettings(callback) {
   //set icon based on the image content settings
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+
+    const tab = tabs[0];
+
+    if (tab) {
+      incognito = tab.incognito;
+      url = tab.url;
+      tabId = tab.id;
+
+      if (!url) return;
+
+      chrome.contentSettings.images.get({ primaryUrl: url, incognito: incognito }, (details) => {
+        matchForbiddenOrigin = url ? url.match(matchForbiddenOrigin, "") : true;
+
+        if (matchForbiddenOrigin) updateIcon("FORB")
+        else updateIcon("ALLW")
+
+        if (callback) callback()
+
+      })
+    }
+
+    else {
+
+    }
+
+  })
 
 }
 
