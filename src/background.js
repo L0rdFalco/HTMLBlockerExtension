@@ -129,11 +129,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
 
   if (details.reason === "install") {
-    appSetup("NEW")
+    setTabRules()
   }
 
   if (details.reason === "update") {
-    appSetup("UPD")
+    setTabRules()
   }
 
 });
@@ -141,8 +141,6 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 chrome.runtime.onStartup.addListener(() => {
   imgBlockingInit()
-  getTabSettings()
-
 })
 
 chrome.windows.onFocusChanged.addListener(() => {
@@ -209,7 +207,7 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
 
 function getTabSettings() {
-  //set icon based on the image content settings
+  //extracts required tab data
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
     const tab = tabs[0];
@@ -218,15 +216,6 @@ function getTabSettings() {
       incognito = tab.incognito;
       url = tab.url;
       tabId = tab.id;
-
-      if (!url) return;
-
-      matchForbiddenOrigin = url ? url.match(forbiddenOrigin, "") : true;
-
-      if (matchForbiddenOrigin) updateIcon("FBD")
-
-      else updateIcon("ALLW")
-
     }
 
     else {
@@ -258,22 +247,13 @@ function toggleContextMenu() {
 
 }
 
-function importRules(localStorageRules) {
+function setTabRules() {
 
-}
-
-function appSetup(msg) {
-  //import rules
-  //set appropriate badge text
   if (rules.length) {
-    importRules(rules)
+
   }
 
-  updateIcon(msg)
-
-
 }
-
 
 function imgBlockingInit() {
   chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], (data) => {
@@ -281,7 +261,7 @@ function imgBlockingInit() {
     rules = data.imgTF_rules || rules;
 
     if (rules.length) {
-      importRules(rules)
+      setTabRules(rules)
     }
 
     getTabSettings();
