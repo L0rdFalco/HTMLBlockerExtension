@@ -688,15 +688,11 @@ var mainObj = {
       });
     });
   },
-  blockImages: function blockImages() {
+  toggleImages: function toggleImages() {
     chrome.runtime.sendMessage({
-      action: "block_images"
+      action: "toggle_images"
     }, function (res) {
-      console.log("block images res: ", res);
-      if (res.msg === "success") mainObj.areImagesBlocked = true;
-      chrome.storage.local.set({
-        "imgBlock": true
-      });
+      console.log("toggle images res", res);
     });
 
     //send images to bg script to block images
@@ -718,7 +714,7 @@ var mainObj = {
     });
     this.getSingleEl(".topButton_hideImages").addEventListener("click", function (e) {
       e.preventDefault();
-      mainObj.areImagesBlocked ? mainObj.showImages() : mainObj.blockImages();
+      mainObj.toggleImages();
     });
     this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
       e.preventDefault();
@@ -772,16 +768,9 @@ var mainObj = {
     });
     mainObj.areToolsLoaded = false;
   },
-  setImageBlockStatus: function setImageBlockStatus() {
-    chrome.storage.local.get("imgBlock", function (data) {
-      console.log("image", data);
-      if (data.imgBlock) mainObj.areImagesBlocked = true;else mainObj.areImagesBlocked = false;
-    });
-  },
   init: function init() {
     console.log("cs init");
     chrome.runtime.onMessage.addListener(cbObj.bgReceiver);
-    this.setImageBlockStatus();
     this.loadHiddenEls();
   }
 };

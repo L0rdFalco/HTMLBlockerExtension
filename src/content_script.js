@@ -441,12 +441,10 @@ const mainObj = {
         })
 
     },
-    blockImages: function () {
+    toggleImages: function () {
 
-        chrome.runtime.sendMessage({ action: "block_images" }, (res) => {
-            console.log("block images res: ", res);
-            if (res.msg === "success") mainObj.areImagesBlocked = true;
-            chrome.storage.local.set({ "imgBlock": true })
+        chrome.runtime.sendMessage({ action: "toggle_images" }, (res) => {
+            console.log("toggle images res", res);
 
         })
 
@@ -502,7 +500,7 @@ const mainObj = {
         })
         this.getSingleEl(".topButton_hideImages").addEventListener("click", (e) => {
             e.preventDefault();
-            mainObj.areImagesBlocked ? mainObj.showImages() : mainObj.blockImages()
+            mainObj.toggleImages()
         })
         this.getSingleEl(".topButton_close").addEventListener("click", (e) => {
             e.preventDefault();
@@ -563,22 +561,10 @@ const mainObj = {
         mainObj.areToolsLoaded = false;
     },
 
-    setImageBlockStatus: function () {
-
-        chrome.storage.local.get("imgBlock", (data) => {
-            console.log("image", data);
-            if (data.imgBlock) mainObj.areImagesBlocked = true
-            else mainObj.areImagesBlocked = false
-        })
-    },
-
 
     init: function () {
         console.log("cs init");
         chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
-
-        this.setImageBlockStatus()
-
         this.loadHiddenEls();
     }
 

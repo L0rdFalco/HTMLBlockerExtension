@@ -202,18 +202,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     })
   }
 
-  else if (msg.action === "show_images") {
-    console.log("show images");
+  else if (msg.action === "toggle_images") {
+    console.log("toggle images");
 
-    (async function () {
-      const res = await toggleImageBlocking()
-
-      if (res === "success") sendResponse({ msg: "success", url: "" })
-    })()
-
-  }
-  else if (msg.action === "block_images") {
-    console.log("block images");
     (async function () {
       const res = await toggleImageBlocking()
 
@@ -241,7 +232,7 @@ async function getTabData() {
       url = tab.url;
       tabId = tab.id;
 
-      return [url, incognito, tabId]
+      return [url ? url : null, incognito, tabId ? tabId : null]
     }
 
     else {
@@ -268,8 +259,19 @@ async function toggleImageBlocking() {
   const res = await getTabData()
   console.log("tabData res: ", res);
 
+  if (!res[0]) return // when there's no url
+  if (!res[2]) return // when theres no tabId
+
+
+
   const ImgsRes = await chrome.contentSettings.images.get({ primaryUrl: res[0], incognito: res[1] });
   console.log("images res: ", ImgsRes);
+
+  let setting = ImgsRes.setting;
+  if (!setting) return;
+
+  const urlParser = new URL(res[0])
+  console.log("url obj: ", urlParser);
 
   return "success"
 
