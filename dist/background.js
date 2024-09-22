@@ -95874,30 +95874,30 @@ function isSiteViable() {
   return _isSiteViable.apply(this, arguments);
 }
 function _isSiteViable() {
-  _isSiteViable = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+  _isSiteViable = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
     var tabs;
-    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-      while (1) switch (_context5.prev = _context5.next) {
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
         case 0:
-          _context5.next = 2;
+          _context7.next = 2;
           return chrome.tabs.query({
             active: true,
             currentWindow: true
           });
         case 2:
-          tabs = _context5.sent;
+          tabs = _context7.sent;
           if (!(!tabs || !tabs.length || tabs[0].id < 0)) {
-            _context5.next = 5;
+            _context7.next = 5;
             break;
           }
-          return _context5.abrupt("return");
+          return _context7.abrupt("return");
         case 5:
-          return _context5.abrupt("return", tabs[0]);
+          return _context7.abrupt("return", tabs[0]);
         case 6:
         case "end":
-          return _context5.stop();
+          return _context7.stop();
       }
-    }, _callee5);
+    }, _callee7);
   }));
   return _isSiteViable.apply(this, arguments);
 }
@@ -95905,41 +95905,41 @@ function areToolsLoaded() {
   return _areToolsLoaded.apply(this, arguments);
 }
 function _areToolsLoaded() {
-  _areToolsLoaded = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+  _areToolsLoaded = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
     var mTab, visibStatus;
-    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-      while (1) switch (_context6.prev = _context6.next) {
+    return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+      while (1) switch (_context8.prev = _context8.next) {
         case 0:
-          _context6.prev = 0;
-          _context6.next = 3;
+          _context8.prev = 0;
+          _context8.next = 3;
           return isSiteViable();
         case 3:
-          mTab = _context6.sent;
+          mTab = _context8.sent;
           if (mTab.url.startsWith("http")) {
-            _context6.next = 6;
+            _context8.next = 6;
             break;
           }
-          return _context6.abrupt("return", noIcon());
+          return _context8.abrupt("return", noIcon());
         case 6:
-          _context6.next = 8;
+          _context8.next = 8;
           return chrome.tabs.sendMessage(mTab.id, {
             action: "getStatus"
           });
         case 8:
-          visibStatus = _context6.sent;
+          visibStatus = _context8.sent;
           visibStatus ? onIcon() : offIcon();
-          _context6.next = 16;
+          _context8.next = 16;
           break;
         case 12:
-          _context6.prev = 12;
-          _context6.t0 = _context6["catch"](0);
+          _context8.prev = 12;
+          _context8.t0 = _context8["catch"](0);
           console.log("blocking status error");
           noIcon();
         case 16:
         case "end":
-          return _context6.stop();
+          return _context8.stop();
       }
-    }, _callee6, null, [[0, 12]]);
+    }, _callee8, null, [[0, 12]]);
   }));
   return _areToolsLoaded.apply(this, arguments);
 }
@@ -95947,28 +95947,28 @@ function toggleTools(_x) {
   return _toggleTools.apply(this, arguments);
 }
 function _toggleTools() {
-  _toggleTools = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(mTabID) {
-    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-      while (1) switch (_context7.prev = _context7.next) {
+  _toggleTools = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9(mTabID) {
+    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+      while (1) switch (_context9.prev = _context9.next) {
         case 0:
-          _context7.prev = 0;
-          _context7.next = 3;
+          _context9.prev = 0;
+          _context9.next = 3;
           return chrome.tabs.sendMessage(mTabID, {
             action: "toggle",
             status: allowed
           });
         case 3:
-          return _context7.abrupt("return", _context7.sent);
+          return _context9.abrupt("return", _context9.sent);
         case 6:
-          _context7.prev = 6;
-          _context7.t0 = _context7["catch"](0);
+          _context9.prev = 6;
+          _context9.t0 = _context9["catch"](0);
           console.log("toggle error");
           noIcon();
         case 10:
         case "end":
-          return _context7.stop();
+          return _context9.stop();
       }
-    }, _callee7, null, [[0, 6]]);
+    }, _callee9, null, [[0, 6]]);
   }));
   return _toggleTools.apply(this, arguments);
 }
@@ -95976,12 +95976,12 @@ function forceInjectCS(_x2) {
   return _forceInjectCS.apply(this, arguments);
 }
 function _forceInjectCS() {
-  _forceInjectCS = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(mTab) {
-    return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-      while (1) switch (_context8.prev = _context8.next) {
+  _forceInjectCS = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10(mTab) {
+    return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+      while (1) switch (_context10.prev = _context10.next) {
         case 0:
-          _context8.prev = 0;
-          _context8.next = 3;
+          _context10.prev = 0;
+          _context10.next = 3;
           return chrome.scripting.executeScript({
             files: ["content_script.js"],
             target: {
@@ -95989,18 +95989,18 @@ function _forceInjectCS() {
             }
           });
         case 3:
-          _context8.next = 9;
+          _context10.next = 9;
           break;
         case 5:
-          _context8.prev = 5;
-          _context8.t0 = _context8["catch"](0);
+          _context10.prev = 5;
+          _context10.t0 = _context10["catch"](0);
           console.log("the webpage is probably forbidding script injection");
           noIcon();
         case 9:
         case "end":
-          return _context8.stop();
+          return _context10.stop();
       }
-    }, _callee8, null, [[0, 5]]);
+    }, _callee10, null, [[0, 5]]);
   }));
   return _forceInjectCS.apply(this, arguments);
 }
@@ -96074,15 +96074,55 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   areToolsLoaded();
   getTabData();
 });
-chrome.runtime.onMessage.addListener(function (msg, sender, res) {
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
     //save to indexDB
 
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
   } else if (msg.action === "extract_perm_hidden_elms") {
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.get)("web:".concat(msg.website)).then(function (data) {
-      res(data || "[]");
+      sendResponse(data || "[]");
     });
+  } else if (msg.action === "show_images") {
+    console.log("show images");
+    _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      var res;
+      return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+        while (1) switch (_context5.prev = _context5.next) {
+          case 0:
+            _context5.next = 2;
+            return toggleImageBlocking();
+          case 2:
+            res = _context5.sent;
+            if (res === "success") sendResponse({
+              msg: "success"
+            });
+          case 4:
+          case "end":
+            return _context5.stop();
+        }
+      }, _callee5);
+    }))();
+  } else if (msg.action === "block_images") {
+    console.log("block images");
+    _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+      var res;
+      return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+        while (1) switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
+            return toggleImageBlocking();
+          case 2:
+            res = _context6.sent;
+            if (res === "success") sendResponse({
+              msg: "success"
+            });
+          case 4:
+          case "end":
+            return _context6.stop();
+        }
+      }, _callee6);
+    }))();
   }
   return true;
 });
@@ -96093,38 +96133,43 @@ function getTabData() {
   return _getTabData.apply(this, arguments);
 }
 function _getTabData() {
-  _getTabData = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+  _getTabData = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
     var tabs, tab;
-    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-      while (1) switch (_context9.prev = _context9.next) {
+    return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+      while (1) switch (_context11.prev = _context11.next) {
         case 0:
-          _context9.prev = 0;
-          _context9.next = 3;
+          _context11.prev = 0;
+          _context11.next = 3;
           return chrome.tabs.query({
             active: true,
             currentWindow: true
           });
         case 3:
-          tabs = _context9.sent;
+          tabs = _context11.sent;
           tab = tabs[0];
-          if (tab) {
-            incognito = tab.incognito;
-            url = tab.url;
-            tabId = tab.id;
-          } else {
-            console.log("no active tab");
+          if (!tab) {
+            _context11.next = 12;
+            break;
           }
-          _context9.next = 11;
+          incognito = tab.incognito;
+          url = tab.url;
+          tabId = tab.id;
+          return _context11.abrupt("return", [incognito, url, tabId]);
+        case 12:
+          console.log("no active tab");
+          return _context11.abrupt("return", []);
+        case 14:
+          _context11.next = 19;
           break;
-        case 8:
-          _context9.prev = 8;
-          _context9.t0 = _context9["catch"](0);
+        case 16:
+          _context11.prev = 16;
+          _context11.t0 = _context11["catch"](0);
           console.log("getTabData error");
-        case 11:
+        case 19:
         case "end":
-          return _context9.stop();
+          return _context11.stop();
       }
-    }, _callee9, null, [[0, 8]]);
+    }, _callee11, null, [[0, 16]]);
   }));
   return _getTabData.apply(this, arguments);
 }
@@ -96133,6 +96178,24 @@ function openImgPanel() {
     url: "chrome://settings/content/images",
     active: true
   });
+}
+function toggleImageBlocking(_x3) {
+  return _toggleImageBlocking.apply(this, arguments);
+}
+function _toggleImageBlocking() {
+  _toggleImageBlocking = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(cb) {
+    return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+      while (1) switch (_context12.prev = _context12.next) {
+        case 0:
+          console.log("toggle images");
+          return _context12.abrupt("return", "success");
+        case 2:
+        case "end":
+          return _context12.stop();
+      }
+    }, _callee12);
+  }));
+  return _toggleImageBlocking.apply(this, arguments);
 }
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {

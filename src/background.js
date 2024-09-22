@@ -185,7 +185,7 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 })
 
 
-chrome.runtime.onMessage.addListener((msg, sender, res) => {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
 
@@ -198,10 +198,29 @@ chrome.runtime.onMessage.addListener((msg, sender, res) => {
 
   else if (msg.action === "extract_perm_hidden_elms") {
     get(`web:${msg.website}`).then(data => {
-      res(data || "[]")
+      sendResponse(data || "[]")
     })
   }
 
+  else if (msg.action === "show_images") {
+    console.log("show images");
+
+    (async function () {
+      const res = await toggleImageBlocking()
+
+      if (res === "success") sendResponse({ msg: "success" })
+    })()
+
+  }
+  else if (msg.action === "block_images") {
+    console.log("block images");
+    (async function () {
+      const res = await toggleImageBlocking()
+
+      if (res === "success") sendResponse({ msg: "success" })
+    })()
+
+  }
   return true
 })
 
@@ -240,6 +259,13 @@ async function getTabData() {
 
 function openImgPanel() {
   chrome.tabs.create({ url: "chrome://settings/content/images", active: true })
+
+}
+
+async function toggleImageBlocking(cb) {
+  console.log("toggle images");
+
+  return "success"
 
 }
 function toggleContextMenu() {
@@ -284,8 +310,5 @@ function imgBlockingInit() {
   })
 
 }
-
-
-
 
 areToolsLoaded()

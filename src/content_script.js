@@ -432,8 +432,21 @@ const mainObj = {
 
     showImages: function () {
         //send msg to backend for show images
+        chrome.runtime.sendMessage({ action: "show_images" }, (res) => {
+            if (res.msg === "success") this.areImagesBlocked = true;
+
+            chrome.storage.local.set({ "imgBlock": false })
+
+        })
+
     },
     blockImages: function () {
+
+        chrome.runtime.sendMessage({ action: "block_images" }, (res) => {
+            if (res.msg === "success") this.areImagesBlocked = true;
+            chrome.storage.local.set({ "imgBlock": true })
+
+        })
 
         //send images to bg script to block images
     },
@@ -548,11 +561,20 @@ const mainObj = {
         mainObj.areToolsLoaded = false;
     },
 
+    setImageBlockStatus: function () {
+
+        chrome.storage.local.get("imgBlock", (data) => {
+            if (data.imgBlock) mainObj.areImagesBlocked = true
+            else mainObj.areImagesBlocked = false
+        })
+    },
+
 
     init: function () {
         console.log("cs init");
         chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
 
+        this.setImageBlockStatus()
         this.loadHiddenEls();
     }
 
