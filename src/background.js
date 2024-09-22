@@ -261,6 +261,7 @@ async function toggleImageBlocking() {
 
   if (!res[0]) return // when there's no url
   if (!res[2]) return // when theres no tabId
+  if (res[0].match(forbiddenOrigin)) return // when its a forbidden page
 
 
 
