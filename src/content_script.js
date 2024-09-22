@@ -433,7 +433,8 @@ const mainObj = {
     showImages: function () {
         //send msg to backend for show images
         chrome.runtime.sendMessage({ action: "show_images" }, (res) => {
-            if (res.msg === "success") this.areImagesBlocked = true;
+            if (res.msg === "success") mainObj.areImagesBlocked = true;
+            console.log("show images res: ", res);
 
             chrome.storage.local.set({ "imgBlock": false })
 
@@ -443,7 +444,8 @@ const mainObj = {
     blockImages: function () {
 
         chrome.runtime.sendMessage({ action: "block_images" }, (res) => {
-            if (res.msg === "success") this.areImagesBlocked = true;
+            console.log("block images res: ", res);
+            if (res.msg === "success") mainObj.areImagesBlocked = true;
             chrome.storage.local.set({ "imgBlock": true })
 
         })
@@ -500,7 +502,7 @@ const mainObj = {
         })
         this.getSingleEl(".topButton_hideImages").addEventListener("click", (e) => {
             e.preventDefault();
-            this.areImagesBlocked ? showImages() : blockImages()
+            mainObj.areImagesBlocked ? mainObj.showImages() : mainObj.blockImages()
         })
         this.getSingleEl(".topButton_close").addEventListener("click", (e) => {
             e.preventDefault();
@@ -564,6 +566,7 @@ const mainObj = {
     setImageBlockStatus: function () {
 
         chrome.storage.local.get("imgBlock", (data) => {
+            console.log("image", data);
             if (data.imgBlock) mainObj.areImagesBlocked = true
             else mainObj.areImagesBlocked = false
         })
@@ -575,6 +578,7 @@ const mainObj = {
         chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
 
         this.setImageBlockStatus()
+
         this.loadHiddenEls();
     }
 

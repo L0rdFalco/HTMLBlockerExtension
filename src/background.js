@@ -208,7 +208,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     (async function () {
       const res = await toggleImageBlocking()
 
-      if (res === "success") sendResponse({ msg: "success" })
+      if (res === "success") sendResponse({ msg: "success", url: "" })
     })()
 
   }
@@ -217,7 +217,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     (async function () {
       const res = await toggleImageBlocking()
 
-      if (res === "success") sendResponse({ msg: "success" })
+      if (res === "success") sendResponse({ msg: "success", url: "" })
     })()
 
   }
@@ -241,7 +241,7 @@ async function getTabData() {
       url = tab.url;
       tabId = tab.id;
 
-      return [incognito, url, tabId]
+      return [url, incognito, tabId]
     }
 
     else {
@@ -262,8 +262,14 @@ function openImgPanel() {
 
 }
 
-async function toggleImageBlocking(cb) {
+async function toggleImageBlocking() {
   console.log("toggle images");
+
+  const res = await getTabData()
+  console.log("tabData res: ", res);
+
+  const ImgsRes = await chrome.contentSettings.images.get({ primaryUrl: res[0], incognito: res[1] });
+  console.log("images res: ", ImgsRes);
 
   return "success"
 

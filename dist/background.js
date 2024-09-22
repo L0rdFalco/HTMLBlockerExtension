@@ -96095,7 +96095,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           case 2:
             res = _context5.sent;
             if (res === "success") sendResponse({
-              msg: "success"
+              msg: "success",
+              url: ""
             });
           case 4:
           case "end":
@@ -96115,7 +96116,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           case 2:
             res = _context6.sent;
             if (res === "success") sendResponse({
-              msg: "success"
+              msg: "success",
+              url: ""
             });
           case 4:
           case "end":
@@ -96154,7 +96156,7 @@ function _getTabData() {
           incognito = tab.incognito;
           url = tab.url;
           tabId = tab.id;
-          return _context11.abrupt("return", [incognito, url, tabId]);
+          return _context11.abrupt("return", [url, incognito, tabId]);
         case 12:
           console.log("no active tab");
           return _context11.abrupt("return", []);
@@ -96179,17 +96181,31 @@ function openImgPanel() {
     active: true
   });
 }
-function toggleImageBlocking(_x3) {
+function toggleImageBlocking() {
   return _toggleImageBlocking.apply(this, arguments);
 }
 function _toggleImageBlocking() {
-  _toggleImageBlocking = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(cb) {
+  _toggleImageBlocking = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+    var res, ImgsRes;
     return _regeneratorRuntime().wrap(function _callee12$(_context12) {
       while (1) switch (_context12.prev = _context12.next) {
         case 0:
           console.log("toggle images");
+          _context12.next = 3;
+          return getTabData();
+        case 3:
+          res = _context12.sent;
+          console.log("tabData res: ", res);
+          _context12.next = 7;
+          return chrome.contentSettings.images.get({
+            primaryUrl: res[0],
+            incognito: res[1]
+          });
+        case 7:
+          ImgsRes = _context12.sent;
+          console.log("images res: ", ImgsRes);
           return _context12.abrupt("return", "success");
-        case 2:
+        case 10:
         case "end":
           return _context12.stop();
       }

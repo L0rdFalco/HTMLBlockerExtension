@@ -677,23 +677,23 @@ var mainObj = {
   deactivateDialog: function deactivateDialog() {},
   activateDialog: function activateDialog(cls) {},
   showImages: function showImages() {
-    var _this = this;
     //send msg to backend for show images
     chrome.runtime.sendMessage({
       action: "show_images"
     }, function (res) {
-      if (res.msg === "success") _this.areImagesBlocked = true;
+      if (res.msg === "success") mainObj.areImagesBlocked = true;
+      console.log("show images res: ", res);
       chrome.storage.local.set({
         "imgBlock": false
       });
     });
   },
   blockImages: function blockImages() {
-    var _this2 = this;
     chrome.runtime.sendMessage({
       action: "block_images"
     }, function (res) {
-      if (res.msg === "success") _this2.areImagesBlocked = true;
+      console.log("block images res: ", res);
+      if (res.msg === "success") mainObj.areImagesBlocked = true;
       chrome.storage.local.set({
         "imgBlock": true
       });
@@ -702,7 +702,6 @@ var mainObj = {
     //send images to bg script to block images
   },
   loadBlockingTools: function loadBlockingTools() {
-    var _this3 = this;
     console.log("loading tools");
     if (!this.mBlockerDiv) this.injectCSS2Head();
     var shadowElement = document.createElement("div");
@@ -719,7 +718,7 @@ var mainObj = {
     });
     this.getSingleEl(".topButton_hideImages").addEventListener("click", function (e) {
       e.preventDefault();
-      _this3.areImagesBlocked ? showImages() : blockImages();
+      mainObj.areImagesBlocked ? mainObj.showImages() : mainObj.blockImages();
     });
     this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
       e.preventDefault();
@@ -775,6 +774,7 @@ var mainObj = {
   },
   setImageBlockStatus: function setImageBlockStatus() {
     chrome.storage.local.get("imgBlock", function (data) {
+      console.log("image", data);
       if (data.imgBlock) mainObj.areImagesBlocked = true;else mainObj.areImagesBlocked = false;
     });
   },
