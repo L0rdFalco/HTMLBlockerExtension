@@ -96200,7 +96200,6 @@ function _toggleImageBlocking() {
           return _context11.abrupt("return");
         case 15:
           urlParser = new URL(res[0]);
-          console.log("url obj: ", urlParser);
           pattern = /^file:/.test(url) ? url : "".concat(urlParser.hostname, "/*");
           if (!/^file:/.test(url)) {
             // when url is a live link and not a local file
@@ -96229,8 +96228,8 @@ function _toggleImageBlocking() {
               bypassCache: true
             });
           }
-          setLocalStorageRule(pattern, newSetting);
-        case 23:
+          setLocalStorageRule(pattern, newSetting, res[1]);
+        case 22:
         case "end":
           return _context11.stop();
       }
@@ -96238,7 +96237,37 @@ function _toggleImageBlocking() {
   }));
   return _toggleImageBlocking.apply(this, arguments);
 }
-function setLocalStorageRule(pattern, newSetting) {}
+function setLocalStorageRule(pattern, newSetting, incognito) {
+  console.log("pattern ", pattern);
+  console.log("setting ", newSetting);
+  console.log("privacy ", incognito);
+  if (incognito) return;
+  chome.storage.local.get("imgTF_rules", function (data) {
+    console.log(data);
+    var rules = data.imgtf_rules || [];
+    var keyExist = false;
+    if (rules.length) {
+      //check if  current url + blocking status is saved in storage
+      for (var i = 0; i < rules.length; i++) {
+        if (pattern === rules[i].primaryPattern) {
+          rules[i].setting = newSetting;
+          keyExist = true;
+          break;
+        }
+      }
+    }
+    if (!keyExist) {
+      rules.push({
+        primaryPattern: pattern,
+        setting: newSetting,
+        scope: incognito ? 'incognito_session_only' : 'regular'
+      });
+    }
+    chrome.storage.local.set({
+      imgTF_rules: rules
+    });
+  });
+}
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {
     contextMenuId = chrome.contextMenus.create({
