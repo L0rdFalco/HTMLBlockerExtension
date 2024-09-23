@@ -96237,36 +96237,66 @@ function _toggleImageBlocking() {
   }));
   return _toggleImageBlocking.apply(this, arguments);
 }
-function setLocalStorageRule(pattern, newSetting, incognito) {
-  console.log("pattern ", pattern);
-  console.log("setting ", newSetting);
-  console.log("privacy ", incognito);
-  if (incognito) return;
-  chome.storage.local.get("imgTF_rules", function (data) {
-    console.log(data);
-    var rules = data.imgtf_rules || [];
-    var keyExist = false;
-    if (rules.length) {
-      //check if  current url + blocking status is saved in storage
-      for (var i = 0; i < rules.length; i++) {
-        if (pattern === rules[i].primaryPattern) {
+function setLocalStorageRule(_x3, _x4, _x5) {
+  return _setLocalStorageRule.apply(this, arguments);
+}
+function _setLocalStorageRule() {
+  _setLocalStorageRule = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(pattern, newSetting, incognito) {
+    var data, rules, keyExist, i;
+    return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+      while (1) switch (_context12.prev = _context12.next) {
+        case 0:
+          if (!incognito) {
+            _context12.next = 2;
+            break;
+          }
+          return _context12.abrupt("return");
+        case 2:
+          _context12.next = 4;
+          return chrome.storage.local.get("imgTF_rules");
+        case 4:
+          data = _context12.sent;
+          rules = data.imgtf_rules || [];
+          keyExist = false;
+          if (!rules.length) {
+            _context12.next = 17;
+            break;
+          }
+          i = 0;
+        case 9:
+          if (!(i < rules.length)) {
+            _context12.next = 17;
+            break;
+          }
+          if (!(pattern === rules[i].primaryPattern)) {
+            _context12.next = 14;
+            break;
+          }
           rules[i].setting = newSetting;
           keyExist = true;
+          return _context12.abrupt("break", 17);
+        case 14:
+          i++;
+          _context12.next = 9;
           break;
-        }
+        case 17:
+          if (!keyExist) {
+            rules.push({
+              primaryPattern: pattern,
+              setting: newSetting,
+              scope: incognito ? 'incognito_session_only' : 'regular'
+            });
+          }
+          chrome.storage.local.set({
+            imgTF_rules: rules
+          });
+        case 19:
+        case "end":
+          return _context12.stop();
       }
-    }
-    if (!keyExist) {
-      rules.push({
-        primaryPattern: pattern,
-        setting: newSetting,
-        scope: incognito ? 'incognito_session_only' : 'regular'
-      });
-    }
-    chrome.storage.local.set({
-      imgTF_rules: rules
-    });
-  });
+    }, _callee12);
+  }));
+  return _setLocalStorageRule.apply(this, arguments);
 }
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {
@@ -96282,19 +96312,67 @@ function toggleContextMenu() {
     contextMenuId = null;
   }
 }
-function setContentRules() {
-  if (rules.length) {}
+function setContentRules(_x6) {
+  return _setContentRules.apply(this, arguments);
+}
+function _setContentRules() {
+  _setContentRules = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(r) {
+    var i;
+    return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+      while (1) switch (_context13.prev = _context13.next) {
+        case 0:
+          console.log("rules: ", r);
+          if (rules.length) {
+            for (i = 0; i < rules.length; i++) {
+              chrome.contentSettings.images.set({
+                primaryPattern: rules[i].primaryPattern,
+                setting: rules[i].setting,
+                scope: rules[i].scope
+              });
+            }
+          }
+          chrome.storage.local.set({
+            imgTF_rules: rules
+          });
+        case 3:
+        case "end":
+          return _context13.stop();
+      }
+    }, _callee13);
+  }));
+  return _setContentRules.apply(this, arguments);
 }
 function imgBlockingInit() {
-  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], function (data) {
-    prefs = data.image_on_off_prefs || prefs;
-    rules = data.imgTF_rules || rules;
-    setContentRules(rules); //importRules
-
-    getTabData(); //getSettings
-
-    toggleContextMenu();
-  });
+  return _imgBlockingInit.apply(this, arguments);
+}
+function _imgBlockingInit() {
+  _imgBlockingInit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
+    var data;
+    return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+      while (1) switch (_context14.prev = _context14.next) {
+        case 0:
+          toggleContextMenu();
+          console.log("1");
+          _context14.next = 4;
+          return chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules']);
+        case 4:
+          data = _context14.sent;
+          prefs = data.image_on_off_prefs || prefs;
+          rules = data.imgTF_rules || rules;
+          console.log("2", prefs);
+          console.log("2", rules);
+          _context14.next = 11;
+          return setContentRules(rules);
+        case 11:
+          _context14.next = 13;
+          return getTabData();
+        case 13:
+        case "end":
+          return _context14.stop();
+      }
+    }, _callee14);
+  }));
+  return _imgBlockingInit.apply(this, arguments);
 }
 areToolsLoaded();
 })();

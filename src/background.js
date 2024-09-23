@@ -304,41 +304,35 @@ async function toggleImageBlocking() {
 }
 
 
-function setLocalStorageRule(pattern, newSetting, incognito) {
-  console.log("pattern ", pattern);
-  console.log("setting ", newSetting);
-  console.log("privacy ", incognito);
+async function setLocalStorageRule(pattern, newSetting, incognito) {
 
   if (incognito) return
 
-  chome.storage.local.get("imgTF_rules", (data) => {
-    console.log(data);
-    let rules = data.imgtf_rules || []
-    let keyExist = false;
+  const data = await chrome.storage.local.get("imgTF_rules")
 
-    if (rules.length) { //check if  current url + blocking status is saved in storage
-      for (let i = 0; i < rules.length; i++) {
-        if (pattern === rules[i].primaryPattern) {
-          rules[i].setting = newSetting;
-          keyExist = true;
-          break;
-        }
+  let rules = data.imgtf_rules || []
+  let keyExist = false;
 
+  if (rules.length) { //check if  current url + blocking status is saved in storage
+    for (let i = 0; i < rules.length; i++) {
+      if (pattern === rules[i].primaryPattern) {
+        rules[i].setting = newSetting;
+        keyExist = true;
+        break;
       }
+
     }
+  }
 
-    if (!keyExist) {
-      rules.push({
-        primaryPattern: pattern,
-        setting: newSetting,
-        scope: incognito ? 'incognito_session_only' : 'regular'
-      });
-    }
+  if (!keyExist) {
+    rules.push({
+      primaryPattern: pattern,
+      setting: newSetting,
+      scope: incognito ? 'incognito_session_only' : 'regular'
+    });
+  }
 
-    chrome.storage.local.set({ imgTF_rules: rules })
-
-  })
-
+  chrome.storage.local.set({ imgTF_rules: rules })
 
 
 }
@@ -363,26 +357,40 @@ function toggleContextMenu() {
 
 }
 
-function setContentRules() {
+async function setContentRules(r) {
+  console.log("rules: ", r);
 
   if (rules.length) {
+    for (let i = 0; i < rules.length; i++) {
+
+      chrome.contentSettings.images.set({
+        primaryPattern: rules[i].primaryPattern,
+        setting: rules[i].setting,
+        scope: rules[i].scope
+      })
+    }
 
   }
+  chrome.storage.local.set({ imgTF_rules: rules })
+
 
 }
 
-function imgBlockingInit() {
-  chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'], (data) => {
-    prefs = data.image_on_off_prefs || prefs;
-    rules = data.imgTF_rules || rules;
+async function imgBlockingInit() {
 
+  toggleContextMenu();
+  console.log("1");
+  let data = await chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'])
 
-    setContentRules(rules)//importRules
+  prefs = data.image_on_off_prefs || prefs;
+  rules = data.imgTF_rules || rules;
 
-    getTabData();//getSettings
+  console.log("2", prefs);
+  console.log("2", rules);
 
-    toggleContextMenu();
-  })
+  await setContentRules(rules)//importRules
+
+  await getTabData();//getSettings
 
 }
 
