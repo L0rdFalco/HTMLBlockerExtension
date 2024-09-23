@@ -35,6 +35,7 @@ let incognito;
 let url;
 let tabId;
 let matchForbiddenOrigin;
+let currHost = "";
 
 
 function onIcon() {
@@ -206,9 +207,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     console.log("toggle images");
 
     (async function () {
-      const res = await toggleImageBlocking()
+      await toggleImageBlocking()
 
-      if (res === "success") sendResponse({ msg: "success", url: "" })
     })()
 
   }
@@ -249,24 +249,19 @@ async function getTabData() {
 }
 
 function openImgPanel() {
-  chrome.tabs.create({ url: "chrome://settings/content/images", active: true })
+  chrome.tabs.create({ url: "chrome://settings/content/images", active: true });
 
 }
 
 async function toggleImageBlocking() {
-  console.log("toggle images");
 
   const res = await getTabData()
-  console.log("tabData res: ", res);
 
   if (!res[0]) return // when there's no url
   if (!res[2]) return // when theres no tabId
   if (res[0].match(forbiddenOrigin)) return // when its a forbidden page
 
-
-
   const ImgsRes = await chrome.contentSettings.images.get({ primaryUrl: res[0], incognito: res[1] });
-  console.log("images res: ", ImgsRes);
 
   let setting = ImgsRes.setting;
   if (!setting) return;
@@ -274,9 +269,46 @@ async function toggleImageBlocking() {
   const urlParser = new URL(res[0])
   console.log("url obj: ", urlParser);
 
-  return "success"
+  let pattern = /^file:/.test(url) ? url : `${urlParser.hostname}/*`;
+  if (!/^file:/.test(url)) { // when url is a live link and not a local file
+    prefs.allProtocols = false; //brute force removal of unneeded flag
+    pattern = prefs.allProtocols ? '*://' : `${urlParser.protocol}//`;
+    const domParts = urlParser.hostname.split('.');
+    if (prefs.allSubdomains && domParts.length > 2) {
+      while (domParts.length > 2) {
+        domParts.shift();
+      }
+      pattern += `*.${domParts.join('.')}`;
+    } else {
+      pattern += urlParser.hostname;
+    }
+    pattern += prefs.allPorts ? ':*' : (urlParser.port ? `:${urlParser.port}` : '');
+    pattern += '/*';
+  }
+
+  const newSetting = setting === "allow" ? "block" : "allow"
+
+  chrome.contentSettings.images.set({
+    primaryPattern: pattern,
+    setting: newSetting,
+    scope: incognito ? "incognito_session_only" : "regular"
+  })
+
+  if (prefs.autoRefresh) {
+    chrome.tabs.reload(res[2], { bypassCache: true })
+  }
+
+  setLocalStorageRule(pattern, newSetting)
+
+
 
 }
+
+
+function setLocalStorageRule(pattern, newSetting) {
+
+}
+
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {
     contextMenuId = chrome.contextMenus.create({

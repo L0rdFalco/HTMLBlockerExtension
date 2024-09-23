@@ -95841,6 +95841,7 @@ var incognito;
 var url;
 var tabId;
 var matchForbiddenOrigin;
+var currHost = "";
 function onIcon() {
   chrome.action.setIcon({
     path: "./icons/icon16_on.png"
@@ -96086,19 +96087,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   } else if (msg.action === "toggle_images") {
     console.log("toggle images");
     _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-      var res;
       return _regeneratorRuntime().wrap(function _callee5$(_context5) {
         while (1) switch (_context5.prev = _context5.next) {
           case 0:
             _context5.next = 2;
             return toggleImageBlocking();
           case 2:
-            res = _context5.sent;
-            if (res === "success") sendResponse({
-              msg: "success",
-              url: ""
-            });
-          case 4:
           case "end":
             return _context5.stop();
         }
@@ -96165,23 +96159,27 @@ function toggleImageBlocking() {
 }
 function _toggleImageBlocking() {
   _toggleImageBlocking = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-    var res, ImgsRes, setting, urlParser;
+    var res, ImgsRes, setting, urlParser, pattern, domParts, newSetting;
     return _regeneratorRuntime().wrap(function _callee11$(_context11) {
       while (1) switch (_context11.prev = _context11.next) {
         case 0:
-          console.log("toggle images");
-          _context11.next = 3;
+          _context11.next = 2;
           return getTabData();
-        case 3:
+        case 2:
           res = _context11.sent;
-          console.log("tabData res: ", res);
           if (res[0]) {
+            _context11.next = 5;
+            break;
+          }
+          return _context11.abrupt("return");
+        case 5:
+          if (res[2]) {
             _context11.next = 7;
             break;
           }
           return _context11.abrupt("return");
         case 7:
-          if (res[2]) {
+          if (!res[0].match(forbiddenOrigin)) {
             _context11.next = 9;
             break;
           }
@@ -96194,18 +96192,45 @@ function _toggleImageBlocking() {
           });
         case 11:
           ImgsRes = _context11.sent;
-          console.log("images res: ", ImgsRes);
           setting = ImgsRes.setting;
           if (setting) {
-            _context11.next = 16;
+            _context11.next = 15;
             break;
           }
           return _context11.abrupt("return");
-        case 16:
+        case 15:
           urlParser = new URL(res[0]);
           console.log("url obj: ", urlParser);
-          return _context11.abrupt("return", "success");
-        case 19:
+          pattern = /^file:/.test(url) ? url : "".concat(urlParser.hostname, "/*");
+          if (!/^file:/.test(url)) {
+            // when url is a live link and not a local file
+            prefs.allProtocols = false; //brute force removal of unneeded flag
+            pattern = prefs.allProtocols ? '*://' : "".concat(urlParser.protocol, "//");
+            domParts = urlParser.hostname.split('.');
+            if (prefs.allSubdomains && domParts.length > 2) {
+              while (domParts.length > 2) {
+                domParts.shift();
+              }
+              pattern += "*.".concat(domParts.join('.'));
+            } else {
+              pattern += urlParser.hostname;
+            }
+            pattern += prefs.allPorts ? ':*' : urlParser.port ? ":".concat(urlParser.port) : '';
+            pattern += '/*';
+          }
+          newSetting = setting === "allow" ? "block" : "allow";
+          chrome.contentSettings.images.set({
+            primaryPattern: pattern,
+            setting: newSetting,
+            scope: incognito ? "incognito_session_only" : "regular"
+          });
+          if (prefs.autoRefresh) {
+            chrome.tabs.reload(res[2], {
+              bypassCache: true
+            });
+          }
+          setLocalStorageRule(pattern, newSetting);
+        case 23:
         case "end":
           return _context11.stop();
       }
@@ -96213,6 +96238,7 @@ function _toggleImageBlocking() {
   }));
   return _toggleImageBlocking.apply(this, arguments);
 }
+function setLocalStorageRule(pattern, newSetting) {}
 function toggleContextMenu() {
   if (prefs.showContextMenu && !contextMenuId) {
     contextMenuId = chrome.contextMenus.create({
