@@ -1,4 +1,6 @@
 'use strict';
+/*
+
 const meltelConfigBtn = document.getElementById("meltel_config");
 
 meltelConfigBtn.addEventListener("click", function (e) {
@@ -12,3 +14,25 @@ meltelConfigBtn.addEventListener("click", function (e) {
     });
 
 });
+
+*/
+
+function showRules() {
+
+}
+
+function loadPrefs() {
+
+}
+
+function save() {
+
+}
+
+document.addEventListener("visibilitychange", showRules, false)
+
+window.onload = function () {
+    loadPrefs()
+    showRules()
+
+}
