@@ -212,6 +212,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     })()
 
   }
+  else if (msg.action === "toggleContextMenu") {
+    toggleContextMenu()
+
+  }
+  else if (msg.action === "openImgPanel") {
+    openImgPanel()
+
+  }
+  else if (msg.action === "clearRules") {
+    clearRules(msg.scope)
+
+
+  }
+  else if (msg.action === "setContentRules") {
+    setContentRules(msg.rules)
+
+  }
+
+
+
   return true
 })
 
@@ -354,7 +374,6 @@ function toggleContextMenu() {
 
   }
 
-
 }
 
 async function setContentRules(r) {
@@ -373,7 +392,6 @@ async function setContentRules(r) {
   }
   chrome.storage.local.set({ imgTF_rules: rules })
 
-
 }
 
 async function imgBlockingInit() {
@@ -384,9 +402,6 @@ async function imgBlockingInit() {
 
   prefs = data.image_on_off_prefs || prefs;
   rules = data.imgTF_rules || rules;
-
-  console.log("2", prefs);
-  console.log("2", rules);
 
   await setContentRules(rules)//importRules
 

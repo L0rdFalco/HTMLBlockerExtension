@@ -105,7 +105,7 @@ window.onload = function () {
     document.getElementById("clearImageSettings").onclick = () => {
 
     }
-    document.getElementById("importRules").onclick = () => {
+    document.getElementById("setContentRules").onclick = () => {
 
     }
     document.getElementById("clearLocalStorageRules").onclick = () => {
