@@ -676,18 +676,6 @@ var mainObj = {
   },
   deactivateDialog: function deactivateDialog() {},
   activateDialog: function activateDialog(cls) {},
-  showImages: function showImages() {
-    //send msg to backend for show images
-    chrome.runtime.sendMessage({
-      action: "show_images"
-    }, function (res) {
-      if (res.msg === "success") mainObj.areImagesBlocked = true;
-      console.log("show images res: ", res);
-      chrome.storage.local.set({
-        "imgBlock": false
-      });
-    });
-  },
   toggleImages: function toggleImages() {
     chrome.runtime.sendMessage({
       action: "toggle_images"

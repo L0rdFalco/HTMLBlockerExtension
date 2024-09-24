@@ -27,15 +27,12 @@ let prefs = {
   defaultIcon: true
 }
 
-let icon = "defaultIcon";
 let forbiddenOrigin = /(chrome\:\/\/)/g;
 let rules = [];
 let contextMenuId = null;
 let incognito;
 let url;
 let tabId;
-let matchForbiddenOrigin;
-let currHost = "";
 
 
 function onIcon() {
@@ -54,11 +51,8 @@ function noIcon() {
 
   chrome.action.setIcon({ path: "./icons/icon16_no.png" });
   chrome.action.setTitle({ title: "NO!" })
-}
 
-function updateIcon(msg) {
-  chrome.action.setBadgeText({ text: msg })
-
+  return
 }
 
 async function isSiteViable() {
@@ -121,6 +115,8 @@ async function forceInjectCS(mTab) {
 }
 
 chrome.runtime.onInstalled.addListener(function (details) {
+  areToolsLoaded()
+
   imgBlockingInit()
 
   if (details.reason === "install" || details.reason === "update") {
@@ -139,12 +135,15 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 });
 
-
 chrome.runtime.onStartup.addListener(() => {
+  areToolsLoaded()
+
   imgBlockingInit()
 })
 
 chrome.windows.onFocusChanged.addListener(() => {
+  areToolsLoaded()
+
   getTabData()
 
 })
@@ -184,7 +183,6 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
   getTabData()
 
 })
-
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
@@ -323,7 +321,6 @@ async function toggleImageBlocking() {
 
 }
 
-
 async function setLocalStorageRule(pattern, newSetting, incognito) {
 
   if (incognito) return
@@ -376,8 +373,8 @@ function toggleContextMenu() {
 
 }
 
-async function setContentRules(r) {
-  console.log("rules: ", r);
+async function setContentRules(sentRules) {
+  if (sentRules) rules = sentRules
 
   if (rules.length) {
     for (let i = 0; i < rules.length; i++) {
@@ -409,4 +406,3 @@ async function imgBlockingInit() {
 
 }
 
-areToolsLoaded()

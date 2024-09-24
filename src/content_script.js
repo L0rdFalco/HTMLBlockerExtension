@@ -296,8 +296,6 @@ const mainObj = {
 
         this.areToolsLoaded ? this.removeBlockingTools() : this.loadBlockingTools()
     },
-
-
     updateRemBxSetting: function () {
         this.getSingleEl("#rmbr_checkbox").innerHTML = this.settings.remember ? "<input type='checkbox' checked>" : "<input type='checkbox' unchecked>"
 
@@ -374,9 +372,6 @@ const mainObj = {
         }
 
     },
-
-
-
     triggerResize: function () {
 
     },
@@ -427,18 +422,6 @@ const mainObj = {
 
     },
     activateDialog: function (cls) {
-
-    },
-
-    showImages: function () {
-        //send msg to backend for show images
-        chrome.runtime.sendMessage({ action: "show_images" }, (res) => {
-            if (res.msg === "success") mainObj.areImagesBlocked = true;
-            console.log("show images res: ", res);
-
-            chrome.storage.local.set({ "imgBlock": false })
-
-        })
 
     },
     toggleImages: function () {
@@ -560,7 +543,6 @@ const mainObj = {
 
         mainObj.areToolsLoaded = false;
     },
-
 
     init: function () {
         console.log("cs init");

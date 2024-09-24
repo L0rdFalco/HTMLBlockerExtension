@@ -95833,15 +95833,12 @@ var prefs = {
   darkIcon: false,
   defaultIcon: true
 };
-var icon = "defaultIcon";
 var forbiddenOrigin = /(chrome\:\/\/)/g;
 var rules = [];
 var contextMenuId = null;
 var incognito;
 var url;
 var tabId;
-var matchForbiddenOrigin;
-var currHost = "";
 function onIcon() {
   chrome.action.setIcon({
     path: "./icons/icon16_on.png"
@@ -95864,11 +95861,6 @@ function noIcon() {
   });
   chrome.action.setTitle({
     title: "NO!"
-  });
-}
-function updateIcon(msg) {
-  chrome.action.setBadgeText({
-    text: msg
   });
 }
 function isSiteViable() {
@@ -96006,6 +95998,7 @@ function _forceInjectCS() {
   return _forceInjectCS.apply(this, arguments);
 }
 chrome.runtime.onInstalled.addListener(function (details) {
+  areToolsLoaded();
   imgBlockingInit();
   if (details.reason === "install" || details.reason === "update") {
     _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
@@ -96026,9 +96019,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
 });
 chrome.runtime.onStartup.addListener(function () {
+  areToolsLoaded();
   imgBlockingInit();
 });
 chrome.windows.onFocusChanged.addListener(function () {
+  areToolsLoaded();
   getTabData();
 });
 chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
@@ -96098,6 +96093,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         }
       }, _callee5);
     }))();
+  } else if (msg.action === "toggleContextMenu") {
+    toggleContextMenu();
+  } else if (msg.action === "openImgPanel") {
+    openImgPanel();
+  } else if (msg.action === "clearRules") {
+    clearRules(msg.scope);
+  } else if (msg.action === "setContentRules") {
+    setContentRules(msg.rules);
   }
   return true;
 });
@@ -96316,12 +96319,12 @@ function setContentRules(_x6) {
   return _setContentRules.apply(this, arguments);
 }
 function _setContentRules() {
-  _setContentRules = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(r) {
+  _setContentRules = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee13(sentRules) {
     var i;
     return _regeneratorRuntime().wrap(function _callee13$(_context13) {
       while (1) switch (_context13.prev = _context13.next) {
         case 0:
-          console.log("rules: ", r);
+          if (sentRules) rules = sentRules;
           if (rules.length) {
             for (i = 0; i < rules.length; i++) {
               chrome.contentSettings.images.set({
@@ -96359,14 +96362,12 @@ function _imgBlockingInit() {
           data = _context14.sent;
           prefs = data.image_on_off_prefs || prefs;
           rules = data.imgTF_rules || rules;
-          console.log("2", prefs);
-          console.log("2", rules);
-          _context14.next = 11;
+          _context14.next = 9;
           return setContentRules(rules);
-        case 11:
-          _context14.next = 13;
+        case 9:
+          _context14.next = 11;
           return getTabData();
-        case 13:
+        case 11:
         case "end":
           return _context14.stop();
       }
@@ -96374,7 +96375,6 @@ function _imgBlockingInit() {
   }));
   return _imgBlockingInit.apply(this, arguments);
 }
-areToolsLoaded();
 })();
 
 /******/ })()
