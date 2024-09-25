@@ -104,7 +104,7 @@ async function forceInjectCS(mTab) {
 
   try {
 
-    await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } });
+    return await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } });
   } catch (error) {
     console.log("the webpage is probably forbidding script injection");
     noIcon()
@@ -155,8 +155,9 @@ chrome.action.onClicked.addListener(async function () {
     const res = await toggleTools(mTab.id)
 
     if (!res) { // in the event the browser didn't inject the CS from the jump
-      await forceInjectCS(mTab)
+      let res = await forceInjectCS(mTab)
 
+      if (!res) return
       await toggleTools(mTab.id)
 
     }
@@ -189,8 +190,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
 
   else if (msg.action === "persist_perm_hidden_elms") {
-    //save to indexDB
-
     set(`web:${msg.website}`, msg.data);
 
   }
