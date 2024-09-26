@@ -95862,6 +95862,7 @@ function noIcon() {
   chrome.action.setTitle({
     title: "NO!"
   });
+  return;
 }
 function isSiteViable() {
   return _isSiteViable.apply(this, arguments);
@@ -95982,18 +95983,17 @@ function _forceInjectCS() {
             }
           });
         case 3:
-          _context9.next = 9;
-          break;
-        case 5:
-          _context9.prev = 5;
+          return _context9.abrupt("return", _context9.sent);
+        case 6:
+          _context9.prev = 6;
           _context9.t0 = _context9["catch"](0);
           console.log("the webpage is probably forbidding script injection");
           noIcon();
-        case 9:
+        case 10:
         case "end":
           return _context9.stop();
       }
-    }, _callee9, null, [[0, 5]]);
+    }, _callee9, null, [[0, 6]]);
   }));
   return _forceInjectCS.apply(this, arguments);
 }
@@ -96027,7 +96027,7 @@ chrome.windows.onFocusChanged.addListener(function () {
   getTabData();
 });
 chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-  var mTab, res;
+  var mTab, res, _res;
   return _regeneratorRuntime().wrap(function _callee4$(_context4) {
     while (1) switch (_context4.prev = _context4.next) {
       case 0:
@@ -96041,26 +96041,33 @@ chrome.action.onClicked.addListener( /*#__PURE__*/_asyncToGenerator( /*#__PURE__
       case 6:
         res = _context4.sent;
         if (res) {
-          _context4.next = 12;
+          _context4.next = 15;
           break;
         }
         _context4.next = 10;
         return forceInjectCS(mTab);
       case 10:
-        _context4.next = 12;
+        _res = _context4.sent;
+        if (_res) {
+          _context4.next = 13;
+          break;
+        }
+        return _context4.abrupt("return");
+      case 13:
+        _context4.next = 15;
         return toggleTools(mTab.id);
-      case 12:
-        _context4.next = 17;
+      case 15:
+        _context4.next = 20;
         break;
-      case 14:
-        _context4.prev = 14;
+      case 17:
+        _context4.prev = 17;
         _context4.t0 = _context4["catch"](0);
         console.log("icon click error");
-      case 17:
+      case 20:
       case "end":
         return _context4.stop();
     }
-  }, _callee4, null, [[0, 14]]);
+  }, _callee4, null, [[0, 17]]);
 })));
 chrome.tabs.onActivated.addListener(function (tabId, changeInfo, tab) {
   areToolsLoaded();
@@ -96072,8 +96079,6 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
-    //save to indexDB
-
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
   } else if (msg.action === "extract_perm_hidden_elms") {
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.get)("web:".concat(msg.website)).then(function (data) {

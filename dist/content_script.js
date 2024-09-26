@@ -394,7 +394,7 @@ var cssFinder = function () {
   return n;
 }();
 var X = "!!r33ln00ꓭ";
-
+var shadowElement = null;
 //pay extra attention to this on next run
 var SettingsDialog = /*#__PURE__*/function () {
   function SettingsDialog(shadowRoot, close) {
@@ -688,7 +688,7 @@ var mainObj = {
   loadBlockingTools: function loadBlockingTools() {
     console.log("loading tools");
     if (!this.mBlockerDiv) this.injectCSS2Head();
-    var shadowElement = document.createElement("div");
+    shadowElement = document.createElement("div");
     shadowElement.setAttribute("id", "blkr_wind");
     shadowElement.attachShadow({
       mode: "open"
@@ -696,32 +696,13 @@ var mainObj = {
     shadowElement.style.visibility = "hidden";
     document.body.appendChild(shadowElement);
     this.mBlockerDiv = shadowElement;
-    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
-    this.getSingleEl("link").addEventListener("load", function () {
-      shadowElement.style.visibility = "visible";
-    });
-    this.getSingleEl(".topButton_hideImages").addEventListener("click", function (e) {
-      e.preventDefault();
-      mainObj.toggleImages();
-    });
-    this.getSingleEl(".topButton_close").addEventListener("click", function (e) {
-      e.preventDefault();
-      mainObj.removeBlockingTools();
-    });
-    this.getSingleEl(".topButton_minimize").addEventListener("click", function (e) {
-      e.preventDefault();
-      mainObj.getSingleEl(".mainWindow").classList.toggle("minimized");
-    });
-    this.getSingleEl(".topButton_settings").addEventListener("click", function (e) {
-      e.preventDefault();
-      mainObj.activateDialog(SettingsDialog);
-    });
-    this.getSingleEl("#rmbr_checkbox").addEventListener("click", function (e) {
-      mainObj.settings.remember = !mainObj.settings.remember;
-      mainObj.persistHiddenEls();
-      mainObj.updateElementsListUI();
-      e.preventDefault();
-    });
+    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">V1 Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
+    this.getSingleEl("link").addEventListener("load", cbObj.onLoadCB);
+    this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB);
+    this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB);
+    this.getSingleEl(".topButton_minimize").addEventListener("click", cbObj.minimizeCB);
+    this.getSingleEl(".topButton_settings").addEventListener("click", cbObj.settingsCB);
+    this.getSingleEl("#rmbr_checkbox").addEventListener("click", cbObj.remCheckboxCB);
     document.addEventListener("mouseover", cbObj.mouseOver, true); // done
     document.addEventListener("mousedown", cbObj.hideSelectedEl, true); // done
     document.addEventListener("mouseup", cbObj.preventEvent, true); // done
@@ -889,6 +870,31 @@ var cbObj = {
     highlighterEl.style.top = rect.y + "px";
     highlighterEl.style.width = rect.width + "px";
     highlighterEl.style.height = rect.height + "px";
+  },
+  remCheckboxCB: function remCheckboxCB(e) {
+    e.preventDefault();
+    mainObj.settings.remember = !mainObj.settings.remember;
+    mainObj.persistHiddenEls();
+    mainObj.updateElementsListUI();
+  },
+  settingsCB: function settingsCB(e) {
+    e.preventDefault();
+    mainObj.activateDialog(SettingsDialog);
+  },
+  minimizeCB: function minimizeCB(e) {
+    e.preventDefault();
+    mainObj.getSingleEl(".mainWindow").classList.toggle("minimized");
+  },
+  closeBtnCB: function closeBtnCB(e) {
+    e.preventDefault();
+    mainObj.removeBlockingTools();
+  },
+  toggleImagesCB: function toggleImagesCB(e) {
+    e.preventDefault();
+    mainObj.toggleImages();
+  },
+  onLoadCB: function onLoadCB() {
+    shadowElement.style.visibility = "visible";
   }
 };
 mainObj.init();
