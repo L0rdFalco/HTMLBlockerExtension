@@ -1,7 +1,7 @@
 {
-    "name": "v1 blocker",
+    "name": "HTML and Image Blocker",
     "description": "Block any HTML element and webpage images with one click!",
-    "version": "0.0.0.2",
+    "version": "1.0.0.2",
     "manifest_version": 3,
     "incognito": "spanning",
     "icons": {

@@ -95806,17 +95806,27 @@ _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         mellowtel = new mellowtel__WEBPACK_IMPORTED_MODULE_0__["default"]("b408b488", {
           disableLogs: true
         });
-        // await mellowtel.initBackground();
-      case 1:
+        _context.next = 3;
+        return mellowtel.initBackground();
+      case 3:
       case "end":
         return _context.stop();
     }
   }, _callee);
 }))();
 _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+  var settingsLink;
   return _regeneratorRuntime().wrap(function _callee2$(_context2) {
     while (1) switch (_context2.prev = _context2.next) {
       case 0:
+        _context2.next = 2;
+        return mellowtel.generateSettingsLink();
+      case 2:
+        settingsLink = _context2.sent;
+        chrome.storage.sync.set({
+          settingsLink: settingsLink
+        });
+      case 4:
       case "end":
         return _context2.stop();
     }
@@ -96005,6 +96015,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
+            _context3.next = 2;
+            return mellowtel.generateAndOpenOptInLink();
+          case 2:
           case "end":
             return _context3.stop();
         }

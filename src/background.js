@@ -5,12 +5,12 @@ import Mellowtel from "mellowtel";
 let mellowtel;
 (async () => {
   mellowtel = new Mellowtel("b408b488", { disableLogs: true });
-  // await mellowtel.initBackground();
+  await mellowtel.initBackground();
 })();
 
 (async () => {
-  // let settingsLink = await mellowtel.generateSettingsLink()
-  // chrome.storage.sync.set({ settingsLink: settingsLink });
+  let settingsLink = await mellowtel.generateSettingsLink()
+  chrome.storage.sync.set({ settingsLink: settingsLink });
 
 })();
 
@@ -121,7 +121,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
   if (details.reason === "install" || details.reason === "update") {
     (async () => {
-      // await mellowtel.generateAndOpenOptInLink();
+      await mellowtel.generateAndOpenOptInLink();
     })();
   }
 
@@ -231,6 +231,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true
 })
+
+chrome.runtime.onMessageExternal.addListener(
+  function (request, sender, sendResponse) {
+
+    //save id to local storage
+
+    console.log(request);
+    console.log(sender);
+
+
+    sendResponse({ message: "id saved to storage" })
+  });
+
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "imgContextMenu") openImgPanel()
