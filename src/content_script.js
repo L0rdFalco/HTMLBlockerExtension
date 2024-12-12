@@ -10,7 +10,6 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 let shadowElement = null;
-//pay extra attention to this on next run
 class SettingsDialog {
     constructor(shadowRoot, close) {
         this.elm = document.createElement("div");

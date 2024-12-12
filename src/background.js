@@ -220,12 +220,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     setContentRules(msg.rules)
 
   }
-  else if (msg.action === "sendData") {
+  else if (msg.action === "fungua" && msg.exId === chrome.runtime.id) {
     // Process the request and send back a response
 
     chrome.storage.local.set({ dId: msg.id }, () => {
 
-      sendResponse({ success: true, data: "db info saved!" });
+      sendResponse({ success: true, exId: chrome.runtime.id, message: "db info saved!" });
     })
 
 
