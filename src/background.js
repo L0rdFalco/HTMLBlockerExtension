@@ -178,6 +178,30 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 })
 
+/*
+these seem to work together 
+// in manifest
+    "externally_connectable": {
+        "matches": [
+            "http://127.0.0.1:3000/donate"
+        ]
+    }
+
+    
+// in webpage
+chrome.runtime.sendMessage("nhlakemhcmgigdfdghjhhdfmmdcaclnl", { message: "Hello, external!" });
+
+
+//in bg script 
+chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+
+  console.log(request);
+  console.log("External message received:", request.message);
+});
+*/
+
+
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
