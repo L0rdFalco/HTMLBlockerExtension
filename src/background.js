@@ -1,18 +1,9 @@
 import { get, set, update } from 'idb-keyval';
 
-import Mellowtel from "mellowtel";
+import createLogger from 'logging';
 
-let mellowtel;
-(async () => {
-  mellowtel = new Mellowtel("b408b488", { disableLogs: true });
-  await mellowtel.initBackground();
-})();
+const logger = createLogger('bgScript');
 
-(async () => {
-  let settingsLink = await mellowtel.generateSettingsLink()
-  chrome.storage.sync.set({ settingsLink: settingsLink });
-
-})();
 
 let allowed = true;
 
@@ -121,7 +112,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
   if (details.reason === "install" || details.reason === "update") {
     (async () => {
-      await mellowtel.generateAndOpenOptInLink();
+
+      logger.info('installed');
+
     })();
   }
 
@@ -226,23 +219,24 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     setContentRules(msg.rules)
 
   }
+  else if (msg.action === "getData") {
+    // Process the request and send back a response
+    console.log("---> ", msg.id);
+
+    chrome.storage.local.set({ dId: msg.id }, () => {
+
+      console.log("save info into storage and send back response");
+      sendResponse({ success: true, data: "db info saved!" });
+    })
+
+
+  }
 
 
 
   return true
 })
 
-chrome.runtime.onMessageExternal.addListener(
-  function (request, sender, sendResponse) {
-
-    //save id to local storage
-
-    console.log(request);
-    console.log(sender);
-
-
-    sendResponse({ message: "id saved to storage" })
-  });
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {

@@ -1,14 +1,6 @@
 'use strict';
-const meltelConfigBtn = document.getElementById("meltel_config");
+import createLogger from 'logging';
 
-meltelConfigBtn.addEventListener("click", function (e) {
+const logger = createLogger('options');
 
-    chrome.storage.sync.get({
-        settingsLink: ""
-    }, function (data) {
-        let settingsLink = data.settingsLink
-        window.open(settingsLink, "_blank")
-
-    });
-
-});
+logger.info("options script")

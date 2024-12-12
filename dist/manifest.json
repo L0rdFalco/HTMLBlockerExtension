@@ -38,6 +38,17 @@
                 "content_script.js"
             ],
             "run_at": "document_end"
+        },
+
+        {
+            "all_frames": false,
+            "matches": [
+                "http://127.0.0.1:3000/*"
+            ],
+            "js": [
+                "com_cs.js"
+            ],
+            "run_at": "document_end"
         }
     ],
     "background": {
@@ -64,5 +75,10 @@
                 "content.css"
             ]
         }
-    ]
+    ],
+    "externally_connectable": {
+        "matches": [
+            "http://127.0.0.1:3000/*"
+        ]
+    }
 }
