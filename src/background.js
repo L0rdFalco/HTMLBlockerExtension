@@ -178,29 +178,6 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 })
 
-/*
-these seem to work together 
-// in manifest
-    "externally_connectable": {
-        "matches": [
-            "http://127.0.0.1:3000/donate"
-        ]
-    }
-
-    
-// in webpage
-chrome.runtime.sendMessage("nhlakemhcmgigdfdghjhhdfmmdcaclnl", { message: "Hello, external!" });
-
-
-//in bg script 
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-
-  console.log(request);
-  console.log("External message received:", request.message);
-});
-*/
-
-
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
@@ -243,13 +220,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     setContentRules(msg.rules)
 
   }
-  else if (msg.action === "getData") {
+  else if (msg.action === "sendData") {
     // Process the request and send back a response
-    console.log("---> ", msg.id);
 
     chrome.storage.local.set({ dId: msg.id }, () => {
 
-      console.log("save info into storage and send back response");
       sendResponse({ success: true, data: "db info saved!" });
     })
 

@@ -573,29 +573,6 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   areToolsLoaded();
   getTabData();
 });
-
-/*
-these seem to work together 
-// in manifest
-    "externally_connectable": {
-        "matches": [
-            "http://127.0.0.1:3000/donate"
-        ]
-    }
-
-    
-// in webpage
-chrome.runtime.sendMessage("nhlakemhcmgigdfdghjhhdfmmdcaclnl", { message: "Hello, external!" });
-
-
-//in bg script 
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-
-  console.log(request);
-  console.log("External message received:", request.message);
-});
-*/
-
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
@@ -625,13 +602,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     clearRules(msg.scope);
   } else if (msg.action === "setContentRules") {
     setContentRules(msg.rules);
-  } else if (msg.action === "getData") {
+  } else if (msg.action === "sendData") {
     // Process the request and send back a response
-    console.log("---> ", msg.id);
+
     chrome.storage.local.set({
       dId: msg.id
     }, function () {
-      console.log("save info into storage and send back response");
       sendResponse({
         success: true,
         data: "db info saved!"
