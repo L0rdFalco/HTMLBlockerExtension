@@ -10,7 +10,7 @@ const cssFinder = (() => { let e, t; function n(n, a) { if (n.nodeType !== Node.
 
 const X = "!!r33ln00ꓭ"
 let shadowElement = null;
-class SettingsDialog {
+class ActivationDialog {
     constructor(shadowRoot, close) {
         this.elm = document.createElement("div");
         this.elm.className = "dialog dialog_advOptions"
@@ -27,26 +27,34 @@ class SettingsDialog {
 
     <div class="advOptions">
         <div class="advOptions__row">
-            <button class="advOptions__export">Export elements</button>
-            <p class="advOptions__rowHelp">Exports a list of all the permanently removed elements from all the websites to a JSON file.</p>
+            <button class="advOptions__export">activate</button>
+            <p class="advOptions__rowHelp">Make a small donation to keep this app free for a year</p>
         </div>
 
         <div class="advOptions__row">
-            <button class="advOptions__import"><input type="file">Import elements</button>
-            <p class="advOptions__rowHelp">Loads a list of permanently removed elements from a previously exported file.</p>
+            <button class="advOptions__import"><input type="file">No thanks</button>
+            <p class="advOptions__rowHelp">let me use it just this one time!</p>
         </div>
     </div>
     `
         shadowRoot.appendChild(this.elm)
 
         this.elm.querySelector(".topButton_close").addEventListener("click", (e) => {
-            close() //?
+            close() //how does this work?
 
         })
         this.elm.querySelector(".advOptions__export").addEventListener("click", (e) => {
+            /*
+            put the premium functionality here
+            */
 
         })
-        this.elm.querySelector(".advOptions__import input").addEventListener("change", (e) => {
+        this.elm.querySelector(".advOptions__import input").addEventListener("click", (e) => {
+            /*
+            hit the donation api
+            */
+
+            console.log("hit the donation api and start the donation ");
 
         })
 
@@ -396,10 +404,14 @@ const mainObj = {
 
     },
     deactivateDialog: function () {
-
+        mainObj.activeDialog?.destroy()
+        mainObj.activeDialog = null
+        mainObj.getSingleEl('.mainWindow').style.removeProperty('display')
     },
     activateDialog: function (cls) {
-
+        mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog)
+        mainObj.getSingleEl('.mainWindow').style.display = 'none'
+        mainObj.removeHighlighter()
     },
     toggleImages: function () {
 
@@ -438,7 +450,7 @@ const mainObj = {
             <div class="topButtons">
             <div class="topButton topButton_hideImages" title="Hide Images">📸</div>
 
-                <div class="topButton topButton_settings" title="Advanced options">
+                <div class="topButton topButton_settings" title="feature blocked!">
                     <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 </div>
                 <div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
@@ -685,11 +697,12 @@ const cbObj = {
     },
     settingsCB: (e) => {
         e.preventDefault()
-        mainObj.activateDialog(SettingsDialog)
+        mainObj.activateDialog(ActivationDialog)
 
     },
     minimizeCB: (e) => {
         e.preventDefault()
+
         mainObj.getSingleEl(".mainWindow").classList.toggle("minimized")
 
     },
@@ -713,4 +726,14 @@ const cbObj = {
 }
 
 mainObj.init()
+
+/*
+    mainObj.activateDialog(ActivationDialog) is used to bring up the dialog
+
+    block the following:
+    images,
+    close,
+    bl_delete
+
+*/
 

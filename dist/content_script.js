@@ -447,20 +447,30 @@ var cssFinder = function () {
 }();
 var X = "!!r33ln00ꓭ";
 var shadowElement = null;
-var SettingsDialog = /*#__PURE__*/function () {
-  function SettingsDialog(shadowRoot, close) {
-    _classCallCheck(this, SettingsDialog);
+var ActivationDialog = /*#__PURE__*/function () {
+  function ActivationDialog(shadowRoot, close) {
+    _classCallCheck(this, ActivationDialog);
     this.elm = document.createElement("div");
     this.elm.className = "dialog dialog_advOptions";
-    this.elm.innerHTML = "\n        <div class=\"header\">\n        <span class=\"header__logo\">Advanced options</span>\n    </div>\n\n    <hr/>\n\n    <div class=\"topButtons\">\n        <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n    </div>\n\n    <div class=\"advOptions\">\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__export\">Export elements</button>\n            <p class=\"advOptions__rowHelp\">Exports a list of all the permanently removed elements from all the websites to a JSON file.</p>\n        </div>\n\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__import\"><input type=\"file\">Import elements</button>\n            <p class=\"advOptions__rowHelp\">Loads a list of permanently removed elements from a previously exported file.</p>\n        </div>\n    </div>\n    ";
+    this.elm.innerHTML = "\n        <div class=\"header\">\n        <span class=\"header__logo\">Advanced options</span>\n    </div>\n\n    <hr/>\n\n    <div class=\"topButtons\">\n        <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n    </div>\n\n    <div class=\"advOptions\">\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__export\">activate</button>\n            <p class=\"advOptions__rowHelp\">Make a small donation to keep this app free for a year</p>\n        </div>\n\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__import\"><input type=\"file\">No thanks</button>\n            <p class=\"advOptions__rowHelp\">let me use it just this one time!</p>\n        </div>\n    </div>\n    ";
     shadowRoot.appendChild(this.elm);
     this.elm.querySelector(".topButton_close").addEventListener("click", function (e) {
-      close(); //?
+      close(); //how does this work?
     });
-    this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {});
-    this.elm.querySelector(".advOptions__import input").addEventListener("change", function (e) {});
+    this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {
+      /*
+      put the premium functionality here
+      */
+    });
+    this.elm.querySelector(".advOptions__import input").addEventListener("click", function (e) {
+      /*
+      hit the donation api
+      */
+
+      console.log("hit the donation api and start the donation ");
+    });
   }
-  return _createClass(SettingsDialog, [{
+  return _createClass(ActivationDialog, [{
     key: "destroy",
     value: function destroy() {
       this.elm.remove();
@@ -725,8 +735,17 @@ var mainObj = {
     });
     chrome.runtime.sendMessage({}, function (data) {});
   },
-  deactivateDialog: function deactivateDialog() {},
-  activateDialog: function activateDialog(cls) {},
+  deactivateDialog: function deactivateDialog() {
+    var _mainObj$activeDialog;
+    (_mainObj$activeDialog = mainObj.activeDialog) === null || _mainObj$activeDialog === void 0 || _mainObj$activeDialog.destroy();
+    mainObj.activeDialog = null;
+    mainObj.getSingleEl('.mainWindow').style.removeProperty('display');
+  },
+  activateDialog: function activateDialog(cls) {
+    mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog);
+    mainObj.getSingleEl('.mainWindow').style.display = 'none';
+    mainObj.removeHighlighter();
+  },
   toggleImages: function toggleImages() {
     chrome.runtime.sendMessage({
       action: "toggle_images"
@@ -747,7 +766,7 @@ var mainObj = {
     shadowElement.style.visibility = "hidden";
     document.body.appendChild(shadowElement);
     this.mBlockerDiv = shadowElement;
-    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"Advanced options\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
+    shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"feature blocked!\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
     this.getSingleEl("link").addEventListener("load", cbObj.onLoadCB);
     this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB);
     this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB);
@@ -930,7 +949,7 @@ var cbObj = {
   },
   settingsCB: function settingsCB(e) {
     e.preventDefault();
-    mainObj.activateDialog(SettingsDialog);
+    mainObj.activateDialog(ActivationDialog);
   },
   minimizeCB: function minimizeCB(e) {
     e.preventDefault();
@@ -949,6 +968,16 @@ var cbObj = {
   }
 };
 mainObj.init();
+
+/*
+    mainObj.activateDialog(ActivationDialog) is used to bring up the dialog
+
+    block:
+    images,
+    close,
+    
+
+*/
 })();
 
 /******/ })()

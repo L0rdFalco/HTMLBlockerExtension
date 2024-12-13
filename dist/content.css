@@ -73,6 +73,7 @@ hr {
 .topButton_settings {
 	background: #fff;
 	color: #999;
+	display: none;
 }
 
 .topButton_settings svg {
