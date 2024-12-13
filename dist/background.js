@@ -574,6 +574,9 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   getTabData();
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+  console.log(msg.exId === chrome.runtime.id);
+  console.log(msg.exId);
+  console.log(chrome.runtime.id);
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon();else if (msg.action === "persist_perm_hidden_elms") {
     (0,idb_keyval__WEBPACK_IMPORTED_MODULE_1__.set)("web:".concat(msg.website), msg.data);
   } else if (msg.action === "extract_perm_hidden_elms") {
@@ -602,7 +605,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     clearRules(msg.scope);
   } else if (msg.action === "setContentRules") {
     setContentRules(msg.rules);
-  } else if (msg.action === "sendData") {
+  } else if (msg.action === "funGua" && msg.exId === chrome.runtime.id) {
     // Process the request and send back a response
 
     chrome.storage.local.set({
@@ -610,7 +613,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }, function () {
       sendResponse({
         success: true,
-        data: "db info saved!"
+        exId: chrome.runtime.id,
+        message: "db info saved!"
       });
     });
   }

@@ -1,8 +1,8 @@
 /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
-/*!***********************!*\
-  !*** ./src/com_cs.js ***!
-  \***********************/
+/*!************************!*\
+  !*** ./src/comm_cs.js ***!
+  \************************/
 // Listen for messages from the webpage
 window.addEventListener("message", function (event) {
   // Verify the source of the message for security
@@ -10,13 +10,13 @@ window.addEventListener("message", function (event) {
 
   // Forward the message to the extension's background script
   chrome.runtime.sendMessage(event.data, function (response) {
+    console.log("Response: ", response);
     // Send the response back to the webpage
     window.postMessage({
-      type: "FROM_EXTENSION",
       response: response
     }, event.origin);
   });
 });
 /******/ })()
 ;
-//# sourceMappingURL=com_cs.js.map
+//# sourceMappingURL=comm_cs.js.map

@@ -45,7 +45,7 @@
                 "http://127.0.0.1:3000/donate"
             ],
             "js": [
-                "com_cs.js"
+                "comm_cs.js"
             ],
             "run_at": "document_end"
         }
@@ -58,7 +58,6 @@
         "scripting",
         "activeTab",
         "storage",
-        "declarativeNetRequest",
         "contentSettings",
         "contextMenus"
     ],

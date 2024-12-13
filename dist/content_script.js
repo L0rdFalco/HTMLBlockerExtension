@@ -447,7 +447,6 @@ var cssFinder = function () {
 }();
 var X = "!!r33ln00ꓭ";
 var shadowElement = null;
-//pay extra attention to this on next run
 var SettingsDialog = /*#__PURE__*/function () {
   function SettingsDialog(shadowRoot, close) {
     _classCallCheck(this, SettingsDialog);

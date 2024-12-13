@@ -7,7 +7,7 @@ module.exports = {
         background: path.join(__dirname, 'src', 'background.js'),
         popup: path.join(__dirname, 'src', 'popup.js'),
         content_script: path.join(__dirname, 'src', 'content_script.js'),
-        com_cs: path.join(__dirname, 'src', 'com_cs.js'),
+        comm_cs: path.join(__dirname, 'src', 'comm_cs.js'),
     },
     output: {
         path: path.join(__dirname, 'dist'),

@@ -181,6 +181,10 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
+  console.log(msg.exId === chrome.runtime.id);
+  console.log(msg.exId);
+  console.log(chrome.runtime.id);
+
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
 
   else if (msg.action === "persist_perm_hidden_elms") {
@@ -220,7 +224,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     setContentRules(msg.rules)
 
   }
-  else if (msg.action === "fungua" && msg.exId === chrome.runtime.id) {
+  else if (msg.action === "funGua" && msg.exId === chrome.runtime.id) {
     // Process the request and send back a response
 
     chrome.storage.local.set({ dId: msg.id }, () => {
