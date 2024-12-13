@@ -2,8 +2,11 @@
 window.addEventListener("message", (event) => {
 
 
+
     // Verify the source of the message for security
     if (event.origin !== "http://127.0.0.1:3000") return;
+    console.log("message listener hit!", event.origin);
+    console.log("event ", event);
 
     // Forward the message to the extension's background script
     chrome.runtime.sendMessage(event.data, (response) => {
@@ -13,3 +16,5 @@ window.addEventListener("message", (event) => {
         window.postMessage({ response }, event.origin);
     });
 });
+
+console.log("comm cs loadeed");

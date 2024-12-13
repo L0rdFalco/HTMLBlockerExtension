@@ -181,6 +181,8 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
+  console.log(msg);
+
   console.log(msg.exId === chrome.runtime.id);
   console.log(msg.exId);
   console.log(chrome.runtime.id);
@@ -239,6 +241,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true
 })
+
+chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+
+  console.log("External message received:", request);
+  sendResponse({ success: true })
+
+});
 
 
 

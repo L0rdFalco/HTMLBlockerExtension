@@ -42,7 +42,7 @@
         {
             "all_frames": false,
             "matches": [
-                "http://127.0.0.1:3000/donate"
+                "http://127.0.0.1:3000/donate/*"
             ],
             "js": [
                 "comm_cs.js"

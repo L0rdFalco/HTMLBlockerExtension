@@ -574,6 +574,7 @@ chrome.tabs.onUpdated.addListener(function (msg, sender, res) {
   getTabData();
 });
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+  console.log(msg);
   console.log(msg.exId === chrome.runtime.id);
   console.log(msg.exId);
   console.log(chrome.runtime.id);
@@ -619,6 +620,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     });
   }
   return true;
+});
+chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {
+  console.log("External message received:", request);
+  sendResponse({
+    success: true
+  });
 });
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   if (info.menuItemId === "imgContextMenu") openImgPanel();
