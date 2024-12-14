@@ -1,6 +1,8 @@
 'use strict';
 
 import createLogger from 'logging';
+import { merge, clone } from 'lodash';
+
 
 const logger = createLogger('csScript');
 
@@ -85,9 +87,9 @@ const helpersObj = {
 
     getActivationStatus: async function (mainFunc, dialogFunc) {
 
-        const data = await chrome.storage.local.get("dId")
+        const data = merge(clone(await chrome.storage.local.get("dId")))
 
-        console.log("extracted data: ", data.length);
+        logger.info("extracted data");
 
         if (!data || Object.keys(data).length === 0) {
             //show dialog
@@ -100,7 +102,7 @@ const helpersObj = {
 
             const res1 = await fetch(`http://127.0.0.1:3000/buck/status/${data.dId}`)
 
-            const res2 = await res1.json()
+            const res2 = merge(clone(await res1.json()))
 
 
 
@@ -113,7 +115,7 @@ const helpersObj = {
             }
         } catch (error) {
 
-            console.log("somethng went wrong. Try later");
+            logger.debug("somethng went wrong. Try later");
 
         }
     },
@@ -443,16 +445,16 @@ const mainObj = {
         mainObj.getSingleEl('.mainWindow').style.removeProperty('display')
     },
     activateDialog: function (cls) {
-        console.log("activate dialog called");
+        logger.debug("activate dialog called");
         mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog)
         mainObj.getSingleEl('.mainWindow').style.display = 'none'
         mainObj.removeHighlighter()
-        console.log("dialog activated");
+        logger.debug("dialog activated");
     },
     toggleImages: function () {
 
         chrome.runtime.sendMessage({ action: "toggle_images" }, (res) => {
-            console.log("toggle images res", res);
+            logger.debug("toggle images res", res);
 
         })
 
@@ -460,7 +462,7 @@ const mainObj = {
     },
 
     loadBlockingTools: function () {
-        console.log("loading tools");
+        logger.debug("loading tools");
 
         if (!this.mBlockerDiv) this.injectCSS2Head();
 
@@ -528,7 +530,7 @@ const mainObj = {
 
     removeBlockingTools: function () {
 
-        console.log("remove blocking tools");
+        logger.debug("remove blocking tools");
         mainObj.deactivateDialog()
         mainObj.removeHighlighter()
         mainObj.removeOverlays()
@@ -547,7 +549,7 @@ const mainObj = {
     },
 
     init: function () {
-        console.log("cs init");
+        logger.debug("cs init");
         chrome.runtime.onMessage.addListener(cbObj.bgReceiver)
         this.loadHiddenEls();
     }
@@ -557,10 +559,10 @@ const cbObj = {
     onChangePermanent: function (e) {
         /*
         
-        console.log(this);
-        console.log(e.target);
-        console.log((e.target.parentElement).parentElement);
-        console.log((e.target.parentNode).parentNode);
+        logger.debug(this);
+        logger.debug(e.target);
+        logger.debug((e.target.parentElement).parentElement);
+        logger.debug((e.target.parentNode).parentNode);
         
         */
 
@@ -592,7 +594,7 @@ const cbObj = {
         let selector = helpersObj.closest(this, "tr").selector;
         if (!selector) return;
 
-        console.log(selector, mainObj.previewedHiddenSelector);
+        logger.debug(selector, mainObj.previewedHiddenSelector);
 
         if (mainObj.previewedHiddenSelector == selector) {
             mainObj.previewedHiddenSelector = null;
@@ -693,7 +695,7 @@ const cbObj = {
 
     },
     updateHighlighterPosition: function () {
-        let rect = mainObj.markedElement?.getBoundingClientRect();
+        let rect = merge(clone(mainObj.markedElement?.getBoundingClientRect()));
 
         if (!rect) return;
 
@@ -747,7 +749,7 @@ const cbObj = {
 
         e.preventDefault()
 
-        console.log("delete");
+        logger.debug("delete");
 
         let func = () => {
 
