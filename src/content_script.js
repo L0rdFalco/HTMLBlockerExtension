@@ -31,7 +31,7 @@ class ActivationDialog {
             </div>
 
             <div class="advOptions__row">
-                <button class="advOptions__import"><input type="file">No thanks</button>
+                <button class="advOptions__import">No thanks</button>
                 <p class="advOptions__rowHelp">id rather not</p>
             </div>
         </div>
@@ -40,7 +40,6 @@ class ActivationDialog {
 
         this.elm.querySelector(".topButton_close").addEventListener("click", (e) => {
             close() //how does this work?
-            e.preventDefault()
 
         })
         this.elm.querySelector(".advOptions__export").addEventListener("click", (e) => {
@@ -49,7 +48,7 @@ class ActivationDialog {
 
             close()
         })
-        this.elm.querySelector(".advOptions__import input").addEventListener("click", (e) => {
+        this.elm.querySelector(".advOptions__import").addEventListener("click", (e) => {
 
             // run blocked code
 
@@ -97,18 +96,25 @@ const helpersObj = {
             return
         }
 
-        const res1 = await fetch(`http://127.0.0.1:3000/buck/status/${data.dId}`)
+        try {
 
-        const res2 = await res1.json()
+            const res1 = await fetch(`http://127.0.0.1:3000/buck/status/${data.dId}`)
+
+            const res2 = await res1.json()
 
 
 
-        if (res2.status) {
-            mainFunc()
-        }
-        else {
-            //show dialog
-            dialogFunc(ActivationDialog)
+            if (res2.status) {
+                mainFunc()
+            }
+            else {
+                //show dialog
+                dialogFunc(ActivationDialog)
+            }
+        } catch (error) {
+
+            console.log("somethng went wrong. Try later");
+
         }
     },
 
@@ -722,11 +728,8 @@ const cbObj = {
     closeBtnCB: (e) => {
         e.preventDefault()
 
-        let func = () => {
-            mainObj.removeBlockingTools()
-        }
+        mainObj.removeBlockingTools()
 
-        helpersObj.getActivationStatus(func, mainObj.activateDialog)
 
     },
     toggleImagesCB: (e) => {

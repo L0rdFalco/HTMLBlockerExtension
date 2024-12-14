@@ -454,18 +454,17 @@ var ActivationDialog = /*#__PURE__*/function () {
     _classCallCheck(this, ActivationDialog);
     this.elm = document.createElement("div");
     this.elm.className = "dialog dialog_advOptions";
-    this.elm.innerHTML = "\n        <span class=\"header__logo\">Advanced options</span>\n        </div>\n\n        <hr/>\n\n        <div class=\"topButtons\">\n            <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n        </div>\n\n        <div class=\"advOptions\">\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__export\">Activate</button>\n                <p class=\"advOptions__rowHelp\">make a small donation to activate extension</p>\n            </div>\n\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__import\"><input type=\"file\">No thanks</button>\n                <p class=\"advOptions__rowHelp\">id rather not</p>\n            </div>\n        </div>\n    ";
+    this.elm.innerHTML = "\n        <span class=\"header__logo\">Advanced options</span>\n        </div>\n\n        <hr/>\n\n        <div class=\"topButtons\">\n            <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n        </div>\n\n        <div class=\"advOptions\">\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__export\">Activate</button>\n                <p class=\"advOptions__rowHelp\">make a small donation to activate extension</p>\n            </div>\n\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__import\">No thanks</button>\n                <p class=\"advOptions__rowHelp\">id rather not</p>\n            </div>\n        </div>\n    ";
     shadowRoot.appendChild(this.elm);
     this.elm.querySelector(".topButton_close").addEventListener("click", function (e) {
       close(); //how does this work?
-      e.preventDefault();
     });
     this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {
       // e.preventDefault()
       window.open("http://127.0.0.1:3000/donate/".concat(chrome.runtime.id));
       close();
     });
-    this.elm.querySelector(".advOptions__import input").addEventListener("click", function (e) {
+    this.elm.querySelector(".advOptions__import").addEventListener("click", function (e) {
       // run blocked code
 
       close();
@@ -513,13 +512,14 @@ var helpersObj = {
             dialogFunc(ActivationDialog);
             return _context3.abrupt("return");
           case 7:
-            _context3.next = 9;
+            _context3.prev = 7;
+            _context3.next = 10;
             return fetch("http://127.0.0.1:3000/buck/status/".concat(data.dId));
-          case 9:
+          case 10:
             res1 = _context3.sent;
-            _context3.next = 12;
+            _context3.next = 13;
             return res1.json();
-          case 12:
+          case 13:
             res2 = _context3.sent;
             if (res2.status) {
               mainFunc();
@@ -527,11 +527,17 @@ var helpersObj = {
               //show dialog
               dialogFunc(ActivationDialog);
             }
-          case 14:
+            _context3.next = 20;
+            break;
+          case 17:
+            _context3.prev = 17;
+            _context3.t0 = _context3["catch"](7);
+            console.log("somethng went wrong. Try later");
+          case 20:
           case "end":
             return _context3.stop();
         }
-      }, _callee3);
+      }, _callee3, null, [[7, 17]]);
     }));
     function getActivationStatus(_x, _x2) {
       return _getActivationStatus.apply(this, arguments);
@@ -990,10 +996,7 @@ var cbObj = {
   },
   closeBtnCB: function closeBtnCB(e) {
     e.preventDefault();
-    var func = function func() {
-      mainObj.removeBlockingTools();
-    };
-    helpersObj.getActivationStatus(func, mainObj.activateDialog);
+    mainObj.removeBlockingTools();
   },
   toggleImagesCB: function toggleImagesCB(e) {
     e.preventDefault();
