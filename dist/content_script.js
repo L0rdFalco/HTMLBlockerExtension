@@ -454,22 +454,18 @@ var ActivationDialog = /*#__PURE__*/function () {
     _classCallCheck(this, ActivationDialog);
     this.elm = document.createElement("div");
     this.elm.className = "dialog dialog_advOptions";
-    this.elm.innerHTML = "\n        <div class=\"header\">\n        <span class=\"header__logo\">Advanced options</span>\n    </div>\n\n    <hr/>\n\n    <div class=\"topButtons\">\n        <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n    </div>\n\n    <div class=\"advOptions\">\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__export\">activate</button>\n            <p class=\"advOptions__rowHelp\">Make a small donation to keep this app free for a year</p>\n        </div>\n\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__import\"><input type=\"file\">No thanks</button>\n            <p class=\"advOptions__rowHelp\">let me use it just this one time!</p>\n        </div>\n    </div>\n    ";
+    this.elm.innerHTML = "\n        <div class=\"header\">\n        <span class=\"header__logo\">Advanced options</span>\n    </div>\n\n    <hr/>\n\n    <div class=\"topButtons\">\n        <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n    </div>\n\n    <div class=\"advOptions\">\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__activate\">activate</button>\n            <p class=\"advOptions__rowHelp\">Make a small donation to keep this app free for a year</p>\n        </div>\n\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__no\">No thanks</button>\n            <p class=\"advOptions__rowHelp\">let me use it just this one time!</p>\n        </div>\n    </div>\n    ";
     shadowRoot.appendChild(this.elm);
     this.elm.querySelector(".topButton_close").addEventListener("click", function (e) {
       close(); //how does this work?
     });
-    this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {
-      /*
-      put the premium functionality here
-      */
+    this.elm.querySelector(".advOptions__activate").addEventListener("click", function (e) {
+      window.open("http://127.0.0.1:3000/donate/".concat(chrome.runtime.id));
+      close();
     });
-    this.elm.querySelector(".advOptions__import input").addEventListener("click", function (e) {
-      /*
-      hit the donation api
-      */
+    this.elm.querySelector(".advOptions__no input").addEventListener("click", function (e) {
 
-      console.log("hit the donation api and start the donation ");
+      // run blocked code
     });
   }
   return _createClass(ActivationDialog, [{
@@ -526,7 +522,9 @@ var helpersObj = {
             if (res2.status) {
               // run functionality
 
-              mainFunc();
+              dialogFunc(ActivationDialog);
+
+              // mainFunc()
             } else {
               //show dialog
               dialogFunc(ActivationDialog);
@@ -1020,17 +1018,11 @@ var cbObj = {
   },
   closeBtnCB: function closeBtnCB(e) {
     e.preventDefault();
-    var func = function func() {
-      mainObj.removeBlockingTools();
-    };
-    helpersObj.getActivationStatus(func, mainObj.activateDialog);
+    helpersObj.getActivationStatus(mainObj.removeBlockingTools, mainObj.activateDialog);
   },
   toggleImagesCB: function toggleImagesCB(e) {
     e.preventDefault();
-    var func = function func() {
-      mainObj.toggleImages();
-    };
-    helpersObj.getActivationStatus(func, mainObj.activateDialog);
+    helpersObj.getActivationStatus(mainObj.toggleImages, mainObj.activateDialog);
   },
   onLoadCB: function onLoadCB() {
     shadowElement.style.visibility = "visible";

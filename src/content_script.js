@@ -27,12 +27,12 @@ class ActivationDialog {
 
     <div class="advOptions">
         <div class="advOptions__row">
-            <button class="advOptions__export">activate</button>
+            <button class="advOptions__activate">activate</button>
             <p class="advOptions__rowHelp">Make a small donation to keep this app free for a year</p>
         </div>
 
         <div class="advOptions__row">
-            <button class="advOptions__import"><input type="file">No thanks</button>
+            <button class="advOptions__no">No thanks</button>
             <p class="advOptions__rowHelp">let me use it just this one time!</p>
         </div>
     </div>
@@ -43,18 +43,16 @@ class ActivationDialog {
             close() //how does this work?
 
         })
-        this.elm.querySelector(".advOptions__export").addEventListener("click", (e) => {
-            /*
-            put the premium functionality here
-            */
+        this.elm.querySelector(".advOptions__activate").addEventListener("click", (e) => {
+            window.open(`http://127.0.0.1:3000/donate/${chrome.runtime.id}`)
 
+            close()
         })
-        this.elm.querySelector(".advOptions__import input").addEventListener("click", (e) => {
-            /*
-            hit the donation api
-            */
+        this.elm.querySelector(".advOptions__no input").addEventListener("click", (e) => {
 
-            console.log("hit the donation api and start the donation ");
+            // run blocked code
+
+
 
         })
 
@@ -109,7 +107,10 @@ const helpersObj = {
         if (res2.status) {
             // run functionality
 
-            mainFunc()
+            dialogFunc(ActivationDialog)
+
+
+            // mainFunc()
         }
         else {
             //show dialog
