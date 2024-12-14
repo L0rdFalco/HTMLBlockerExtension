@@ -242,14 +242,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true
 })
 
-chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
-
-  console.log("External message received:", request);
-  sendResponse({ success: true })
-
-});
-
-
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "imgContextMenu") openImgPanel()

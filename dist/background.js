@@ -621,12 +621,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   }
   return true;
 });
-chrome.runtime.onMessageExternal.addListener(function (request, sender, sendResponse) {
-  console.log("External message received:", request);
-  sendResponse({
-    success: true
-  });
-});
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   if (info.menuItemId === "imgContextMenu") openImgPanel();
 });

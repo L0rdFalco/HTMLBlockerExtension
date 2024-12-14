@@ -84,6 +84,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
@@ -491,7 +493,62 @@ var helpersObj = {
       el = el.parentElement;
     }
     return retval;
-  }
+  },
+  getActivationStatus: function () {
+    var _getActivationStatus = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(mainFunc, dialogFunc) {
+      var data, res1, res2;
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.next = 2;
+            return chrome.storage.local.get("dId");
+          case 2:
+            data = _context3.sent;
+            console.log("extracted data: ", data);
+            if (data) {
+              _context3.next = 7;
+              break;
+            }
+            //show dialog
+
+            dialogFunc(ActivationDialog);
+            return _context3.abrupt("return");
+          case 7:
+            _context3.next = 9;
+            return fetch("http://127.0.0.1:3000/buck/status/".concat(data.dId));
+          case 9:
+            res1 = _context3.sent;
+            _context3.next = 12;
+            return res1.json();
+          case 12:
+            res2 = _context3.sent;
+            console.log("from db: ", res2);
+            if (res2.status) {
+              // run functionality
+
+              mainFunc();
+            } else {
+              //show dialog
+              dialogFunc(ActivationDialog);
+            }
+
+            /*
+            if no result, show dialog
+            if result, find status
+            if expired, show dialog
+            if active run function
+            */
+          case 15:
+          case "end":
+            return _context3.stop();
+        }
+      }, _callee3);
+    }));
+    function getActivationStatus(_x, _x2) {
+      return _getActivationStatus.apply(this, arguments);
+    }
+    return getActivationStatus;
+  }()
 };
 var mainObj = {
   areToolsLoaded: false,
@@ -690,7 +747,7 @@ var mainObj = {
         }
         tr.selector = this.hiddenElements[i].selector;
         tr.querySelector("input").addEventListener("change", cbObj.onChangePermanent, false);
-        tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false);
+        tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false); //block
         tr.querySelector(".bl_preview").addEventListener("mouseenter", cbObj.onPreviewHoverOn, false);
         tr.querySelector(".bl_preview").addEventListener("mouseleave", cbObj.onPreviewHoverOff, false);
         tr.querySelector("a.bl_edit_selector").addEventListener("click", cbObj.onEditSelector, false);
@@ -768,8 +825,8 @@ var mainObj = {
     this.mBlockerDiv = shadowElement;
     shadowElement.shadowRoot.innerHTML = "\n        <link rel=\"stylesheet\" href=\"".concat(chrome.runtime.getURL('content.css'), "\">\n        <div class=\"mainWindow\">\n            <div class=\"header\">\n                <span class=\"header__logo\">Point and Click To Block HTML Element\n                </span>\n                <span class=\"header__logo header__logo_small\"> HTML Element Blocker</span>\n            </div>\n            \n            <hr/>\n\n            <div class=\"topButtons\">\n            <div class=\"topButton topButton_hideImages\" title=\"Hide Images\">\uD83D\uDCF8</div>\n\n                <div class=\"topButton topButton_settings\" title=\"feature blocked!\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-settings\"><circle cx=\"12\" cy=\"12\" r=\"3\"></circle><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"></path></svg>\n                </div>\n                <div class=\"topButton topButton_minimize\" title=\"Minimize\"><i>\u279C</i></div>\n                <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n            </div>\n            <div class=\"settingsRow\">\n                <label>\n                    Remember by default: <span id=\"rmbr_checkbox\">?</span>\n                </label>\n            </div>\n            <div id=\"blkr_current_elm\">Use the mouse to select an element to remove.</div>\n            <div id=\"blkr_elm_list\"></div>\n        </div>\n        ");
     this.getSingleEl("link").addEventListener("load", cbObj.onLoadCB);
-    this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB);
-    this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB);
+    this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB); //block
+    this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB); //block
     this.getSingleEl(".topButton_minimize").addEventListener("click", cbObj.minimizeCB);
     this.getSingleEl(".topButton_settings").addEventListener("click", cbObj.settingsCB);
     this.getSingleEl("#rmbr_checkbox").addEventListener("click", cbObj.remCheckboxCB);
@@ -833,19 +890,25 @@ var cbObj = {
     mainObj.persistHiddenEls();
   },
   onDeleteClick: function onDeleteClick(e) {
-    var tr = helpersObj.closest(this, "tr");
-    if (tr.selector) {
-      var i = mainObj.hiddenElements.findIndex(function (elm) {
-        return elm.selector === tr.selector;
-      });
-      mainObj.hiddenElements.splice(i, 1);
-    }
-    mainObj.injectCSS2Head();
-    mainObj.refreshOverlays();
-    mainObj.updateElementsListUI();
-    mainObj.persistHiddenEls();
+    var _this = this;
     e.preventDefault();
-    e.stopPropagation();
+    console.log("delete");
+    var func = function func() {
+      var tr = helpersObj.closest(_this, "tr");
+      if (tr.selector) {
+        var i = mainObj.hiddenElements.findIndex(function (elm) {
+          return elm.selector === tr.selector;
+        });
+        mainObj.hiddenElements.splice(i, 1);
+      }
+      mainObj.injectCSS2Head();
+      mainObj.refreshOverlays();
+      mainObj.updateElementsListUI();
+      mainObj.persistHiddenEls();
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   onPreviewHoverOn: function onPreviewHoverOn(e) {
     var selector = helpersObj.closest(this, "tr").selector;
@@ -957,11 +1020,17 @@ var cbObj = {
   },
   closeBtnCB: function closeBtnCB(e) {
     e.preventDefault();
-    mainObj.removeBlockingTools();
+    var func = function func() {
+      mainObj.removeBlockingTools();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   toggleImagesCB: function toggleImagesCB(e) {
     e.preventDefault();
-    mainObj.toggleImages();
+    var func = function func() {
+      mainObj.toggleImages();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   onLoadCB: function onLoadCB() {
     shadowElement.style.visibility = "visible";
@@ -972,10 +1041,10 @@ mainObj.init();
 /*
     mainObj.activateDialog(ActivationDialog) is used to bring up the dialog
 
-    block:
+    block the following:
     images,
     close,
-    
+    bl_delete
 
 */
 })();

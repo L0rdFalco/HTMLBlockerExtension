@@ -84,7 +84,47 @@ const helpersObj = {
         }
         return retval
 
-    }
+    },
+
+    getActivationStatus: async function (mainFunc, dialogFunc) {
+
+        const data = await chrome.storage.local.get("dId")
+
+        console.log("extracted data: ", data);
+
+        if (!data) {
+            //show dialog
+
+            dialogFunc(ActivationDialog)
+            return
+        }
+
+        const res1 = await fetch(`http://127.0.0.1:3000/buck/status/${data.dId}`)
+
+        const res2 = await res1.json()
+
+        console.log("from db: ", res2);
+
+
+        if (res2.status) {
+            // run functionality
+
+            mainFunc()
+        }
+        else {
+            //show dialog
+            dialogFunc(ActivationDialog)
+        }
+
+
+        /*
+        if no result, show dialog
+        if result, find status
+        if expired, show dialog
+        if active run function
+        */
+
+    },
 
 }
 
@@ -346,7 +386,7 @@ const mainObj = {
             tr.selector = this.hiddenElements[i].selector;
 
             tr.querySelector("input").addEventListener("change", cbObj.onChangePermanent, false);
-            tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false);
+            tr.querySelector("a.bl_delete").addEventListener("click", cbObj.onDeleteClick, false); //block
             tr.querySelector(".bl_preview").addEventListener("mouseenter", cbObj.onPreviewHoverOn, false);
             tr.querySelector(".bl_preview").addEventListener("mouseleave", cbObj.onPreviewHoverOff, false);
             tr.querySelector("a.bl_edit_selector").addEventListener("click", cbObj.onEditSelector, false);
@@ -375,6 +415,8 @@ const mainObj = {
         mainObj.injectOverlays()
 
     },
+
+
     persistHiddenEls: function () {
 
         chrome.runtime.sendMessage({
@@ -468,8 +510,8 @@ const mainObj = {
 
         this.getSingleEl("link").addEventListener("load", cbObj.onLoadCB)
 
-        this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB)
-        this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB)
+        this.getSingleEl(".topButton_hideImages").addEventListener("click", cbObj.toggleImagesCB)//block
+        this.getSingleEl(".topButton_close").addEventListener("click", cbObj.closeBtnCB)//block
         this.getSingleEl(".topButton_minimize").addEventListener("click", cbObj.minimizeCB)
         this.getSingleEl(".topButton_settings").addEventListener("click", cbObj.settingsCB)
         this.getSingleEl("#rmbr_checkbox").addEventListener("click", cbObj.remCheckboxCB)
@@ -542,21 +584,35 @@ const cbObj = {
     },
 
     onDeleteClick: function (e) {
-        let tr = helpersObj.closest(this, "tr")
 
-        if (tr.selector) {
+        e.preventDefault()
 
-            let i = mainObj.hiddenElements.findIndex(elm => elm.selector === tr.selector);
-            mainObj.hiddenElements.splice(i, 1)
+        console.log("delete");
+
+
+
+
+        let func = () => {
+
+            let tr = helpersObj.closest(this, "tr")
+
+            if (tr.selector) {
+
+                let i = mainObj.hiddenElements.findIndex(elm => elm.selector === tr.selector);
+                mainObj.hiddenElements.splice(i, 1)
+            }
+
+            mainObj.injectCSS2Head()
+            mainObj.refreshOverlays()
+            mainObj.updateElementsListUI()
+            mainObj.persistHiddenEls()
+
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        mainObj.injectCSS2Head()
-        mainObj.refreshOverlays()
-        mainObj.updateElementsListUI()
-        mainObj.persistHiddenEls()
+        helpersObj.getActivationStatus(func, mainObj.activateDialog)
 
-        e.preventDefault();
-        e.stopPropagation();
 
     },
 
@@ -708,13 +764,15 @@ const cbObj = {
     },
     closeBtnCB: (e) => {
         e.preventDefault()
-        mainObj.removeBlockingTools()
+
+        helpersObj.getActivationStatus(mainObj.removeBlockingTools, mainObj.activateDialog)
 
     },
     toggleImagesCB: (e) => {
         e.preventDefault()
 
-        mainObj.toggleImages()
+        helpersObj.getActivationStatus(mainObj.toggleImages, mainObj.activateDialog)
+
 
     },
     onLoadCB: () => {
