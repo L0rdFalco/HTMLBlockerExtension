@@ -454,18 +454,21 @@ var ActivationDialog = /*#__PURE__*/function () {
     _classCallCheck(this, ActivationDialog);
     this.elm = document.createElement("div");
     this.elm.className = "dialog dialog_advOptions";
-    this.elm.innerHTML = "\n        <div class=\"header\">\n        <span class=\"header__logo\">Advanced options</span>\n    </div>\n\n    <hr/>\n\n    <div class=\"topButtons\">\n        <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n    </div>\n\n    <div class=\"advOptions\">\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__activate\">activate</button>\n            <p class=\"advOptions__rowHelp\">Make a small donation to keep this app free for a year</p>\n        </div>\n\n        <div class=\"advOptions__row\">\n            <button class=\"advOptions__no\">No thanks</button>\n            <p class=\"advOptions__rowHelp\">let me use it just this one time!</p>\n        </div>\n    </div>\n    ";
+    this.elm.innerHTML = "\n        <span class=\"header__logo\">Advanced options</span>\n        </div>\n\n        <hr/>\n\n        <div class=\"topButtons\">\n            <div class=\"topButton topButton_close\" title=\"Close\">\u2716</div>\n        </div>\n\n        <div class=\"advOptions\">\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__export\">Activate</button>\n                <p class=\"advOptions__rowHelp\">make a small donation to activate extension</p>\n            </div>\n\n            <div class=\"advOptions__row\">\n                <button class=\"advOptions__import\"><input type=\"file\">No thanks</button>\n                <p class=\"advOptions__rowHelp\">id rather not</p>\n            </div>\n        </div>\n    ";
     shadowRoot.appendChild(this.elm);
     this.elm.querySelector(".topButton_close").addEventListener("click", function (e) {
       close(); //how does this work?
+      e.preventDefault();
     });
-    this.elm.querySelector(".advOptions__activate").addEventListener("click", function (e) {
+    this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {
+      // e.preventDefault()
       window.open("http://127.0.0.1:3000/donate/".concat(chrome.runtime.id));
       close();
     });
-    this.elm.querySelector(".advOptions__no input").addEventListener("click", function (e) {
-
+    this.elm.querySelector(".advOptions__import input").addEventListener("click", function (e) {
       // run blocked code
+
+      close();
     });
   }
   return _createClass(ActivationDialog, [{
@@ -500,8 +503,8 @@ var helpersObj = {
             return chrome.storage.local.get("dId");
           case 2:
             data = _context3.sent;
-            console.log("extracted data: ", data);
-            if (data) {
+            console.log("extracted data: ", data.length);
+            if (!(!data || Object.keys(data).length === 0)) {
               _context3.next = 7;
               break;
             }
@@ -518,25 +521,13 @@ var helpersObj = {
             return res1.json();
           case 12:
             res2 = _context3.sent;
-            console.log("from db: ", res2);
             if (res2.status) {
-              // run functionality
-
-              dialogFunc(ActivationDialog);
-
-              // mainFunc()
+              mainFunc();
             } else {
               //show dialog
               dialogFunc(ActivationDialog);
             }
-
-            /*
-            if no result, show dialog
-            if result, find status
-            if expired, show dialog
-            if active run function
-            */
-          case 15:
+          case 14:
           case "end":
             return _context3.stop();
         }
@@ -797,9 +788,11 @@ var mainObj = {
     mainObj.getSingleEl('.mainWindow').style.removeProperty('display');
   },
   activateDialog: function activateDialog(cls) {
+    console.log("activate dialog called");
     mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog);
     mainObj.getSingleEl('.mainWindow').style.display = 'none';
     mainObj.removeHighlighter();
+    console.log("dialog activated");
   },
   toggleImages: function toggleImages() {
     chrome.runtime.sendMessage({
@@ -886,27 +879,6 @@ var cbObj = {
     var hiddenEl = mainObj.hiddenElements[i];
     hiddenEl.permanent = this.checked;
     mainObj.persistHiddenEls();
-  },
-  onDeleteClick: function onDeleteClick(e) {
-    var _this = this;
-    e.preventDefault();
-    console.log("delete");
-    var func = function func() {
-      var tr = helpersObj.closest(_this, "tr");
-      if (tr.selector) {
-        var i = mainObj.hiddenElements.findIndex(function (elm) {
-          return elm.selector === tr.selector;
-        });
-        mainObj.hiddenElements.splice(i, 1);
-      }
-      mainObj.injectCSS2Head();
-      mainObj.refreshOverlays();
-      mainObj.updateElementsListUI();
-      mainObj.persistHiddenEls();
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   onPreviewHoverOn: function onPreviewHoverOn(e) {
     var selector = helpersObj.closest(this, "tr").selector;
@@ -1018,11 +990,38 @@ var cbObj = {
   },
   closeBtnCB: function closeBtnCB(e) {
     e.preventDefault();
-    helpersObj.getActivationStatus(mainObj.removeBlockingTools, mainObj.activateDialog);
+    var func = function func() {
+      mainObj.removeBlockingTools();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   toggleImagesCB: function toggleImagesCB(e) {
     e.preventDefault();
-    helpersObj.getActivationStatus(mainObj.toggleImages, mainObj.activateDialog);
+    var func = function func() {
+      mainObj.toggleImages();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
+  },
+  onDeleteClick: function onDeleteClick(e) {
+    var _this = this;
+    e.preventDefault();
+    console.log("delete");
+    var func = function func() {
+      var tr = helpersObj.closest(_this, "tr");
+      if (tr.selector) {
+        var i = mainObj.hiddenElements.findIndex(function (elm) {
+          return elm.selector === tr.selector;
+        });
+        mainObj.hiddenElements.splice(i, 1);
+      }
+      mainObj.injectCSS2Head();
+      mainObj.refreshOverlays();
+      mainObj.updateElementsListUI();
+      mainObj.persistHiddenEls();
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    helpersObj.getActivationStatus(func, mainObj.activateDialog);
   },
   onLoadCB: function onLoadCB() {
     shadowElement.style.visibility = "visible";

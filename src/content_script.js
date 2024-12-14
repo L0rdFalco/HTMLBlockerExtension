@@ -15,40 +15,41 @@ class ActivationDialog {
         this.elm = document.createElement("div");
         this.elm.className = "dialog dialog_advOptions"
         this.elm.innerHTML = `
-        <div class="header">
         <span class="header__logo">Advanced options</span>
-    </div>
-
-    <hr/>
-
-    <div class="topButtons">
-        <div class="topButton topButton_close" title="Close">✖</div>
-    </div>
-
-    <div class="advOptions">
-        <div class="advOptions__row">
-            <button class="advOptions__activate">activate</button>
-            <p class="advOptions__rowHelp">Make a small donation to keep this app free for a year</p>
         </div>
 
-        <div class="advOptions__row">
-            <button class="advOptions__no">No thanks</button>
-            <p class="advOptions__rowHelp">let me use it just this one time!</p>
+        <hr/>
+
+        <div class="topButtons">
+            <div class="topButton topButton_close" title="Close">✖</div>
         </div>
-    </div>
+
+        <div class="advOptions">
+            <div class="advOptions__row">
+                <button class="advOptions__export">Activate</button>
+                <p class="advOptions__rowHelp">make a small donation to activate extension</p>
+            </div>
+
+            <div class="advOptions__row">
+                <button class="advOptions__import"><input type="file">No thanks</button>
+                <p class="advOptions__rowHelp">id rather not</p>
+            </div>
+        </div>
     `
         shadowRoot.appendChild(this.elm)
 
         this.elm.querySelector(".topButton_close").addEventListener("click", (e) => {
             close() //how does this work?
+            e.preventDefault()
 
         })
-        this.elm.querySelector(".advOptions__activate").addEventListener("click", (e) => {
+        this.elm.querySelector(".advOptions__export").addEventListener("click", (e) => {
+            // e.preventDefault()
             window.open(`http://127.0.0.1:3000/donate/${chrome.runtime.id}`)
 
             close()
         })
-        this.elm.querySelector(".advOptions__no input").addEventListener("click", (e) => {
+        this.elm.querySelector(".advOptions__import input").addEventListener("click", (e) => {
 
             // run blocked code
 
@@ -87,9 +88,9 @@ const helpersObj = {
 
         const data = await chrome.storage.local.get("dId")
 
-        console.log("extracted data: ", data);
+        console.log("extracted data: ", data.length);
 
-        if (!data) {
+        if (!data || Object.keys(data).length === 0) {
             //show dialog
 
             dialogFunc(ActivationDialog)
@@ -99,7 +100,6 @@ const helpersObj = {
         const res1 = await fetch(`http://127.0.0.1:3000/buck/status/${data.dId}`)
 
         const res2 = await res1.json()
-
 
 
 
@@ -437,9 +437,11 @@ const mainObj = {
         mainObj.getSingleEl('.mainWindow').style.removeProperty('display')
     },
     activateDialog: function (cls) {
+        console.log("activate dialog called");
         mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog)
         mainObj.getSingleEl('.mainWindow').style.display = 'none'
         mainObj.removeHighlighter()
+        console.log("dialog activated");
     },
     toggleImages: function () {
 
@@ -569,38 +571,7 @@ const cbObj = {
 
     },
 
-    onDeleteClick: function (e) {
 
-        e.preventDefault()
-
-        console.log("delete");
-
-
-
-
-        let func = () => {
-
-            let tr = helpersObj.closest(this, "tr")
-
-            if (tr.selector) {
-
-                let i = mainObj.hiddenElements.findIndex(elm => elm.selector === tr.selector);
-                mainObj.hiddenElements.splice(i, 1)
-            }
-
-            mainObj.injectCSS2Head()
-            mainObj.refreshOverlays()
-            mainObj.updateElementsListUI()
-            mainObj.persistHiddenEls()
-
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        helpersObj.getActivationStatus(func, mainObj.activateDialog)
-
-
-    },
 
     onPreviewHoverOn: function (e) {
         let selector = helpersObj.closest(this, "tr").selector
@@ -751,13 +722,50 @@ const cbObj = {
     closeBtnCB: (e) => {
         e.preventDefault()
 
-        helpersObj.getActivationStatus(mainObj.removeBlockingTools, mainObj.activateDialog)
+        let func = () => {
+            mainObj.removeBlockingTools()
+        }
+
+        helpersObj.getActivationStatus(func, mainObj.activateDialog)
 
     },
     toggleImagesCB: (e) => {
         e.preventDefault()
 
-        helpersObj.getActivationStatus(mainObj.toggleImages, mainObj.activateDialog)
+        let func = () => {
+            mainObj.toggleImages()
+        }
+
+        helpersObj.getActivationStatus(func, mainObj.activateDialog)
+
+
+    },
+    onDeleteClick: function (e) {
+
+        e.preventDefault()
+
+        console.log("delete");
+
+        let func = () => {
+
+            let tr = helpersObj.closest(this, "tr")
+
+            if (tr.selector) {
+
+                let i = mainObj.hiddenElements.findIndex(elm => elm.selector === tr.selector);
+                mainObj.hiddenElements.splice(i, 1)
+            }
+
+            mainObj.injectCSS2Head()
+            mainObj.refreshOverlays()
+            mainObj.updateElementsListUI()
+            mainObj.persistHiddenEls()
+
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        helpersObj.getActivationStatus(func, mainObj.activateDialog)
 
 
     },
