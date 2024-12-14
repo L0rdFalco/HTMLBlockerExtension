@@ -52,8 +52,7 @@ class ActivationDialog {
 
             // run blocked code
 
-
-
+            close()
         })
 
     }
@@ -101,30 +100,16 @@ const helpersObj = {
 
         const res2 = await res1.json()
 
-        console.log("from db: ", res2);
+
 
 
         if (res2.status) {
-            // run functionality
-
-            dialogFunc(ActivationDialog)
-
-
-            // mainFunc()
+            mainFunc()
         }
         else {
             //show dialog
             dialogFunc(ActivationDialog)
         }
-
-
-        /*
-        if no result, show dialog
-        if result, find status
-        if expired, show dialog
-        if active run function
-        */
-
     },
 
 }
