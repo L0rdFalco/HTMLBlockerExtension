@@ -784,13 +784,4 @@ const cbObj = {
 
 mainObj.init()
 
-/*
-    mainObj.activateDialog(ActivationDialog) is used to bring up the dialog
-
-    block the following:
-    images,
-    close,
-    bl_delete
-
-*/
 

@@ -1,5 +1,7 @@
 import { get, set, update } from 'idb-keyval';
 
+import { merge, clone } from "lodash"
+
 import createLogger from 'logging';
 
 const logger = createLogger('bgScript');
@@ -67,7 +69,7 @@ async function areToolsLoaded() {
     visibStatus ? onIcon() : offIcon();
 
   } catch (error) {
-    console.log("blocking status error");
+    logger.debug("blocking status error");
 
     noIcon()
 
@@ -82,7 +84,7 @@ async function toggleTools(mTabID) {
     return await chrome.tabs.sendMessage(mTabID, { action: "toggle", status: allowed })
 
   } catch (error) {
-    console.log("toggle error");
+    logger.debug("toggle error");
 
     noIcon()
 
@@ -97,7 +99,7 @@ async function forceInjectCS(mTab) {
 
     return await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } });
   } catch (error) {
-    console.log("the webpage is probably forbidding script injection");
+    logger.debug("the webpage is probably forbidding script injection");
     noIcon()
 
   }
@@ -157,7 +159,7 @@ chrome.action.onClicked.addListener(async function () {
 
   } catch (error) {
 
-    console.log("icon click error");
+    logger.debug("icon click error");
 
   }
 
@@ -181,12 +183,6 @@ chrome.tabs.onUpdated.addListener((msg, sender, res) => {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
-  console.log(msg);
-
-  console.log(msg.exId === chrome.runtime.id);
-  console.log(msg.exId);
-  console.log(chrome.runtime.id);
-
   if (msg.action === "toolsVisibStatus") msg.visible ? onIcon() : offIcon()
 
   else if (msg.action === "persist_perm_hidden_elms") {
@@ -201,7 +197,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   else if (msg.action === "toggle_images") {
-    console.log("toggle images");
+    logger.debug("toggle images");
 
     (async function () {
       await toggleImageBlocking()
@@ -264,14 +260,14 @@ async function getTabData() {
     }
 
     else {
-      console.log("no active tab");
+      logger.debug("no active tab");
 
       return []
 
     }
 
   } catch (error) {
-    console.log("getTabData error");
+    logger.debug("getTabData error");
   }
 
 }
@@ -335,7 +331,7 @@ async function setLocalStorageRule(pattern, newSetting, incognito) {
 
   if (incognito) return
 
-  const data = await chrome.storage.local.get("imgTF_rules")
+  const data = merge(clone(await chrome.storage.local.get("imgTF_rules")))
 
   let rules = data.imgtf_rules || []
   let keyExist = false;
@@ -359,7 +355,9 @@ async function setLocalStorageRule(pattern, newSetting, incognito) {
     });
   }
 
-  chrome.storage.local.set({ imgTF_rules: rules })
+  let obj = merge(clone({ imgTF_rules: rules }))
+
+  chrome.storage.local.set(onj)
 
 
 }
@@ -404,7 +402,7 @@ async function setContentRules(sentRules) {
 async function imgBlockingInit() {
 
   toggleContextMenu();
-  console.log("1");
+  logger.debug("1");
   let data = await chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'])
 
   prefs = data.image_on_off_prefs || prefs;

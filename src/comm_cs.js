@@ -18,4 +18,4 @@ window.addEventListener("message", (event) => {
     });
 });
 
-console.log("comm cs loadeed");
+console.log("comm cs loaded");
