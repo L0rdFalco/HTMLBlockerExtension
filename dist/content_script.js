@@ -17211,39 +17211,6 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 }.call(this));
 
 
-/***/ }),
-
-/***/ "./node_modules/logging/lib/browser.js":
-/*!*********************************************!*\
-  !*** ./node_modules/logging/lib/browser.js ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({
-    value: true
-}));
-// Super basic browser support just to avoid breaking universal builds.
-// title and log level are not included in the output at this time.
-var logger = function logger() {
-    var _console;
-
-    return (_console = console).log.apply(_console, arguments);
-};
-
-function createLogger() /* title */{
-    return {
-        info: logger,
-        warn: logger,
-        error: logger,
-        debug: logger
-    };
-}
-
-exports["default"] = createLogger;
-
 /***/ })
 
 /******/ 	});
@@ -17346,9 +17313,8 @@ var __webpack_exports__ = {};
   !*** ./src/content_script.js ***!
   \*******************************/
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var logging__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! logging */ "./node_modules/logging/lib/browser.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -17375,9 +17341,6 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 
-
-var logger = (0,logging__WEBPACK_IMPORTED_MODULE_0__["default"])('csScript');
-logger.info("cs start");
 var cssFinder = function () {
   var e, t;
   function n(n, a) {
@@ -17767,15 +17730,15 @@ var helpersObj = {
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.t0 = lodash__WEBPACK_IMPORTED_MODULE_1__.merge;
-            _context3.t1 = lodash__WEBPACK_IMPORTED_MODULE_1__.clone;
+            _context3.t0 = lodash__WEBPACK_IMPORTED_MODULE_0__.merge;
+            _context3.t1 = lodash__WEBPACK_IMPORTED_MODULE_0__.clone;
             _context3.next = 4;
             return chrome.storage.local.get("dId");
           case 4:
             _context3.t2 = _context3.sent;
             _context3.t3 = (0, _context3.t1)(_context3.t2);
             data = (0, _context3.t0)(_context3.t3);
-            logger.info("extracted data");
+            console.log("extracted data");
             if (!(!data || Object.keys(data).length === 0)) {
               _context3.next = 11;
               break;
@@ -17790,8 +17753,8 @@ var helpersObj = {
             return fetch("http://127.0.0.1:3000/buck/status/".concat(data.dId));
           case 14:
             res1 = _context3.sent;
-            _context3.t4 = lodash__WEBPACK_IMPORTED_MODULE_1__.merge;
-            _context3.t5 = lodash__WEBPACK_IMPORTED_MODULE_1__.clone;
+            _context3.t4 = lodash__WEBPACK_IMPORTED_MODULE_0__.merge;
+            _context3.t5 = lodash__WEBPACK_IMPORTED_MODULE_0__.clone;
             _context3.next = 19;
             return res1.json();
           case 19:
@@ -17809,7 +17772,7 @@ var helpersObj = {
           case 25:
             _context3.prev = 25;
             _context3.t8 = _context3["catch"](11);
-            logger.debug("somethng went wrong. Try later");
+            console.log("somethng went wrong. Try later");
           case 28:
           case "end":
             return _context3.stop();
@@ -17936,6 +17899,7 @@ var mainObj = {
       highlighterEl.style.pointerEvents = "none";
       highlighterEl.style.position = "fixed";
       highlighterEl.style.background = 'rgba(255,128,128,0.4)';
+      highlighterEl.style.border = "3px solid black";
       highlighterEl.style.zIndex = mainObj.maxZ - 1;
       document.body.appendChild(highlighterEl);
     }
@@ -17972,7 +17936,7 @@ var mainObj = {
         overlayEl.style.top = rect.top + window.scrollY + "px";
         overlayEl.style.width = rect.width + "px";
         overlayEl.style.height = rect.height + "px";
-        overlayEl.style.background = 'rgba(128,128,128,1)';
+        overlayEl.style.background = 'rgb(163, 163, 163)';
         overlayEl.style.zIndex = this.mazZ - 2;
         overlayEl.relatedElement = e;
         document.body.appendChild(overlayEl);
@@ -18071,23 +18035,23 @@ var mainObj = {
     mainObj.getSingleEl('.mainWindow').style.removeProperty('display');
   },
   activateDialog: function activateDialog(cls) {
-    logger.debug("activate dialog called");
+    console.log("activate dialog called");
     mainObj.activeDialog = new cls(mainObj.mBlockerDiv.shadowRoot, mainObj.deactivateDialog);
     mainObj.getSingleEl('.mainWindow').style.display = 'none';
     mainObj.removeHighlighter();
-    logger.debug("dialog activated");
+    console.log("dialog activated");
   },
   toggleImages: function toggleImages() {
     chrome.runtime.sendMessage({
       action: "toggle_images"
     }, function (res) {
-      logger.debug("toggle images res", res);
+      console.log("toggle images res", res);
     });
 
     //send images to bg script to block images
   },
   loadBlockingTools: function loadBlockingTools() {
-    logger.debug("loading tools");
+    console.log("loading tools");
     if (!this.mBlockerDiv) this.injectCSS2Head();
     shadowElement = document.createElement("div");
     shadowElement.setAttribute("id", "blkr_wind");
@@ -18121,7 +18085,7 @@ var mainObj = {
     }); //  message to change the icon
   },
   removeBlockingTools: function removeBlockingTools() {
-    logger.debug("remove blocking tools");
+    console.log("remove blocking tools");
     mainObj.deactivateDialog();
     mainObj.removeHighlighter();
     mainObj.removeOverlays();
@@ -18139,7 +18103,7 @@ var mainObj = {
     mainObj.areToolsLoaded = false;
   },
   init: function init() {
-    logger.debug("cs init");
+    console.log("cs init");
     chrome.runtime.onMessage.addListener(cbObj.bgReceiver);
     this.loadHiddenEls();
   }
@@ -18148,10 +18112,10 @@ var cbObj = {
   onChangePermanent: function onChangePermanent(e) {
     /*
     
-    logger.debug(this);
-    logger.debug(e.target);
-    logger.debug((e.target.parentElement).parentElement);
-    logger.debug((e.target.parentNode).parentNode);
+    console.log(this);
+    console.log(e.target);
+    console.log((e.target.parentElement).parentElement);
+    console.log((e.target.parentNode).parentNode);
     
     */
 
@@ -18172,7 +18136,7 @@ var cbObj = {
   onPreviewHoverOff: function onPreviewHoverOff(e) {
     var selector = helpersObj.closest(this, "tr").selector;
     if (!selector) return;
-    logger.debug(selector, mainObj.previewedHiddenSelector);
+    console.log(selector, mainObj.previewedHiddenSelector);
     if (mainObj.previewedHiddenSelector == selector) {
       mainObj.previewedHiddenSelector = null;
       mainObj.injectCSS2Head();
@@ -18248,7 +18212,7 @@ var cbObj = {
   },
   updateHighlighterPosition: function updateHighlighterPosition() {
     var _mainObj$markedElemen;
-    var rect = (0,lodash__WEBPACK_IMPORTED_MODULE_1__.merge)((0,lodash__WEBPACK_IMPORTED_MODULE_1__.clone)((_mainObj$markedElemen = mainObj.markedElement) === null || _mainObj$markedElemen === void 0 ? void 0 : _mainObj$markedElemen.getBoundingClientRect()));
+    var rect = (_mainObj$markedElemen = mainObj.markedElement) === null || _mainObj$markedElemen === void 0 ? void 0 : _mainObj$markedElemen.getBoundingClientRect();
     if (!rect) return;
     var highlighterEl = document.querySelector("#blkr_highlighter");
     if (!highlighterEl) return;
@@ -18285,7 +18249,7 @@ var cbObj = {
   onDeleteClick: function onDeleteClick(e) {
     var _this = this;
     e.preventDefault();
-    logger.debug("delete");
+    console.log("delete");
     var func = function func() {
       var tr = helpersObj.closest(_this, "tr");
       if (tr.selector) {

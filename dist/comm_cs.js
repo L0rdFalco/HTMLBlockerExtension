@@ -20,7 +20,7 @@ window.addEventListener("message", function (event) {
     }, event.origin);
   });
 });
-console.log("comm cs loadeed");
+console.log("comm cs loaded");
 /******/ })()
 ;
 //# sourceMappingURL=comm_cs.js.map

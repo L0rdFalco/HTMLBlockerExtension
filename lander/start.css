@@ -1,0 +1,236 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap');
+
+:root {
+    --background-color: #f9f9f9;
+    --container-bg: #ffffff;
+    --accent-color: #fcf0a7; 
+    --text-color: #333333;
+    --secondary-text: #555555;
+    --button-hover: #fcf0a7;
+    --step-number-bg: #fcf0a7;
+    --step-number-color: #333333;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+main{
+    display: flex;
+    width: 90vw !important;
+    gap: 20px;
+}
+.container:nth-child(1){
+    width: 60% !important;
+}
+.container:nth-child(2){
+    width: 40% !important;
+}
+.container:nth-child(2) hr{
+    margin: 10px 0;
+}
+.container:nth-child(2) ul{
+    text-align:left;
+    padding: 0;
+    list-style-type: none;
+
+}
+.container:nth-child(2) ul li{
+    margin:5px 0;
+    
+}
+.container:nth-child(2) ul li>div{
+    gap: 5px;
+    display: flex;
+    
+}
+.container {
+    background: var(--container-bg);
+    border-radius: 15px;
+    padding: 20px;
+    /* max-width: 800px; */
+    /* width: 100%; */
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-y: scroll;
+    flex-shrink: 1;
+    max-height: 99vh;
+    overflow: hidden;
+}
+
+.logo {
+    width: 20vw;
+    margin-bottom: 20px;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.intro {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: var(--secondary-text);
+}
+
+.instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f1f1;
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.step:hover {
+    transform: translateY(-5px);
+}
+
+.step-number {
+    background: var(--accent-color);
+    color: var(--step-number-color);
+    font-size: 1.5em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+.step-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.step-content p {
+    font-size: 1em;
+    line-height: 1.5;
+    color: var(--secondary-text);
+}
+.shortcut{
+    width: 25px;
+    margin-bottom: -7px;
+}
+.shortcut2{
+    width: 15px;
+    margin-bottom: -2px;
+}
+.cta-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background: var(--accent-color);
+    color: #333333;
+    border: none;
+    border-radius: 30px;
+    font-size: 1em;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.cta-button:hover {
+    background: var(--button-hover);
+    transform: scale(1.05);
+}
+.keyboard-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .instructions {
+        flex-direction: column;
+    }
+    main{
+        flex-direction: column;
+    }
+    .container:nth-child(1){
+        width: 100% !important;
+    }
+    .container:nth-child(2){
+        width: 100% !important;
+    }
+
+    .step {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .step-number {
+        margin-bottom: 10px;
+    }
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Space between buttons */
+  }
+
+  .download-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    padding: 16px 0;
+    width: 400px; /* Fixed width */
+    height: 60px; /* Fixed height */
+    border-radius: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .download-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .download-button.blue {
+    background-color: #007bff;
+  }
+
+  .download-button.green {
+    background-color: #cc380b;
+  }
+
+  .download-button img {
+    width: 24px; /* Logo size */
+    height: 24px;
+    margin-right: 10px; /* Space between logo and text */
+  }

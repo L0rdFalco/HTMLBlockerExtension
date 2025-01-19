@@ -2,9 +2,6 @@ import { get, set, update } from 'idb-keyval';
 
 import { merge, clone } from "lodash"
 
-import createLogger from 'logging';
-
-const logger = createLogger('bgScript');
 
 
 let allowed = true;
@@ -69,7 +66,7 @@ async function areToolsLoaded() {
     visibStatus ? onIcon() : offIcon();
 
   } catch (error) {
-    logger.debug("blocking status error");
+    console.log("blocking status error", error);
 
     noIcon()
 
@@ -84,7 +81,7 @@ async function toggleTools(mTabID) {
     return await chrome.tabs.sendMessage(mTabID, { action: "toggle", status: allowed })
 
   } catch (error) {
-    logger.debug("toggle error");
+    console.log("toggle error");
 
     noIcon()
 
@@ -99,7 +96,7 @@ async function forceInjectCS(mTab) {
 
     return await chrome.scripting.executeScript({ files: ["content_script.js"], target: { tabId: mTab.id } });
   } catch (error) {
-    logger.debug("the webpage is probably forbidding script injection");
+    console.log("the webpage is probably forbidding script injection");
     noIcon()
 
   }
@@ -115,7 +112,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
   if (details.reason === "install" || details.reason === "update") {
     (async () => {
 
-      logger.info('installed');
+      console.log('installed');
 
     })();
   }
@@ -159,7 +156,7 @@ chrome.action.onClicked.addListener(async function () {
 
   } catch (error) {
 
-    logger.debug("icon click error");
+    console.log("icon click error");
 
   }
 
@@ -197,7 +194,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   else if (msg.action === "toggle_images") {
-    logger.debug("toggle images");
+    console.log("toggle images");
 
     (async function () {
       await toggleImageBlocking()
@@ -260,14 +257,14 @@ async function getTabData() {
     }
 
     else {
-      logger.debug("no active tab");
+      console.log("no active tab");
 
       return []
 
     }
 
   } catch (error) {
-    logger.debug("getTabData error");
+    console.log("getTabData error");
   }
 
 }
@@ -356,8 +353,9 @@ async function setLocalStorageRule(pattern, newSetting, incognito) {
   }
 
   let obj = merge(clone({ imgTF_rules: rules }))
+  console.log("_.'d: ", obj);
 
-  chrome.storage.local.set(onj)
+  chrome.storage.local.set({ imgTF_rules: rules })
 
 
 }
@@ -402,7 +400,7 @@ async function setContentRules(sentRules) {
 async function imgBlockingInit() {
 
   toggleContextMenu();
-  logger.debug("1");
+  console.log("1");
   let data = await chrome.storage.local.get(['img_on_off_prefs', 'imgTF_rules'])
 
   prefs = data.image_on_off_prefs || prefs;
