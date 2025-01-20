@@ -98,10 +98,8 @@ const helpersObj = {
 
             const res2 = merge(clone(await res1.json()))
 
-
-
             if (res2.status) {
-                // mainFunc()
+                mainFunc()
             }
             else {
                 //show dialog

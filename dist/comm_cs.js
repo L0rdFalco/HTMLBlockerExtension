@@ -6,7 +6,7 @@ var __webpack_exports__ = {};
 // Listen for messages from the webpage
 window.addEventListener("message", function (event) {
   // Verify the source of the message for security
-  if (event.origin !== "http://127.0.0.1:3000") return;
+  if (event.origin !== "https://puzzle-generator-online-r906.onrender.com") return;
   console.log("message listener hit!", event.origin);
   console.log("event data from webpage ", event);
 

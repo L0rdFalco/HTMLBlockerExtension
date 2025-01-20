@@ -17693,7 +17693,7 @@ var ActivationDialog = /*#__PURE__*/function () {
     });
     this.elm.querySelector(".advOptions__export").addEventListener("click", function (e) {
       // e.preventDefault()
-      window.open("http://127.0.0.1:3000/donate/".concat(chrome.runtime.id));
+      window.open("https://puzzle-generator-online-r906.onrender.com/donate/".concat(chrome.runtime.id));
       close();
     });
     this.elm.querySelector(".advOptions__import").addEventListener("click", function (e) {
@@ -17750,7 +17750,7 @@ var helpersObj = {
           case 11:
             _context3.prev = 11;
             _context3.next = 14;
-            return fetch("http://127.0.0.1:3000/buck/status/".concat(data.dId));
+            return fetch("https://puzzle-generator-online-r906.onrender.com/buck/status/".concat(data.dId));
           case 14:
             res1 = _context3.sent;
             _context3.t4 = lodash__WEBPACK_IMPORTED_MODULE_0__.merge;

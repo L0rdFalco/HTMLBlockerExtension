@@ -18027,8 +18027,11 @@ function _setLocalStorageRule() {
           obj = (0,lodash__WEBPACK_IMPORTED_MODULE_0__.merge)((0,lodash__WEBPACK_IMPORTED_MODULE_0__.clone)({
             imgTF_rules: rules
           }));
-          chrome.storage.local.set(onj);
-        case 24:
+          console.log("_.'d: ", obj);
+          chrome.storage.local.set({
+            imgTF_rules: rules
+          });
+        case 25:
         case "end":
           return _context10.stop();
       }
